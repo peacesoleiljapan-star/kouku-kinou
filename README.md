@@ -15,7 +15,7 @@
 - Windows 用かんたん起動: [TailscaleClientLauncher.cmd](TailscaleClientLauncher.cmd)
 - 起動ツール設定: [TailscaleClientLauncher.settings.json](TailscaleClientLauncher.settings.json)
 - 実運用設定のひな形: [.env.example](.env.example)
-- 現在の実運用設定: [.env](.env)
+- 現在の実運用設定: Git 管理対象外の .env を各環境で配置して使います。
 
 ## 想定構成
 
