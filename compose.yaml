@@ -1,0 +1,28 @@
+services:
+  kouku-kinou:
+    build:
+      context: .
+    container_name: kouku-kinou
+    environment:
+      KOUKU_KINOU_DB: /data/records.db
+      KOUKU_KINOU_AUTH_MODE: ${KOUKU_KINOU_AUTH_MODE:-tailscale-or-password}
+      KOUKU_KINOU_PASSWORD: ${KOUKU_KINOU_PASSWORD}
+      KOUKU_KINOU_SESSION_TTL_MINUTES: ${KOUKU_KINOU_SESSION_TTL_MINUTES:-480}
+      KOUKU_KINOU_SECURE_COOKIE: ${KOUKU_KINOU_SECURE_COOKIE:-1}
+      KOUKU_KINOU_ALLOWED_NETWORKS: ${KOUKU_KINOU_ALLOWED_NETWORKS:-}
+      KOUKU_KINOU_TRUST_PROXY: ${KOUKU_KINOU_TRUST_PROXY:-0}
+    ports:
+      - "127.0.0.1:8010:8010"
+    restart: unless-stopped
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - import json,sys,urllib.request; data=json.load(urllib.request.urlopen('http://127.0.0.1:8010/api/health', timeout=5)); sys.exit(0 if data.get('status') == 'ok' else 1)
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    volumes:
+      - ./data:/data

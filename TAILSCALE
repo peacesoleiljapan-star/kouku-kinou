@@ -1,0 +1,1027 @@
+User: 口腔機能アプリでのtailscaleに必要な条件は何ですか？
+
+GitHub Copilot: 口腔機能アプリ側の前提条件を、まず既存ドキュメントとリポジトリメモリで確認します。条件が「必須」と「推奨」で混ざりやすいので、その切り分けまで含めて整理します。
+
+Read [](file:///c%3A/Users/user/Documents/vscrepo/kouku-kinou/DEPLOY_SYNOLOGY_JA.md#1-1), lines 1 to 220
+
+Read [](file:///c%3A/Users/user/Documents/vscrepo/kouku-kinou/TAILSCALE)
+
+Read memory [](file:///c%3A/Users/user/AppData/Roaming/Code/User/workspaceStorage/3e3ed11b3af4b6bdbb35f3c0b98f200a/GitHub.copilot-chat/memory-tool/memories/repo/kouku-kinou.md)
+
+アプリ側で「Tailscale 接続済み」と見なす条件をコードでも確認します。ドキュメントだけでなく、実際に何を見て判定しているかを押さえます。
+
+Searched for regex `KOUKU_KINOU_AUTH_MODE|tailscale-or-password|Tailscale|X-Forwarded|ts.net|Tailscale 接続が必要` (`**/kouku-kinou/**`), 80 results
+
+Read [](file:///c%3A/Users/user/Documents/vscrepo/kouku-kinou/server.py#1-1), lines 1 to 260
+
+判定ロジックの場所は見えたので、次に認証条件だけを絞って読みます。利用者条件とサーバー条件を混同しないよう、ヘッダー判定と設定値を確認します。
+
+Searched for regex `DEFAULT_AUTH_MODE|tailscale_headers|tailscale-or-password|X-Forwarded-Proto|Ts-|Tailscale|auth_mode|tailnet` (`**/kouku-kinou/server.py`), 39 results
+
+Read [](file:///c%3A/Users/user/Documents/vscrepo/kouku-kinou/.env.example)
+
+Read [](file:///c%3A/Users/user/Documents/vscrepo/kouku-kinou/compose.yaml)
+
+必要条件の核は、Tailscale ヘッダーが届く公開経路を使っているかどうかです。そこだけ server.py の該当箇所で確認します。
+
+Read [](file:///c%3A/Users/user/Documents/vscrepo/kouku-kinou/server.py#1448-1448), lines 1448 to 1530
+
+Read [](file:///c%3A/Users/user/Documents/vscrepo/kouku-kinou/server.py#1768-1768), lines 1768 to 1810
+
+Read [](file:///c%3A/Users/user/Documents/vscrepo/kouku-kinou/OPERATIONS_MANUAL_JA.md#1-1), lines 1 to 80
+
+口腔機能アプリで Tailscale を成立させる条件は、実質この5点です。
+
+1. Synology 側に Tailscale が入っていて、NAS が tailnet に参加済みであること。DEPLOY_SYNOLOGY_JA.md DEPLOY_SYNOLOGY_JA.md
+2. アプリが NAS 内で 127.0.0.1:8010 で動いていること。公開入口は直接ポートではなく Tailscale Serve 前提です。compose.yaml DEPLOY_SYNOLOGY_JA.md
+3. 管理者が Synology に一度 SSH して `tailscale serve --bg 8010` を設定済みであること。DEPLOY_SYNOLOGY_JA.md
+4. 利用者端末も Tailscale に接続済みで、`ts.net` の HTTPS URL から開くこと。NAS の IP や `:8010` 直打ちは前提外です。DEPLOY_SYNOLOGY_JA.md OPERATIONS_MANUAL_JA.md
+5. アプリ設定が Tailscale 前提になっていること。現在の既定は `KOUKU_KINOU_AUTH_MODE=tailscale-or-password` です。.env.example
+
+アプリが実際に見ている条件は、Tailscale 経由で渡される `Tailscale-User-Login` ヘッダーの有無です。これがあれば Tailscale 認証済みとして扱い、なければ `tailscale` モードでは拒否、`tailscale-or-password` モードでは管理者パスワードにフォールバックします。server.py server.py server.py
+
+つまり、必要条件を一言で言うと「Synology 側で Tailscale Serve を設定し、利用者が Tailscale 接続済みの状態で `ts.net` の正式 URL から入ること」です。逆に、DSM リバースプロキシ、独自ドメイン、ルーターのポート開放は不要です。DEPLOY_SYNOLOGY_JA.md
+
+必要なら次に、
+1. 管理者向けの確認チェックリスト
+2. 利用者向けの確認チェックリスト
+3. 「Tailscale 接続が必要です」と出たときの切り分け
+のどれかに絞って整理します。
+
+User: tailscaleのアカウントを新たに作成しました。
+設定すべき事項を教えてください。
+
+GitHub Copilot: 新しい Tailscale アカウントで変わるのは、単なるログイン先だけでなく tailnet 名と公開 URL です。まず既存ドキュメント内で、旧 tailnet 名や URL を前提にしている箇所を確認して、何を設定し直す必要があるか整理します。
+
+Searched for regex `tail632bc4|ts.net|TailscaleClientLauncher.settings.json|Tailscale|tailscale-or-password` (`**/kouku-kinou/**`), 120 results
+
+Read [](file:///c%3A/Users/user/Documents/vscrepo/kouku-kinou/TailscaleClientLauncher.settings.json)
+
+Read [](file:///c%3A/Users/user/Documents/vscrepo/kouku-kinou/TAILSCALE_TABLET_GUIDE_JA.md)
+
+Read [](file:///c%3A/Users/user/Documents/vscrepo/kouku-kinou/TAILSCALE_CLIENT_GUIDE_JA.md)
+
+旧 URL を前提にしている箇所は確認できました。新アカウント作成後に本当に直す必要があるのは、Tailscale 自体の参加先と、新しい ts.net URL を使う配布設定の2系統です。Tailscale 側の管理画面で追加設定が本当に要るかだけ、公式案内で確認します。ここが不要なら、答えを Synology 設定と URL 差し替えに絞れます。
+
+
+
+2 リソースをフェッチしました
+
+新しい Tailscale アカウントを作った直後に設定すべきものは、Tailscale 管理画面の細かい項目より、まず tailnet の付け替えと公開 URL の更新です。Tailscale 側で必須なのは、NAS と利用者端末が同じ tailnet に入っていることと、Serve 初回時の HTTPS 承認です。ACL や grants を使っている場合だけ、そのルールで NAS へのアクセスが許可されていることも確認してください。
+
+**必須設定**
+1. Synology の Tailscale を新アカウントで再ログインし、NAS を新しい tailnet に参加させます。DEPLOY_SYNOLOGY_JA.md
+2. Synology で Serve をやり直し、新しい公開 URL を確定します。必要なら tailscale serve reset、tailscale serve --bg 8010、tailscale serve status の順です。初回の HTTPS 承認画面が出たら許可します。DEPLOY_SYNOLOGY_JA.md
+3. 利用者の PC やタブレットも同じ tailnet に参加させます。利用者ごとに分けるなら、そのユーザーを tailnet に参加させる運用にします。
+4. アプリ側は今の前提を維持します。現行構成では KOUKU_KINOU_AUTH_MODE は tailscale-or-password、KOUKU_KINOU_PASSWORD は強い管理者パスワード、KOUKU_KINOU_SECURE_COOKIE は 1 のままです。.env.example compose.yaml
+
+**必ず差し替えるもの**
+1. 利用者向け起動ツールの appUrl を、新しい device.tailnet.ts.net に更新します。TailscaleClientLauncher.settings.json
+2. 旧 URL を書いている配布資料も同時に更新します。少なくとも TAILSCALE_CLIENT_GUIDE_JA.md、TAILSCALE_TABLET_GUIDE_JA.md、DEPLOY_SYNOLOGY_JA.md、README.md には旧 tailnet 名が入っています。
+3. 起動ツールの organizationName や supportContact も使うなら、このタイミングで合わせて見直すと配布が楽です。TailscaleClientLauncher.settings.json
+
+**注意点**
+このアプリの自動認証は、Serve が付ける Tailscale-User-Login ヘッダーを見て判定しています。server.py そのため、Tailscale の仕様上、利用者端末をタグ付きデバイスで運用すると自動認証ヘッダーが入らず、パスワード入口に落ちる可能性があります。利用者端末は通常ユーザーとして接続する運用の方が無難です。DSM リバースプロキシ、独自ドメイン、ルーターのポート開放、Funnel はこの構成では不要です。DEPLOY_SYNOLOGY_JA.md
+
+新しい URL が確定したら、Tailscale 接続済み端末から /api/health を開いて 200 が返ることと、トップ画面が開くことを確認すれば十分です。DEPLOY_SYNOLOGY_JA.md
+
+必要なら次に、
+1. 新アカウント移行後の具体的な作業順
+2. 変更が必要なファイル一覧
+3. 利用者への案内文の差し替え例
+のどれかに絞ってまとめます。
+
+User: １だけお願いします
+
+GitHub Copilot: 移行後の作業順だけに絞って、NAS 側・利用者側・確認の順で並べます。既存構成で本当に必要な手順だけに削ります。新アカウント移行後の具体的な作業順は、これで十分です。アプリ本体や記録データはそのままで、Tailscale の参加先と公開 URL を差し替える流れです。
+
+1. 新しい Tailscale アカウントで tailnet 名を確認します。
+新しい公開 URL は 最終的に device名.tailnet名.ts.net になるので、まず tailnet 名を把握します。
+
+2. Synology の Tailscale を新アカウント側に入れ直します。
+DSM の Tailscale 画面で、旧アカウントのままならログアウトして、新しいアカウントでログインします。
+NAS が新しい tailnet に参加できたら次へ進みます。
+
+3. 口腔機能アプリのコンテナが動いていることを確認します。
+前提は compose.yaml の構成どおり、NAS 内で 127.0.0.1:8010 で待ち受けていることです。
+アプリ設定は .env.example の想定どおり、tailscale-or-password と Secure Cookie を維持します。
+
+4. DSM で SSH を有効にして、PC から Synology に入ります。
+その後、root 権限に切り替えます。
+
+    ssh 管理者ユーザー名@NASのIP
+    sudo -i
+
+5. Synology 上で、NAS が本当に新しい tailnet に入っているか確認します。
+
+    tailscale status
+
+もし tailscale が見つからなければ、Synology では次を使います。
+
+    /var/packages/Tailscale/target/bin/tailscale status
+
+6. 旧 Serve 設定を消して、新 tailnet 用に作り直します。
+アカウントを切り替えたら、Serve はやり直す前提で考えた方が安全です。
+
+    tailscale serve reset
+    tailscale serve --bg 8010
+    tailscale serve status
+
+フルパス版はこちらです。
+
+    /var/packages/Tailscale/target/bin/tailscale serve reset
+    /var/packages/Tailscale/target/bin/tailscale serve --bg 8010
+    /var/packages/Tailscale/target/bin/tailscale serve status
+
+初回は HTTPS 有効化の承認画面が出ることがあるので、その URL をブラウザーで開いて許可します。
+
+7. 出てきた新しい公開 URL を控えます。
+ここで表示される URL が、新アカウント移行後の正式 URL です。
+例:
+https://NAS名.新tailnet名.ts.net
+
+8. 配布用の URL を新しいものへ差し替えます。
+最低限、TailscaleClientLauncher.settings.json の appUrl を新 URL に更新します。
+Windows 利用者向けの launcher を使うなら、ここが最重要です。
+
+9. 利用者端末も新しい Tailscale アカウント側へ参加させます。
+PC でもタブレットでも、旧アカウントのままでは新しい ts.net URL に入れません。
+利用者には、新しいアカウントでサインインし直したうえでアプリを開いてもらいます。
+
+10. 動作確認をします。
+Tailscale 接続済みの別端末から、まず health を確認します。
+
+    https://新しいURL/api/health
+
+これが 200 で返れば、公開経路は通っています。
+続けてトップ画面を開き、一覧表示や保存まで見れば完了です。
+
+11. 最後に、利用者への案内を新 URL に統一します。
+必要なら TAILSCALE_CLIENT_GUIDE_JA.md と TAILSCALE_TABLET_GUIDE_JA.md の案内文も新 URL に合わせます。
+
+補足です。
+このアプリの自動認証は、Tailscale Serve が付ける identity header を見ています。server.py なので、正式な ts.net URL から入ることが前提です。NAS の IP 直打ちや別の公開経路は使わない方が安全です。
+
+必要なら次に、あなたの環境向けに「この順で押せばよい」という Synology 画面ベースの手順に落として書きます。
+
+User: synology nas上でtailscaleのアカウントを複数持つことは出来ませんか？今後、様々なアプリを作成しようと考えており、部署ごとにあるグーグルアカウントでアプリを使い分けたいのですが、何かいい方法はありませんか？
+
+GitHub Copilot: Synology 上での複数アカウント運用が可能かと、部署ごとの使い分けに向く設計を切り分けます。まず Tailscale の公式仕様で「1台の NAS を複数 tailnet に同時参加できるか」と、「ユーザー分離をどうやるのが正攻法か」を確認します。
+
+
+
+5 リソースをフェッチしました
+
+Read [](file:///c%3A/Users/user/Documents/vscrepo/kouku-kinou/server.py#1460-1460), lines 1460 to 1485
+
+Read [](file:///c%3A/Users/user/Documents/vscrepo/kouku-kinou/README.md#30-30), lines 30 to 45
+
+結論として、Synology NAS 上の Tailscale パッケージ 1つに、複数の Tailscale アカウントを同時に持たせる運用は基本できません。1つの Tailscale ノードは、その時点で1つの tailnet にだけ所属します。アカウントの切り替えはできますが、部署ごとの同時併用には向きません。
+
+おすすめは、NAS に複数アカウントを持たせるのではなく、1つの組織 tailnet を作って、部署ごとの Google アカウントをその tailnet に招待し、ACL や grants でアプリごとの到達権限を分ける方法です。そのうえで各アプリ側でも、Tailscale のユーザー情報を見て最終判定する形にします。今の口腔機能アプリは server.py で Tailscale のログイン情報が来たら認証済みとみなすだけで、部署ごとの許可判定までは持っていません。README でも Tailscale ヘッダーによる自動認証前提です。README.md なので、同じ NAS で複数アプリを作るなら、各アプリに許可メールアドレスかロール判定を入れるのが安全です。
+
+別案として、部署を同じ tailnet に入れたくないなら、Tailscale Share で特定ユーザーにだけマシンを共有する方法もあります。ただしこれはマシン単位の共有なので、1台の NAS 上に複数アプリを載せる場合は、URL のパスごとの分離までは Tailscale だけではやりにくいです。強く分けたいなら、アプリごとに別ノードを用意する方がきれいです。つまり、アプリごとに別コンテナではなく、必要なら別の Tailscale ノードとして分ける設計です。
+
+実務上は次の方針が一番無難です。
+
+1. 会社用の tailnet は1つにする
+2. 部署ごとの Google アカウント、できれば個人アカウントをその tailnet に招待する
+3. Tailscale の groups と grants で、どの部署がどのアプリに到達できるかを分ける
+4. アプリ側では Tailscale のユーザー情報で最終認可する
+5. 本当に完全分離が必要なアプリだけ、別ノードや別環境に切り出す
+
+補足すると、部署共通の Google アカウントを人間が共用する運用は可能ですが、誰が使ったか追えなくなるので、今後アプリが増えるならあまり勧めません。個人アカウントで参加させて、部署グループでまとめる方が、運用も監査も楽です。
+
+必要なら次に、
+1. 部署別運用に向いた Tailscale 構成案
+2. 今の口腔機能アプリに追加すべき認可仕様
+3. Tailscale の groups と grants のたたき台
+のどれか1つに絞って具体化します。
+
+User: NAS に複数アカウントを持たせるのではなく、1つの組織 tailnet を作って、部署ごとの Google アカウントをその tailnet に招待し、ACL や grants でアプリごとの到達権限を分ける方法を分かりやすく教えてください。図の説明もください。
+
+GitHub Copilot: 部署ごとの分け方を誤ると、Tailscale 側で分けたつもりでも実際は同じ入口を共有してしまいます。まず、Tailscale の policy で何を分けられて、何はアプリ側で分ける必要があるかを整理します。
+
+
+
+4 リソースをフェッチしました
+
+Read [](file:///c%3A/Users/user/Documents/vscrepo/kouku-kinou/README.md#20-20), lines 20 to 45
+
+Read [](file:///c%3A/Users/user/Documents/vscrepo/kouku-kinou/server.py#1500-1500), lines 1500 to 1525
+
+次は、実際にどう設計すればよいかを例で固めます。特に「アプリごとの分離がポート単位なのか、URL パス単位なのか」で設計が変わるので、grants の例と app capabilities の使いどころを確認します。
+
+
+
+Searched for regex `Tailscale-App-Capabilities|Tailscale-User-Login|KOUKU_KINOU_ALLOWED_NETWORKS` (`**/kouku-kinou/**`), 11 results
+
+4 リソースをフェッチしました
+
+図は、高レベルで「誰がどこまで判定されるか」が見える形にします。これで、Tailscale の grants とアプリ側の認可の境界を説明しやすくします。
+
+
+
+いちばん分かりやすい考え方は、Tailscale を会社の内線網のように扱うことです。NAS はその内線網に 1 回だけ参加し、人は部署ごとの Google アカウントで同じ tailnet に入ります。誰がどこまで到達できるかは Tailscale の groups と grants で決め、実際にそのアプリを使ってよいかの最終判定は各アプリが受け取る Tailscale のユーザー情報で決めます。
+
+**図**
+利用者
+部署AのGoogleアカウント
+部署BのGoogleアカウント
+管理者
+↓
+1つの組織 tailnet
+↓
+groups / grants
+誰がどのノード・ポートまで行けるかを判定
+↓
+Synology NAS
+tag:nas
+↓
+Tailscale Serve
+nas.example.ts.net
+↓
+口腔機能アプリ
+別アプリ
+↓
+アプリ側認可
+Tailscale-User-Login
+Tailscale-App-Capabilities
+
+**図の見方**
+上の利用者は、人です。部署ごとの Google アカウントで Tailscale に参加します。
+
+真ん中の groups / grants は、門番です。ここでは、リハビリ部は NAS に入ってよい、事務部も入ってよい、管理者は全部よい、のような「入口の許可」を決めます。
+
+その下の NAS は、同じ Synology です。ここに口腔機能アプリや別アプリが動きます。
+
+Tailscale Serve は、利用者が見る HTTPS の入口です。今の口腔機能アプリもこの前提で動いています。README.md
+
+最後のアプリ側認可は、部屋の鍵です。groups / grants だけだと NAS の入口までしか分けられないことがあり、同じ NAS に複数アプリがあるなら、各アプリで「このメールアドレスは使ってよいか」をもう一度見る必要があります。今の口腔機能アプリは Tailscale のログイン情報を読んで自動認証する実装です。server.py server.py
+
+**実際の作り方**
+1. 会社用の tailnet を 1 つ作ります。NAS はその tailnet にだけ参加させます。
+2. 部署ごとの Google アカウントを、その tailnet のメンバーとして招待します。
+3. 部署ごとの group を作ります。たとえば 口腔機能チーム、帳票チーム、管理者、の 3 つです。
+4. NAS に tag:nas のようなタグを付けます。
+5. grants で、どの group が tag:nas にアクセスできるかを決めます。
+6. 各アプリでは、入ってきた Tailscale のユーザー情報を見て、そのアプリの許可ユーザーかどうかを判定します。
+7. 本当に強く分けたいアプリは、同じ NAS 上でも別ポートや別ノードに分けます。
+
+**設定のイメージ**
+groups
+- group:kouku = 口腔機能アプリを使う部署の Google アカウント
+- group:mail = 別アプリを使う部署の Google アカウント
+- group:admin = 管理者
+
+tagOwners
+- tag:nas を付けられるのは管理者だけ
+
+grants
+- group:kouku は tag:nas の HTTPS 入口に行ける
+- group:mail は tag:nas の HTTPS 入口に行ける
+- group:admin は tag:nas 全体に入れる
+
+ここで大事なのは、同じ NAS の同じ HTTPS 入口を複数アプリで共有する場合、grants だけでは URL のパス単位まではきれいに分けにくいことです。つまり、口腔機能アプリは使えても別アプリは使えない、という最終判定はアプリ側で持つのが現実的です。建物の入口は Tailscale、各部屋の鍵はアプリ側、という分担です。
+
+**Google アカウントの扱い**
+Google Workspace を使っているなら、部署グループを Google 側で管理し、Tailscale に同期させる運用がいちばん楽です。人の異動があっても Google 側を直せばよいからです。
+
+Google Workspace ではなく個別の Gmail を部署ごとに使うなら、Tailscale の policy file の groups にメールアドレスを手で並べる運用になります。小規模ならこれでも十分です。
+
+**今の口腔機能アプリに当てはめると**
+今の実装は、Tailscale のログイン情報が来たら自動認証する形で、部署ごとの許可リストまでは持っていません。server.py なので、この方式で複数アプリを増やすなら、次のどちらかが必要です。
+
+1. 各アプリに 許可メールアドレス一覧 または 許可ドメイン一覧 を持たせる
+2. Tailscale の app capabilities を使って、アプリごとのロールをヘッダーで渡し、各アプリがそれを読む
+
+前者が簡単で、後者が拡張しやすい設計です。
+
+**おすすめの運用方針**
+小さく始めるなら、
+- 1つの tailnet
+- 1台の NAS
+- 部署ごとの Google アカウントを招待
+- grants で NAS 入口を管理
+- 各アプリで許可ユーザーを判定
+
+これで十分です。
+
+アプリが増えてきたら、
+- 重要アプリだけ別ノードや別ホスト名に分ける
+- 役割の細かい差は app capabilities へ寄せる
+
+この順がいちばん無理がありません。
+
+必要なら次に、
+1. あなたの部署構成に合わせた groups / grants のたたき台
+2. 口腔機能アプリに追加する 許可ユーザー判定 の仕様案
+3. 将来アプリが増えたときの NAS 上の配置設計
+のどれか 1 つを具体化します。
+
+User: まず、現在NASと連携しているtailscaleはシステム管理者アカウント「私」
+今後、追加する予定の部署(仮)「訪問看護」「デイサービスA」「デイサービスB」「デイサービスC」「デイサービスD」「カンパニー」「居宅介護支援」「カフェ」を踏まえて
+1.あなたの部署構成に合わせた groups / grants のたたき台
+2.口腔機能アプリに追加する 許可ユーザー判定 の仕様案
+3.将来アプリが増えたときの NAS 上の配置設計
+
+GitHub Copilot: 今ある口腔機能アプリだけでなく、将来 NAS に載せそうなアプリの性質まで踏まえて叩き台を作ります。まずワークスペース内の他アプリの配置前提とポート構成だけ確認して、groups / grants と NAS 設計が破綻しない案に絞ります。
+
+Searched for regex `127.0.0.1:|ports:|--port|uvicorn|8010|8020|8000|serve --bg` (`**/*.{md,yaml,yml,py,json,ps1,cmd}`), 58 results
+
+Read memory [](file:///c%3A/Users/user/AppData/Roaming/Code/User/workspaceStorage/3e3ed11b3af4b6bdbb35f3c0b98f200a/GitHub.copilot-chat/memory-tool/memories/repo/line_purchase_system.md)
+
+Read [](file:///c%3A/Users/user/Documents/vscrepo/line_purchase_system/compose.yaml)
+
+Read memory [](file:///c%3A/Users/user/AppData/Roaming/Code/User/workspaceStorage/3e3ed11b3af4b6bdbb35f3c0b98f200a/GitHub.copilot-chat/memory-tool/memories/repo/mail_print_tool.md)
+
+Read memory [](file:///c%3A/Users/user/AppData/Roaming/Code/User/workspaceStorage/3e3ed11b3af4b6bdbb35f3c0b98f200a/GitHub.copilot-chat/memory-tool/memories/repo/kaiko_tool.md)
+
+今見えている前提は、口腔機能アプリが 8010、別の Web アプリ候補として line_purchase_system が 8000 です。ここから先は、同じ NAS でも「部署ごとのアプリ分離はネットワークだけで足りるか、それともアプリ内認可が要るか」を設計に落とします。
+
+
+
+2 リソースをフェッチしました
+
+Read [](file:///c%3A/Users/user/Documents/vscrepo/line_purchase_system/DEPLOY_SYNOLOGY.md)
+
+Read [](file:///c%3A/Users/user/Documents/vscrepo/kouku-kinou/README.md#100-100), lines 100 to 130
+
+前提として、今の NAS は管理者アカウント「私」にひも付いた Tailscale ノードですが、複数アプリ運用の完成形は 人のアカウント と サービスホストの identity を分ける形です。今すぐ壊す必要はありませんが、内部向け Web アプリが 2 本目、3 本目と増える前に、NAS を tag:nas-core のようなタグ付きサービスホストへ移す前提で設計した方が後で詰まりません。
+
+大事なのは 1 つです。部署は group、アプリは service で分けます。部署ごとに tailnet を分けるのではなく、1 つの tailnet の中で、誰がどのアプリに入れるかを決めます。
+
+**1. Groups / Grants たたき台**
+まず、部署グループの名前は ASCII で固定しておくのが無難です。日本語名は運用資料側に残し、policy 側は短い英字にします。
+
+おすすめの対応は次です。
+
+- group:admins = 私
+- group:houkan = 訪問看護
+- group:day-a = デイサービスA
+- group:day-b = デイサービスB
+- group:day-c = デイサービスC
+- group:day-d = デイサービスD
+- group:day-all = デイサービスA-D のまとめ
+- group:company = カンパニー
+- group:care-support = 居宅介護支援
+- group:cafe = カフェ
+- group:care-all = 訪問看護、デイA-D、居宅介護支援のまとめ
+
+最初の叩き台としては、口腔機能アプリは group:care-all と group:admins、全社ポータルは全部署、カフェ専用アプリは group:cafe と group:admins、NAS 管理画面や SSH は group:admins だけ、という切り方が自然です。
+
+たたき台の policy はこんな形です。メールアドレスは実アカウントに置き換えてください。
+
+~~~json
+{
+  "groups": {
+    "group:admins": ["watashi@example.jp"],
+
+    "group:houkan": ["houkan@example.jp"],
+    "group:day-a": ["day-a@example.jp"],
+    "group:day-b": ["day-b@example.jp"],
+    "group:day-c": ["day-c@example.jp"],
+    "group:day-d": ["day-d@example.jp"],
+    "group:day-all": [
+      "day-a@example.jp",
+      "day-b@example.jp",
+      "day-c@example.jp",
+      "day-d@example.jp"
+    ],
+    "group:company": ["company@example.jp"],
+    "group:care-support": ["care-support@example.jp"],
+    "group:cafe": ["cafe@example.jp"],
+
+    "group:care-all": [
+      "houkan@example.jp",
+      "day-a@example.jp",
+      "day-b@example.jp",
+      "day-c@example.jp",
+      "day-d@example.jp",
+      "care-support@example.jp"
+    ]
+  },
+
+  "tagOwners": {
+    "tag:nas-core": ["group:admins"]
+  },
+
+  "autoApprovers": {
+    "services": {
+      "svc:kouku": ["tag:nas-core"],
+      "svc:company-portal": ["tag:nas-core"],
+      "svc:cafe-app": ["tag:nas-core"]
+    }
+  },
+
+  "grants": [
+    {
+      "src": ["group:admins", "group:care-all"],
+      "dst": ["svc:kouku"],
+      "ip": ["tcp:443"]
+    },
+    {
+      "src": [
+        "group:admins",
+        "group:houkan",
+        "group:day-all",
+        "group:company",
+        "group:care-support",
+        "group:cafe"
+      ],
+      "dst": ["svc:company-portal"],
+      "ip": ["tcp:443"]
+    },
+    {
+      "src": ["group:admins", "group:cafe"],
+      "dst": ["svc:cafe-app"],
+      "ip": ["tcp:443"]
+    },
+    {
+      "src": ["group:admins"],
+      "dst": ["tag:nas-core"],
+      "ip": ["tcp:22", "tcp:5000", "tcp:5001"]
+    }
+  ]
+}
+~~~
+
+この叩き台の意味は単純です。
+
+- 口腔機能アプリは、訪問看護、デイA-D、居宅介護支援、管理者だけが入れる
+- 全社ポータル系は、全部署と管理者が入れる
+- カフェ専用アプリは、カフェと管理者だけが入れる
+- NAS 管理そのものは、私だけが入れる
+
+もし Google Workspace のグループ同期が使えるなら、手書きの groups を減らして、Google 側の部署グループをそのまま source に使う運用の方が楽です。人事異動のたびに policy を直すより、Google 側のグループを直す方が保守しやすいからです。
+
+一点だけ注意があります。今の口腔機能アプリは classic Serve 前提で、NAS ノード自体に HTTPS を生やしています。README.md 将来アプリごとに grants をきれいに分けたいなら、同じ node URL 共有より、Tailscale Services で svc:kouku、svc:cafe-app のようにアプリ単位の service を作る方がきれいです。
+
+**2. 口腔機能アプリに追加する許可ユーザー判定の仕様案**
+今の実装は、Tailscale のログイン情報が来たら認証済みとみなす段階で止まっています。server.py つまり、今は tailnet に入れれば誰でも通りやすい構造です。部署別運用にするなら、認証の次に認可が必要です。
+
+最小で堅い仕様はこれです。
+
+- 認証元は既存どおり Tailscale-User-Login と Tailscale-User-Name を使う
+- 認可は、口腔機能アプリ専用の許可リストで判定する
+- 許可リストは env ではなく JSON ファイルにする
+理由:
+部署が増えると env のカンマ区切りはすぐ読めなくなるためです
+
+おすすめの設定ファイルイメージです。
+
+~~~json
+{
+  "admins": ["watashi@example.jp"],
+  "editors": {
+    "訪問看護": ["houkan@example.jp"],
+    "デイサービスA": ["day-a@example.jp"],
+    "デイサービスB": ["day-b@example.jp"],
+    "デイサービスC": ["day-c@example.jp"],
+    "デイサービスD": ["day-d@example.jp"],
+    "居宅介護支援": ["care-support@example.jp"]
+  },
+  "viewers": {
+    "カンパニー": ["company@example.jp"]
+  }
+}
+~~~
+
+この仕様での判定順は次です。
+
+1. リクエストから Tailscale-User-Login を取得する
+2. 小文字化して正規化する
+3. admins にあれば admin
+4. editors のいずれかにあれば editor
+5. viewers のいずれかにあれば viewer
+6. どこにも無ければ 403 で拒否する
+
+これにすると、たとえば次の運用ができます。
+
+- 私 = admin
+- 訪問看護、デイA-D、居宅介護支援 = editor
+- カンパニー = viewer
+- カフェ = 口腔機能アプリは拒否
+
+役割は最初は 3 つで十分です。
+
+- admin = 設定変更、ユーザー管理、全件編集、必要なら削除
+- editor = 通常入力、保存、一覧、更新
+- viewer = 閲覧と検索のみ、保存や更新は不可
+
+今のアプリに足すべき仕様としては、次の 6 点でまとまります。
+
+- 設定ファイルの場所
+例:
+  /data/authz/kouku-users.json
+- 新しい環境変数
+例:
+  KOUKU_KINOU_AUTHZ_FILE=/data/authz/kouku-users.json
+- 認可失敗時は 401 ではなく 403 を返す
+理由:
+  認証は通っているが、利用権限が無い状態だからです
+- Tailscale ヘッダーがあるのに未許可だった場合は、管理者パスワードへフォールバックしない
+理由:
+  別部署ユーザーがパスワードで迂回できると意味がなくなるからです
+- 画面右上に 現在の Tailscale 名、部署、役割 を表示する
+- 監査ログに login、name、department、role、action、timestamp を残す
+
+今のコード経路だと、Tailscale 情報の取得自体はすでにあります。server.py なので、足すのは 認証 ではなく 認可 と 役割判定 です。ここは小さく追加できます。
+
+将来もっと伸ばすなら、Tailscale-App-Capabilities を受ける方式に進めますが、最初の一歩は JSON allowlist 方式で十分です。複雑にするより先に、どの部署が editor で、どの部署が viewer かを決める方が先です。
+
+**3. 将来アプリが増えたときの NAS 上の配置設計**
+ここはアプリを 3 種類に分けて考えると整理しやすいです。
+
+1. 内部向けブラウザーアプリ
+例:
+口腔機能アプリのような、職員だけが Tailscale 越しに使うもの
+現在の口腔機能アプリはこの型です。compose.yaml
+
+2. 公開 HTTPS が必要なアプリ
+例:
+外部 Webhook や外部 SaaS から叩かれるもの
+workspace では LINE 連携の line_purchase_system がこれに当たり、公開 HTTPS URL が必要です。DEPLOY_SYNOLOGY.md
+
+3. デスクトップ GUI アプリ
+例:
+Windows 端末で起動する PySide アプリ
+workspace では main.py と app_gui.py がこれです
+これは NAS に載せるより、クライアント配布のままの方が自然です
+
+この 3 種を混ぜて考えない方がよいです。おすすめ配置は次です。
+
+- internal
+  口腔機能、社内ポータル、カフェ専用など
+  Tailscale Services または Serve で tailnet 内公開
+- public
+  LINE Webhook のように外部公開が必要なもの
+  Synology の公開 HTTPS、または別 VPS、または Cloudflare Tunnel などで公開
+- desktop
+  郵便印刷や GUI 入力ツール
+  NAS ではなく各 PC 配布
+
+NAS 上のディレクトリは、1アプリ1フォルダで切るのが保守しやすいです。たとえばこんな形です。
+
+~~~text
+/docker/apps/internal/kouku/
+/docker/apps/internal/company-portal/
+/docker/apps/internal/cafe-app/
+/docker/apps/public/line-purchase/
+/docker/shared/backups/
+~~~
+
+ローカルポートは連番ルールを決めておくと楽です。
+
+- 18010 = kouku
+- 18020 = company-portal
+- 18030 = cafe-app
+- 18110 = public line-purchase
+
+このとき、内部向けアプリはすべて 127.0.0.1 bind に寄せます。口腔機能アプリはすでにこの形です。compose.yaml 一方で line_purchase_system は今の compose だとホスト公開前提です。compose.yaml これは内部向けに転用するなら 127.0.0.1 bind に直しますが、LINE Webhook 用なら公開 HTTPS 側に置き続ける方が自然です。
+
+将来の増え方を考えると、設計ルールは次の 5 つで十分です。
+
+- 1アプリ = 1サービス名
+例:
+  svc:kouku、svc:company-portal、svc:cafe-app
+- 1アプリ = 1ローカルポート
+- 1アプリ = 1認可ファイル
+- 1アプリ = 1データフォルダ
+- 1アプリ = 1バックアップジョブ
+
+そして重要なのは、内部向けアプリが増える前に NAS の Tailscale identity を人のアカウントからサービス用タグへ寄せることです。今の 私 アカウントひも付けでも単一アプリ運用は回りますが、アプリ単位の service と grants を真面目にやるなら、サービスホストは tag:nas-core の方が筋がいいです。Tailscale Services もその前提で整理されています。
+
+この 3 点をまとめると、実務上のおすすめはこうです。
+
+- 私 は group:admins に残す
+- 部署はすべて group で表現する
+- 内部向け Web アプリは app ごとに service を作る
+- 口腔機能アプリは JSON allowlist で role 判定を足す
+- 公開 Webhook 系アプリは Tailscale 内部アプリと分ける
+- デスクトップ GUI ツールは NAS に寄せない
+
+次に進めるなら、次のどれが一番価値がありますか。
+
+1. あなたの実メールアドレス案を入れた groups / grants の完成版 JSON
+2. 口腔機能アプリの authz JSON スキーマと画面仕様の詳細版
+3. Synology 上の internal / public / desktop を分けた配置図とポート表の完成版
+
+User: 次に進めるとしたらSynology 上の internal / public / desktop を分けた配置図とポート表の完成版です。
+今の実装、Tailscale のログイン情報が来たら認証済みとみなす形で今後も進めていきます。
+他部署からでもアクセス出来て構いません。どうしても必要になったら検討しますが今ではありません。
+Google Workspaceの導入予定はないです。
+
+GitHub Copilot: 前提が変わったので、設計はかなり単純にできます。部署ごとの厳密な認可は後回しでよくなったため、今は「内部向け」「公開が必要」「デスクトップ配布」の3区分だけが破綻しないように整理します。今の条件なら、完成版はかなり単純です。  
+内部向けは Tailscale だけで入る internal、外部サービスから叩かれるものは public、Windows で使うものは desktop に分けます。  
+部署ごとの厳密な制限はまだ入れないので、internal は tailnet に入っている人なら誰でも使える前提でよく、Google Workspace も不要です。
+
+現在のワークスペースでこの3区分に当てはまるのは次です。
+
+- internal: 口腔機能アプリ。実装の基準は compose.yaml
+- public: LINE 連携系。公開 HTTPS 前提は DEPLOY_SYNOLOGY.md
+- desktop: GUI 配布型。対象は main.py と app_gui.py
+
+**配置図**
+```mermaid
+flowchart TB
+    subgraph Staff[職員端末]
+        U1[PC / タブレット]
+    end
+
+    subgraph Internal[internal]
+        TS[Tailscale]
+        K[口腔機能アプリ\n127.0.0.1:8010]
+        I1[将来の社内アプリ1\n127.0.0.1:8020]
+        I2[将来の社内アプリ2\n127.0.0.1:8030]
+    end
+
+    subgraph Public[public]
+        EXT[LINE / 外部ブラウザー / Webhook]
+        RP[DSM Reverse Proxy\n443]
+        LP[公開アプリ\n127.0.0.1:8110]
+    end
+
+    subgraph Desktop[desktop]
+        PKG[NAS上の配布置き場]
+        D1[kaiko_tool]
+        D2[mail_print_tool]
+    end
+
+    U1 --> TS
+    TS --> K
+    TS --> I1
+    TS --> I2
+
+    EXT --> RP --> LP
+
+    U1 --> PKG
+    PKG --> D1
+    PKG --> D2
+```
+
+この図の意味は次です。
+
+- internal: 職員端末が Tailscale 接続して入る。アプリは NAS の localhost にだけ bind する
+- public: インターネットから来る。Tailscale ログイン情報には頼らず、各アプリ自身の認証や署名検証で守る
+- desktop: NAS は実行場所ではなく配布置き場。実際のアプリは各 PC で起動する
+
+Synology 上のフォルダ配置は、最初からこれで固定するのが扱いやすいです。
+
+```text
+/volume1/docker/internal/kouku-kinou/
+/volume1/docker/internal/internal-app-01/
+/volume1/docker/internal/internal-app-02/
+
+/volume1/docker/public/line-purchase-system/
+/volume1/docker/public/public-app-01/
+
+/volume1/share/desktop-packages/kaiko_tool/
+/volume1/share/desktop-packages/mail_print_tool/
+
+/volume1/backup/apps/
+/volume1/backup/data/
+```
+
+**ポート表**
+完成版のルールは、internal を 80xx、public を 81xx に寄せる形が一番分かりやすいです。  
+口腔機能アプリはもう 8010 で動いているので、そのまま基準にします。
+
+| 区分 | アプリ | NASローカル bind | 外からの入口 | 認証の考え方 |
+|---|---|---:|---|---|
+| internal | 口腔機能アプリ | 127.0.0.1:8010 | Tailscale Serve / Tailscale Services の 443 | Tailscale ログイン情報が来たら認証済み |
+| internal | 将来の社内アプリ1 | 127.0.0.1:8020 | Tailscale の 443 | Tailscale ログイン情報 |
+| internal | 将来の社内アプリ2 | 127.0.0.1:8030 | Tailscale の 443 | Tailscale ログイン情報 |
+| internal | 将来の社内アプリ3 | 127.0.0.1:8040 | Tailscale の 443 | Tailscale ログイン情報 |
+| public | line_purchase_system | 127.0.0.1:8110 | DSM Reverse Proxy の 443 | LINE署名検証やアプリ独自認証 |
+| public | 将来の公開アプリ1 | 127.0.0.1:8120 | DSM Reverse Proxy の 443 | アプリ独自認証 |
+| public | 将来の公開アプリ2 | 127.0.0.1:8130 | DSM Reverse Proxy の 443 | アプリ独自認証 |
+| desktop | kaiko_tool | なし | EXE 配布のみ | Windows ローカル実行 |
+| desktop | mail_print_tool | なし | EXE 配布のみ | Windows ローカル実行 |
+
+予約ルールも決めておくと後で迷いません。
+
+- 8010-8099: internal
+- 8110-8199: public
+- 8210-8299: 検証用、一時用
+- 22: SSH 管理専用
+- 5000, 5001: DSM 管理専用
+
+**運用ルール**
+今の前提に合わせるなら、ルールはこれだけで足ります。
+
+- internal の Web アプリは全部 localhost bind にする
+- internal の認証は、今の口腔機能アプリと同じく Tailscale ログイン情報ベースで進める
+- public のアプリは Tailscale 認証を前提にしない
+- desktop のアプリは NAS に載せず、配布だけ NAS に置く
+- Google Workspace を入れないなら、今は groups を細かく切らず、Tailscale 側は全メンバー許可でよい
+- 本当に制限が必要になった時だけ、groups / grants を細かくする
+
+今の条件だと、Tailscale 側の考え方も最小で十分です。  
+internal 用は全 tailnet member を許可し、管理系だけあなたに絞る形で足ります。
+
+```json
+{
+  "tagOwners": {
+    "tag:nas-core": ["watashi@example.jp"]
+  },
+  "grants": [
+    {
+      "src": ["autogroup:member"],
+      "dst": ["svc:kouku", "svc:internal-app-01", "svc:internal-app-02"],
+      "ip": ["tcp:443"]
+    },
+    {
+      "src": ["watashi@example.jp"],
+      "dst": ["tag:nas-core"],
+      "ip": ["tcp:22", "tcp:5000", "tcp:5001"]
+    }
+  ]
+}
+```
+
+ここで groups を無理に作り込まないのが今の条件には合っています。  
+誰でも internal に入れてよいなら、autogroup:member で十分です。
+
+一番実務的な結論だけ言うと、完成版はこうです。
+
+- 口腔機能アプリは internal、8010 のまま継続
+- 今後の社内向け Web アプリは 8020, 8030, 8040 と増やす
+- LINE や外部 webhook 系は public に分け、8110 以降に置く
+- 郵便印刷や開口・介護系 GUI ツールは desktop のまま配布運用にする
+- まだ部署別制限は入れず、tailnet に入っている人は internal を使える前提で進める
+
+次に実務でやるなら、この順が自然です。
+
+1. このポート表に合わせて、今後載せるアプリ名の一覧を決める
+2. Synology 側のフォルダ名と shared folder 名をこの構成で固定する
+3. internal 用 URL 一覧と public 用ドメイン一覧を 1 枚の運用表にする
+
+必要なら次に、その 3 をそのまま運用資料として使える形で書きます。
+
+User: 社内のtailscaleユーザーとnasの関係を図で示してください
+
+GitHub Copilot: いまの前提だけに絞ると、社内の Tailscale ユーザーと NAS の関係は次の図です。  
+ポイントは、NAS は 1 台の Tailscale ノードとして組織 tailnet に参加し、社内ユーザーはそれぞれの Tailscale アカウントで同じ tailnet に入る、という形です。
+
+```mermaid
+flowchart TB
+    subgraph Users[社内の Tailscale ユーザー]
+        U0[私 / 管理者]
+        U1[職員A]
+        U2[職員B]
+        U3[他部署ユーザー]
+    end
+
+    subgraph Tailnet[1つの組織 tailnet]
+        TS[Tailscale ネットワーク]
+    end
+
+    subgraph NAS[Synology NAS]
+        N1[NAS本体]
+        S1[Tailscale]
+        S2[Tailscale Serve]
+        A1[internal アプリ\n口腔機能アプリ 8010]
+        A2[将来の internal アプリ\n8020 / 8030 ...]
+    end
+
+    U0 --> TS
+    U1 --> TS
+    U2 --> TS
+    U3 --> TS
+
+    TS --> S1
+    S1 --> N1
+    S1 --> S2
+    S2 --> A1
+    S2 --> A2
+```
+
+この図の意味は次のとおりです。
+
+- 社内ユーザーは、それぞれ自分の Tailscale アカウントで同じ tailnet に参加します
+- NAS もその tailnet に 1 台のノードとして参加します
+- NAS 上の internal アプリは、直接 LAN 公開せず、Tailscale Serve 経由で開きます
+- 今の前提では、同じ tailnet に入っている社内ユーザーなら、NAS 上の internal アプリに到達できます
+- あなたは管理者として NAS 管理や設定変更も行い、他の社内ユーザーは主にアプリ利用者です
+
+アクセスの流れだけ抜くと、こうなります。
+
+```mermaid
+flowchart LR
+    U[社内ユーザー] --> T[Tailscale 接続]
+    T --> URL[ts.net の URL]
+    URL --> NAS[Synology NAS]
+    NAS --> APP[internal アプリ]
+```
+
+さらに整理すると、役割の違いはこうです。
+
+- 社内ユーザー: Tailscale に接続してアプリを使う人
+- NAS: アプリを置いているサーバー
+- Tailscale: ユーザーと NAS を同じ社内ネットワークのようにつなぐ仕組み
+- Tailscale Serve: NAS 上の internal アプリを ts.net の URL で開けるようにする入口
+
+必要なら次に、
+1. この図に public と desktop も加えた全体図
+2. 管理者と一般ユーザーの違いを入れた図
+3. 口腔機能アプリへの実際の接続経路だけを大きくした図
+のどれか 1 つを作ります。
+
+User: 新しいtailscaleアカウントでnasにログインした後のユーザー招待など必要な操作を初心者向けに詳しく解説してください。
+
+GitHub Copilot: 新しい Tailscale アカウントで NAS を参加させた後に、初心者が迷いやすいのは「次にどこで誰を招待するか」です。公式のユーザー招待と管理画面の流れだけ確認して、NAS 設定と利用者招待を一本の手順にまとめます。
+
+
+
+5 リソースをフェッチしました
+
+Read [](file:///c%3A/Users/user/Documents/vscrepo/kouku-kinou/DEPLOY_SYNOLOGY_JA.md#1-1), lines 1 to 190
+
+Read [](file:///c%3A/Users/user/Documents/vscrepo/kouku-kinou/TAILSCALE_CLIENT_GUIDE_JA.md)
+
+Read [](file:///c%3A/Users/user/Documents/vscrepo/kouku-kinou/TAILSCALE_TABLET_GUIDE_JA.md)
+
+招待メニューの見え方はプランや tailnet の状態で少し変わるので、その点だけ確認します。招待画面の呼び方と、招待後に相手側で何をするかを公式の流れに合わせて固めます。
+
+
+
+
+
+4 リソースをフェッチしました
+
+https://tailscale.com/pricing をフェッチしました
+
+最初に確認しておくべき点が2つあります。
+
+1. 新しい tailnet が Personal 扱いなら、無料枠は 6 users です。  
+今の想定は あなた 1人 + 部署アカウント 8個 = 9 users なので、そのままだと足りません。しかも Gmail などの公開ドメインで作った tailnet は Personal 扱いになりやすく、Tailscale では非商用向けの位置づけです。社内運用を続ける前提なら、まず Billing 画面で現在の plan を確認してください。
+
+2. 新しく作った tailnet は User approval が既定で有効なことがあります。  
+この場合、招待しただけでは終わらず、相手が初回ログインしたあとに管理者が承認する必要があります。
+
+その前提で、NAS を新しい Tailscale アカウントでログインさせた後の操作を、初心者向けに順番で書くとこうなります。
+
+**やる順番**
+1. PC のブラウザーで Tailscale の Admin Console を開きます。  
+開く場所:
+login.tailscale.com/admin
+
+2. まず Machines 画面で NAS が見えているか確認します。  
+ここで確認すること:
+- NAS が一覧に出ている
+- オフラインではなく接続中になっている
+- device 名が分かりやすい  
+例:
+diskstation
+
+3. 次に、誰を招待するかを決めます。  
+今の前提なら、部署ごとの Google アカウントを 1ユーザーとして招待すれば大丈夫です。  
+例:
+- あなた = Owner または Admin
+- 訪問看護 = Member
+- デイサービスA = Member
+- デイサービスB = Member
+- デイサービスC = Member
+- デイサービスD = Member
+- カンパニー = Member
+- 居宅介護支援 = Member
+- カフェ = Member
+
+4. Users 画面を開いて、ユーザー招待をします。  
+画面の流れ:
+- Admin Console
+- Users
+- Invite external users
+
+初心者には メール招待 がいちばん安全です。  
+やること:
+- 招待したいメールアドレスを入れる
+- role は Member を選ぶ
+- Invite を押す
+
+補足:
+- 普通の利用者に Admin は付けない方が安全です
+- 1回の招待で付けられる role は1種類です
+- あなた以外は全部 Member で始めれば十分です
+
+5. メールではなくリンクで配りたい場合は、Invite link でもできます。  
+画面の流れ:
+- Users
+- Invite external users
+- Copy invite link
+
+この方法は便利ですが、初心者向けには少し注意が必要です。  
+理由:
+- 間違って別の人に転送されやすい
+- 誰に送ったか追いにくい
+
+最初はメール招待を勧めます。
+
+6. 招待された側にやってもらうことを案内します。  
+相手側の流れはこうです。
+- メールの招待リンクを開く
+- 自分の Google アカウントで Tailscale にサインインする
+- Tailscale アプリを入れる
+- PC やタブレットで接続する
+
+ここで大事なのは、相手がすでに別の Tailscale アカウントを持っていても、そのアカウントで招待を受けられることです。
+
+7. User approval が有効な場合は、管理者承認をします。  
+相手が初回ログインすると、Users 画面で pending や Needs approval の状態になることがあります。
+
+そのときの流れ:
+- Admin Console
+- Users
+- pending のユーザーを探す
+- 右側のメニュー
+- Approve
+
+これを押すと、そのユーザーが tailnet に正式参加できます。
+
+8. 期限切れや再送が必要なら、Users 画面でやり直します。  
+使う操作:
+- Resend invite
+- Copy invite link
+- Delete invite
+
+補足:
+- 未使用の招待は 30日で切れます
+- 切れたら再送すれば大丈夫です
+
+9. ユーザー招待が終わったら、NAS 側の Tailscale Serve を設定します。  
+これは今の口腔機能アプリの公開手順そのままです。詳しい流れは DEPLOY_SYNOLOGY_JA.md にまとまっています。
+
+基本コマンド:
+
+    ssh 管理者ユーザー名@NASのIP
+    sudo -i
+    tailscale status
+    tailscale serve --bg 8010
+    tailscale serve status
+
+もし tailscale コマンドが見つからないなら Synology では次です。
+
+    /var/packages/Tailscale/target/bin/tailscale status
+    /var/packages/Tailscale/target/bin/tailscale serve --bg 8010
+    /var/packages/Tailscale/target/bin/tailscale serve status
+
+10. 表示された ts.net の URL を控えます。  
+この URL が、利用者に渡す正式な入口です。  
+例:
+https://NAS名.tailnet名.ts.net
+
+11. 利用者へ案内します。  
+Windows 利用者なら、今の運用では TAILSCALE_CLIENT_GUIDE_JA.md の流れがそのまま使えます。  
+タブレット利用者なら、TAILSCALE_TABLET_GUIDE_JA.md の流れがそのまま使えます。
+
+実際に渡す内容はこれだけで十分です。
+- Tailscale にログインする Google アカウント
+- アプリ URL
+- 接続手順
+
+12. 最後に動作確認をします。  
+管理者が確認する項目:
+- Users に招待したユーザーが見えている
+- 必要なら pending ではなく approved になっている
+- Machines に NAS が見えている
+- Tailscale 接続済みの別端末から URL を開ける
+- /api/health が返る
+- トップ画面が開く
+
+確認用 URL:
+https://実際のURL/api/health
+
+**初心者向けのおすすめ運用**
+最初はこれだけで十分です。
+
+- あなただけ Owner または Admin
+- 他の部署アカウントは全部 Member
+- 招待はメール方式
+- User approval は有効のままで運用
+- アプリ URL は 1つだけ案内
+- NAS の IP や 8010 直打ちは案内しない
+
+**今はやらなくてよいこと**
+今の条件なら、まだ不要です。
+
+- 部署ごとの groups / grants の細分化
+- Google Workspace 連携
+- app capabilities の導入
+- 部署ごとの厳密な閲覧制限
+
+**一番よくある詰まりどころ**
+- 招待しただけで終わったと思ってしまう  
+その後に相手のログインと、必要なら管理者承認があります。
+- 利用者が NAS の IP で開いてしまう  
+正式な ts.net URL だけを使います。
+- 共有リンクを雑に配ってしまう  
+最初はメール招待の方が安全です。
+- user 数を見落とす  
+今の想定は 9 users なので、Personal の 6 users を超えます。
+
+必要なら次に、
+1. あなたのケース専用の 画面を押す順だけ の手順書
+2. 利用者へ送る招待文テンプレート
+3. 招待後に管理者が確認するチェックリスト
+のどれか 1 つをそのまま使える文章で作ります。

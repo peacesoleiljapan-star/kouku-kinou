@@ -1,0 +1,67 @@
+# Windows 利用者向け Tailscale 接続ガイド
+
+この資料は、Windows PC 利用者が コマンド入力なし で Tailscale を導入し、口腔機能・栄養評価システムを開くための案内です。
+
+iPad / Android タブレットで使う場合は、[TAILSCALE_TABLET_GUIDE_JA.md](TAILSCALE_TABLET_GUIDE_JA.md) を見てください。
+
+## 使うもの
+
+管理者から次の 3 ファイルを受け取ります。
+
+1. `TailscaleClientLauncher.cmd`
+2. `TailscaleClientLauncher.ps1`
+3. `TailscaleClientLauncher.settings.json`
+
+3 つは同じフォルダに置いたまま使ってください。
+
+今回の配布 URL は `https://diskstation.tail632bc4.ts.net/` です。launcher の「アプリを開く」もこの URL を使います。
+
+## 初回セットアップ
+
+1. `TailscaleClientLauncher.cmd` をダブルクリックします。
+2. 画面が開いたら「Tailscale をダウンロード」を押します。
+3. Tailscale のインストールを完了します。
+4. launcher に戻り、「Tailscale を起動」を押します。
+5. 表示に従ってサインインします。
+6. 「状態を確認」を押します。
+7. 接続済みになったら「アプリを開く」を押します。
+
+## 毎日の使い方
+
+1. `TailscaleClientLauncher.cmd` を開きます。
+2. 「状態を確認」を押します。
+3. 接続済みと出たら「アプリを開く」を押します。
+4. 必要なら「アプリ URL をコピー」で URL を貼り付けて使います。
+
+## 画面に出る表示の意味
+
+1. `未導入`: Tailscale がまだ入っていません。
+2. `導入済み / 未接続`: Tailscale はあるが、サインインや接続が終わっていません。
+3. `接続済み`: アプリを開ける状態です。
+
+## よくある困りごと
+
+### 1. アプリが開かない
+
+1. 先に「状態を確認」を押す
+2. Tailscale が接続済みか確認する
+3. それでもダメなら管理者へ連絡する
+
+### 2. パスワード画面が出る
+
+1. Tailscale 接続が不完全な場合があります
+2. もう一度「状態を確認」を押します
+3. 必要なら管理者から案内されたパスワードを入力します
+
+### 3. 「Tailscale 接続が必要です」と出る
+
+1. Tailscale が未接続です
+2. launcher から「Tailscale を起動」を押します
+3. 接続後に「アプリを開く」を押し直します
+
+## 利用者が覚えること
+
+1. コマンド入力は不要です
+2. launcher は毎回同じ場所から起動します
+3. 困ったらまず「状態を確認」を押します
+4. それでも直らなければ管理者へ連絡します

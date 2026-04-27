@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>kouku-kinou</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="kouku-kinou">kouku-kinou</h1>
+<p>口腔機能・栄養評価システムを Synology NAS / Docker で自己ホストし、Tailscale Serve で HTTPS 終端するための構成です。</p>
+<p>このフォルダの <code>index.html</code> は Claude artifact の wrapper ですが、<code>server.py</code> がその中に埋め込まれた本体 HTML を抽出し、保存処理だけを SQLite API に差し替えて配信します。これにより、既存レイアウトをほぼそのまま維持しつつ、複数端末で記録を共有できます。</p>
+<h2 id="関連資料">関連資料</h2>
+<ul>
+<li>Synology + Tailscale 配置手順: <a href="DEPLOY_SYNOLOGY_JA.html">DEPLOY_SYNOLOGY_JA.md</a></li>
+<li>利用者向け Tailscale 接続ガイド: <a href="TAILSCALE_CLIENT_GUIDE_JA.html">TAILSCALE_CLIENT_GUIDE_JA.md</a></li>
+<li>初心者向け運用マニュアル: <a href="OPERATIONS_MANUAL_JA.html">OPERATIONS_MANUAL_JA.md</a></li>
+<li>Windows 用かんたん起動: <a href="TailscaleClientLauncher.cmd">TailscaleClientLauncher.cmd</a></li>
+<li>起動ツール設定: <a href="TailscaleClientLauncher.settings.json">TailscaleClientLauncher.settings.json</a></li>
+<li>実運用設定のひな形: <a href=".env.example">.env.example</a></li>
+<li>現在の実運用設定: <a href=".env">.env</a></li>
+</ul>
+<h2 id="想定構成">想定構成</h2>
+<ol>
+<li>アプリ本体は Synology Container Manager 上の Docker コンテナで動かします。</li>
+<li><code>compose.yaml</code> はホストの <code>127.0.0.1:8010</code> にだけ公開し、LAN から直接見えないようにします。</li>
+<li>Synology 上の Tailscale Serve が <code>https://&lt;device&gt;.&lt;tailnet&gt;.ts.net/</code> を終端し、ローカルの <code>http://127.0.0.1:8010</code> へ流します。</li>
+<li>利用者は Tailscale に接続したうえで、その HTTPS URL からアクセスします。</li>
+</ol>
+<p>DSM のリバースプロキシや独自ドメイン、ポート開放は前提にしていません。</p>
+<h2 id="認証とアクセス制御">認証とアクセス制御</h2>
+<p>既定では認証を有効にして起動します。Tailscale 運用向けの既定値は <code>tailscale-or-password</code> です。</p>
+<p>主な環境変数:</p>
+<ul>
+<li><code>KOUKU_KINOU_AUTH_MODE</code>: <code>password</code> / <code>tailscale</code> / <code>tailscale-or-password</code></li>
+<li><code>KOUKU_KINOU_PASSWORD</code>: 管理者用パスワード。<code>tailscale-or-password</code> の予備入口として使います。</li>
+<li><code>KOUKU_KINOU_SESSION_TTL_MINUTES</code>: パスワードログイン時のセッション有効時間。既定 480 分</li>
+<li><code>KOUKU_KINOU_SECURE_COOKIE</code>: <code>1</code> で Secure Cookie を有効化。Tailscale HTTPS では <code>1</code> を維持します。</li>
+<li><code>KOUKU_KINOU_ALLOWED_NETWORKS</code>: 追加の IP 制限が必要な場合だけ使います。</li>
+<li><code>KOUKU_KINOU_TRUST_PROXY</code>: <code>X-Forwarded-For</code> ベースの制御が必要なときだけ <code>1</code> にします。</li>
+</ul>
+<p><code>tailscale-or-password</code> では、Tailscale の HTTPS URL から来た利用者はヘッダーで自動認証されます。Tailscale が使えない場合だけ、管理者用パスワードでの入口が残ります。</p>
+<h2 id="ローカル起動">ローカル起動</h2>
+<p><code>.env</code> がある場合は、<code>python server.py</code> 実行時にも自動で読み込みます。</p>
+<p>PowerShell 例:</p>
+<pre><code class="language-powershell">python server.py <span class="hljs-literal">--auth-mode</span> password <span class="hljs-literal">--host</span> <span class="hljs-number">127.0</span>.<span class="hljs-number">0.1</span> <span class="hljs-literal">--port</span> <span class="hljs-number">8010</span>
+</code></pre>
+<p>認証を切って画面確認だけしたい場合は以下です。</p>
+<pre><code class="language-powershell">python server.py <span class="hljs-literal">--no-auth</span> <span class="hljs-literal">--host</span> <span class="hljs-number">127.0</span>.<span class="hljs-number">0.1</span> <span class="hljs-literal">--port</span> <span class="hljs-number">8010</span>
+</code></pre>
+<p>起動後に以下へアクセスします。</p>
+<ul>
+<li><code>http://localhost:8010/</code></li>
+<li>ヘルスチェック: <code>http://localhost:8010/api/health</code></li>
+</ul>
+<p>SQLite の保存先は既定で <code>data/records.db</code> です。環境変数 <code>KOUKU_KINOU_DB</code> で変更できます。</p>
+<h2 id="docker--synology">Docker / Synology</h2>
+<p><code>.env</code> は作成済みです。まず中身を確認し、必要なら管理者用パスワードを変更してください。</p>
+<pre><code class="language-dotenv">KOUKU_KINOU_AUTH_MODE=tailscale-or-password
+KOUKU_KINOU_PASSWORD=change-this-admin-password
+KOUKU_KINOU_SESSION_TTL_MINUTES=480
+KOUKU_KINOU_SECURE_COOKIE=1
+KOUKU_KINOU_ALLOWED_NETWORKS=
+KOUKU_KINOU_TRUST_PROXY=0
+</code></pre>
+<p>コンテナ起動:</p>
+<pre><code class="language-powershell">docker compose up <span class="hljs-literal">--build</span> <span class="hljs-literal">-d</span>
+</code></pre>
+<p>Tailscale Serve 設定:</p>
+<pre><code class="language-powershell">tailscale serve <span class="hljs-literal">--bg</span> <span class="hljs-number">8010</span>
+tailscale serve status
+</code></pre>
+<p><code>tailscale serve --bg 8010</code> は、Tailscale の HTTPS URL から <code>http://127.0.0.1:8010</code> へ転送します。初回は HTTPS 有効化の承認画面が開くことがあります。</p>
+<h2 id="利用者向け配布物">利用者向け配布物</h2>
+<p>Windows 利用者には、次の 3 ファイルをまとめて配布できます。</p>
+<ol>
+<li><code>TailscaleClientLauncher.cmd</code></li>
+<li><code>TailscaleClientLauncher.ps1</code></li>
+<li><code>TailscaleClientLauncher.settings.json</code></li>
+</ol>
+<p>管理者が <code>TailscaleClientLauncher.settings.json</code> の <code>appUrl</code> を実際の <code>https://...ts.net/</code> へ直しておけば、利用者はコマンド入力なしで Tailscale 導入とアプリ起動を進められます。</p>
+<h2 id="実装メモ">実装メモ</h2>
+<ul>
+<li>画面配信時に <code>localStorage</code> を使う元コードを API 呼び出しへ変換しています。</li>
+<li>記録は SQLite に JSON として保存されます。</li>
+<li>共有対象は同じ NAS 上の単一 DB なので、PC とタブレットで同じ記録一覧を参照できます。</li>
+<li><code>compose.yaml</code> は loopback のみに bind するため、Tailscale Serve を通らない直接アクセスを減らせます。</li>
+<li><code>tailscale</code> または <code>tailscale-or-password</code> では、Tailscale identity header を使った認証に対応しています。</li>
+<li><code>index.html</code> 自体は元 artifact のソースとして残しています。</li>
+</ul>
+
+            
+            
+        </body>
+        </html>
