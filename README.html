@@ -74,7 +74,7 @@
     <div class="toolbar">
         <div>
             <div class="toolbar__title">資料ビュー</div>
-            <div class="toolbar__meta">口腔機能・栄養評価 / Generated from README.md / 2026-05-03 12:06</div>
+            <div class="toolbar__meta">口腔機能・栄養評価 / Generated from README.md / 2026-05-04 22:12</div>
         </div>
         <div class="toolbar__actions">
             <button class="button button--ghost" type="button" onclick="window.print()">印刷</button>
@@ -87,7 +87,7 @@
                 <div class="cover__badge">Overview</div>
                 <h1>口腔機能・栄養評価</h1>
                 <p class="cover__subtitle">配布・運用の全体像</p>
-                <p class="cover__meta">Generated from README.md / 2026-05-03 12:06</p>
+                <p class="cover__meta">Generated from README.md / 2026-05-04 22:12</p>
             </header>
             <div class="print-tip">PDF 化するときは A4 でそのまま印刷できます。見出し、図、コードブロックが崩れにくく、改ページの空きが大きくなりすぎないように調整しています。</div>
             <p>口腔機能・栄養評価システムを Synology NAS / Docker で自己ホストし、Tailscale Serve で HTTPS 終端するための構成です。</p>
@@ -99,6 +99,27 @@
 <p>配布用の PDF 再生成と package フォルダ作成は、<code>build_package.cmd</code> または <code>build_package.ps1</code> でまとめて実行できます。</p>
 <ol><li><code>build_package.cmd</code> をダブルクリックする</li><li>または PowerShell で <code>./build_package.ps1</code> を実行する</li><li>完了後に <code>package/</code> 配下へ管理者向け、Windows 利用者向け、タブレット配布向けのフォルダと ZIP が作成される</li></ol>
 <p>この処理では Markdown から <code>README.html</code> と各 HTML / PDF を作り直すため、README や配布資料を更新した後は再実行してください。</p>
+<h2>共有開発の運用ルール</h2>
+<p>今後の役割は次で固定します。</p>
+<ol><li>開発フォルダ: <code>\\192.168.11.200\全社共有\IT\アプリ開発\神谷\kouku-kinou</code></li><li>運用フォルダ: <code>\\192.168.11.200\docker\kouku-kinou</code></li><li>GitHub: <code>https://github.com/peacesoleiljapan-star/kouku-kinou.git</code></li></ol>
+<p>考え方:</p>
+<ol><li>コード、文書、配布資料の更新は開発フォルダだけで行います。</li><li>運用フォルダは Container Manager に読ませる配備先です。原則として <code>.env</code> と <code>data/</code> 以外を直接編集しません。</li><li>GitHub は履歴管理と復旧元です。開発フォルダで変更したものを commit / push して残します。</li></ol>
+<p>各 PC の Python 環境:</p>
+<ol><li><code>.venv</code> を共有フォルダの中に置かないでください。</li><li>各 PC ごとにローカルの Python / venv を使います。</li><li><code>build_package.ps1</code> は環境変数 <code>KOUKU_KINOU_PYTHON</code> があれば、その <code>python.exe</code> を優先して使います。</li><li>この PC では <code>KOUKU_KINOU_PYTHON=C:\Users\user\Documents\vscrepo\.venv\Scripts\python.exe</code> を設定済みです。</li><li>別の PC では、共有開発フォルダ直下の <code>setup_shared_dev_pc.cmd</code> を 1 回実行すれば、<code>git safe.directory</code> と <code>KOUKU_KINOU_PYTHON</code> の設定を入れられます。必要なら <code>setup_shared_dev_pc.ps1 -PythonPath C:\path\to\python.exe</code> を使います。</li></ol>
+<h2>GitHub への反映</h2>
+<p>このフォルダはすでに GitHub の <code>peacesoleiljapan-star/kouku-kinou</code> と接続済みです。今後は次の 2 通りで反映できます。</p>
+<ol><li>すぐ反映したいときは <code>sync_to_github_now.cmd</code> をダブルクリックする</li><li>自動反映したいときは <code>setup_github_auto_sync.cmd</code> を 1 回だけ実行する</li></ol>
+<p><code>setup_github_auto_sync.cmd</code> を実行すると、Windows のスタートアップへ自動起動を登録し、次を有効にします。</p>
+<ol><li>Windows のスタートアップへ自動起動ランチャーを登録する</li><li>ログオン中はこのフォルダの保存済み変更を監視し、しばらく更新が止まったら自動で commit / push する</li><li>変更がなくても定期的に同期処理を実行する</li></ol>
+<p>初期設定では 60 秒ほど更新が止まると自動反映し、15 分ごとにも定期同期します。未保存の編集内容は GitHub へ送られないため、保存後に反映されます。</p>
+<p>最小の作業手順:</p>
+<ol><li>開発フォルダで <code>git pull</code></li><li>ファイルを編集する</li><li><code>build_package.ps1</code> で package を作る</li><li>必要な配布物を運用フォルダへ反映する</li><li>動作確認後に <code>git add -A</code> → <code>git commit -m &quot;変更内容&quot;</code> → <code>git push</code></li></ol>
+<p>GitHub の最低限のコマンド:</p>
+<pre><code class="language-powershell">git pull
+git status
+git add -A
+git commit -m &quot;変更内容&quot;
+git push</code></pre>
 <h2>配布前チェック</h2>
 <ol><li>配布先に <code>.env</code> がなければ、<code>.env.example</code> をコピーして <code>.env</code> を作成します。</li><li><code>KOUKU_KINOU_PASSWORD</code> を本番用の強い値へ変更します。</li><li><code>TailscaleClientLauncher.settings.json</code> の <code>organizationName</code>、<code>appUrl</code>、<code>supportText</code>、<code>supportContact</code> を配布先に合わせて更新します。</li><li>Windows 利用者へは launcher 3 ファイルと <code>TAILSCALE_CLIENT_GUIDE_JA.pdf</code>、タブレット利用者へは URL と <code>TAILSCALE_TABLET_GUIDE_JA.pdf</code> / <code>TAILSCALE_TABLET_QR_SHEET_JA.pdf</code> を渡します。</li><li>配布前に <code>/api/health</code>、保存、検索、設定画面、アプリ内ヘルプの HTML / PDF / 画像表示を確認します。</li></ol>
 <h2>想定構成</h2>

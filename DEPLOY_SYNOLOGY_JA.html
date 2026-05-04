@@ -74,7 +74,7 @@
     <div class="toolbar">
         <div>
             <div class="toolbar__title">資料ビュー</div>
-            <div class="toolbar__meta">Synology + Tailscale 配置手順 / Generated from DEPLOY_SYNOLOGY_JA.md / 2026-05-03 12:06</div>
+            <div class="toolbar__meta">Synology + Tailscale 配置手順 / Generated from DEPLOY_SYNOLOGY_JA.md / 2026-05-04 22:12</div>
         </div>
         <div class="toolbar__actions">
             <button class="button button--ghost" type="button" onclick="window.print()">印刷</button>
@@ -87,7 +87,7 @@
                 <div class="cover__badge">Admin</div>
                 <h1>Synology + Tailscale 配置手順</h1>
                 <p class="cover__subtitle">管理者向け配置手順</p>
-                <p class="cover__meta">Generated from DEPLOY_SYNOLOGY_JA.md / 2026-05-03 12:06</p>
+                <p class="cover__meta">Generated from DEPLOY_SYNOLOGY_JA.md / 2026-05-04 22:12</p>
             </header>
             <div class="print-tip">PDF 化するときは A4 でそのまま印刷できます。見出し、図、コードブロックが崩れにくく、改ページの空きが大きくなりすぎないように調整しています。</div>
             <p>この手順書は、Synology NAS 上で 口腔機能・栄養評価システム を動かし、Tailscale Serve で HTTPS 終端したい管理者向けです。DSM の独自ドメイン運用やリバースプロキシ設定は使いません。</p>
@@ -100,14 +100,17 @@
 <p>Tailscale Serve は tailnet 内限定です。公開 URL を全世界へ出したい用途には向きません。</p>
 <h2>このアプリの置き場所</h2>
 <p>Synology に置く主なものは次のとおりです。</p>
-<ol><li><code>compose.yaml</code>: アプリ全体を起動する設定</li><li><code>.env</code>: 認証モードや管理者パスワード</li><li><code>server.py</code>: アプリ本体を配信するサーバー</li><li><code>index.html</code>: 元の画面ソース</li><li><code>data/records.db</code>: 記録データと共有設定。最重要ファイル</li></ol>
+<ol><li><code>compose.yaml</code>: アプリ全体を起動する設定</li><li><code>.env</code>: 認証モードや管理者パスワード</li><li><code>Dockerfile</code>: Container Manager で build するときに使う定義</li><li><code>assets/</code>: HTML 資料と画面内参照で使う画像類</li><li><code>server.py</code>: アプリ本体を配信するサーバー</li><li><code>index.html</code>: 元の画面ソース</li><li><code>README.html</code> などの配布資料: ヘルプと配布物で使う HTML / PDF</li><li><code>data/records.db</code>: 記録データと共有設定。最重要ファイル</li></ol>
 <h2>事前準備</h2>
 <p>Synology 側で次を確認します。</p>
 <ol><li>Container Manager が入っている</li><li>Tailscale が Synology に導入済みで、tailnet へ参加できている</li><li>保存用フォルダを作れる</li><li>管理者が 1 回だけ Tailscale CLI を実行できる</li></ol>
 <p>作るフォルダ例:</p>
 <ol><li><code>docker/kouku-kinou</code></li><li><code>docker/kouku-kinou/data</code></li></ol>
-<p>このフォルダに以下を置きます。</p>
-<ol><li><code>compose.yaml</code></li><li><code>.env</code></li><li><code>server.py</code></li><li><code>index.html</code></li><li><code>data</code> フォルダ</li></ol>
+<p>いちばん確実なのは、配布物の <code>package/kouku-kinou-admin-deploy</code> の中身をそのまま <code>docker/kouku-kinou</code> へコピーする方法です。</p>
+<p>最低限でも、<code>docker/kouku-kinou</code> 直下に次を置きます。</p>
+<ol><li><code>compose.yaml</code></li><li><code>.env</code></li><li><code>Dockerfile</code></li><li><code>server.py</code></li><li><code>index.html</code></li><li><code>assets</code> フォルダ</li><li><code>README.html</code> などの HTML / PDF 資料一式</li><li><code>data</code> フォルダ</li></ol>
+<p><code>data</code> フォルダの中には、少なくとも次を置きます。</p>
+<ol><li><code>records.db</code></li><li>必要に応じて <code>records.backup-*.db</code></li></ol>
 <h2>.env の確認</h2>
 <p>実運用前に次を確認してください。</p>
 <ol><li><code>KOUKU_KINOU_AUTH_MODE=tailscale-or-password</code></li><li><code>KOUKU_KINOU_PASSWORD</code>: 管理者用の強いパスワードへ変更</li><li><code>KOUKU_KINOU_SECURE_COOKIE=1</code>: このままでよい</li><li><code>KOUKU_KINOU_DATA_DIR=./data</code>: Synology で迷う場合は <code>/volume1/docker/kouku-kinou/data</code> のような絶対パスへ変更</li><li><code>KOUKU_KINOU_ALLOWED_NETWORKS=</code>: 通常は空欄のままでよい</li><li><code>KOUKU_KINOU_TRUST_PROXY=0</code>: 通常はこのままでよい</li></ol>
