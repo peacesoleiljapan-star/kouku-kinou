@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>Synology + Tailscale 配置手順</title>
+    <style>
+        :root {
+            --ink: #1f2937;
+            --muted: #5b6472;
+            --line: #d6dbe4;
+            --accent: #0f766e;
+            --accent-soft: #ecfdf5;
+            --paper: #ffffff;
+            --page: #eef3f9;
+            --shadow: rgba(15, 23, 42, 0.08);
+            --code: #0f172a;
+            --code-bg: #f8fafc;
+        }
+        * { box-sizing: border-box; }
+        html { background: var(--page); }
+        body { margin: 0; background: var(--page); color: var(--ink); font-family: "BIZ UDPGothic", "Yu Gothic UI", Meiryo, sans-serif; line-height: 1.78; }
+        .toolbar { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 24px; border-bottom: 1px solid var(--line); background: rgba(255,255,255,0.94); backdrop-filter: blur(8px); }
+        .toolbar__title { font-size: 15px; font-weight: 700; letter-spacing: .02em; }
+        .toolbar__meta { color: var(--muted); font-size: 12px; }
+        .toolbar__actions { display: flex; gap: 10px; }
+        .button { appearance: none; border: 1px solid var(--accent); background: var(--accent); color: #fff; border-radius: 999px; padding: 10px 16px; font-size: 13px; font-weight: 700; cursor: pointer; }
+        .button--ghost { background: transparent; color: var(--accent); }
+        .page { width: min(100%, 980px); margin: 28px auto 56px; padding: 0 16px; }
+        .sheet { background: var(--paper); border-radius: 20px; box-shadow: 0 12px 32px var(--shadow); padding: 34px 42px 44px; }
+        .cover { margin-bottom: 28px; padding-bottom: 20px; border-bottom: 2px solid var(--line); }
+        .cover__badge { display: inline-block; margin-bottom: 12px; padding: 6px 12px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-size: 12px; font-weight: 700; letter-spacing: .02em; }
+        .cover h1 { margin: 0 0 10px; font-size: 32px; line-height: 1.3; color: #0f172a; }
+        .cover__subtitle { margin: 0 0 8px; color: var(--muted); font-size: 15px; }
+        .cover__meta { margin: 0; color: var(--muted); font-size: 12px; }
+        .print-tip { margin: 0 0 24px; padding: 12px 14px; border: 1px solid #b7d7d1; border-radius: 14px; background: #f0fdfa; color: #115e59; font-size: 13px; }
+        h2, h3, figure, pre { break-inside: avoid; page-break-inside: avoid; }
+        h2 { margin: 28px 0 14px; padding: 12px 16px; border-left: 6px solid var(--accent); background: var(--accent-soft); color: #0f172a; font-size: 24px; line-height: 1.45; break-after: avoid-page; page-break-after: avoid; }
+        h3 { margin: 26px 0 10px; color: #0f172a; font-size: 20px; line-height: 1.45; break-after: avoid-page; page-break-after: avoid; }
+        p { margin: 0 0 12px; font-size: 15px; }
+        ol, ul { margin: 0 0 16px 1.5em; padding: 0; }
+        li { margin-bottom: 6px; padding-left: 4px; }
+        p, li { orphans: 2; widows: 2; }
+        code { padding: 0.08em 0.35em; border-radius: 6px; background: #eef2ff; color: #1d4ed8; font-family: Consolas, "Cascadia Code", monospace; font-size: 0.95em; }
+        pre { margin: 0 0 18px; padding: 16px 18px; overflow: auto; border: 1px solid var(--line); border-radius: 14px; background: var(--code-bg); }
+        pre code { padding: 0; background: transparent; color: var(--code); font-size: 13px; white-space: pre-wrap; }
+        a { color: #0b57d0; text-decoration: none; }
+        strong { color: #0f172a; }
+        figure { margin: 18px 0 14px; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; background: #fff; }
+        figure img { display: block; width: 100%; height: auto; background: #f8fafc; }
+        .figure--screenshot { max-width: 820px; margin-left: auto; margin-right: auto; }
+        .figure--screenshot img { max-height: 72vh; object-fit: contain; }
+        .figure--qr { max-width: 420px; margin-left: auto; margin-right: auto; }
+        .figure--qr img { padding: 18px; object-fit: contain; }
+        figcaption { padding: 10px 14px; border-top: 1px solid var(--line); background: #f8fafc; color: var(--muted); font-size: 13px; }
+        .footer-note { margin-top: 28px; padding-top: 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; }
+        @page { size: A4; margin: 10mm 11mm 12mm; }
+        @media print {
+            html, body { background: #fff; }
+            .toolbar { display: none; }
+            .page { width: auto; margin: 0; padding: 0; }
+            .sheet { box-shadow: none; border-radius: 0; padding: 0; }
+            figure { margin: 10px 0 12px; }
+            .figure--screenshot { max-width: 168mm; }
+            .figure--screenshot img { max-height: 170mm; }
+            .figure--qr { max-width: 74mm; }
+            .figure--qr img { max-height: 74mm; padding: 10px; }
+            a { color: inherit; text-decoration: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="toolbar">
+        <div>
+            <div class="toolbar__title">資料ビュー</div>
+            <div class="toolbar__meta">Synology + Tailscale 配置手順 / Generated from DEPLOY_SYNOLOGY_JA.md / 2026-05-03 12:06</div>
+        </div>
+        <div class="toolbar__actions">
+            <button class="button button--ghost" type="button" onclick="window.print()">印刷</button>
+            <button class="button" type="button" onclick="window.scrollTo({ top: 0, behavior: 'smooth' })">先頭へ</button>
+        </div>
+    </div>
+    <div class="page">
+        <article class="sheet">
+            <header class="cover">
+                <div class="cover__badge">Admin</div>
+                <h1>Synology + Tailscale 配置手順</h1>
+                <p class="cover__subtitle">管理者向け配置手順</p>
+                <p class="cover__meta">Generated from DEPLOY_SYNOLOGY_JA.md / 2026-05-03 12:06</p>
+            </header>
+            <div class="print-tip">PDF 化するときは A4 でそのまま印刷できます。見出し、図、コードブロックが崩れにくく、改ページの空きが大きくなりすぎないように調整しています。</div>
+            <p>この手順書は、Synology NAS 上で 口腔機能・栄養評価システム を動かし、Tailscale Serve で HTTPS 終端したい管理者向けです。DSM の独自ドメイン運用やリバースプロキシ設定は使いません。</p>
+<h2>この構成でやること</h2>
+<ol><li>Synology Container Manager でアプリを起動する</li><li>アプリのポートを NAS 自身の <code>127.0.0.1:8010</code> だけに公開する</li><li>Synology 上の Tailscale Serve で <code>https://diskstation.tail632bc4.ts.net/</code> を有効にする</li><li>利用者には Tailscale 接続後の HTTPS URL だけを案内する</li></ol>
+<h2>現在の tailnet 情報</h2>
+<ol><li>device 名: <code>diskstation</code></li><li>tailnet 名: <code>tail632bc4</code></li><li>現在のアプリ URL: <code>https://diskstation.tail632bc4.ts.net/</code></li></ol>
+<h2>この構成でやらないこと</h2>
+<ol><li>Synology 独自ドメインの取得</li><li>DSM リバースプロキシ設定</li><li>ルーターでのポート開放</li><li>Tailscale Funnel によるインターネット公開</li></ol>
+<p>Tailscale Serve は tailnet 内限定です。公開 URL を全世界へ出したい用途には向きません。</p>
+<h2>このアプリの置き場所</h2>
+<p>Synology に置く主なものは次のとおりです。</p>
+<ol><li><code>compose.yaml</code>: アプリ全体を起動する設定</li><li><code>.env</code>: 認証モードや管理者パスワード</li><li><code>server.py</code>: アプリ本体を配信するサーバー</li><li><code>index.html</code>: 元の画面ソース</li><li><code>data/records.db</code>: 記録データと共有設定。最重要ファイル</li></ol>
+<h2>事前準備</h2>
+<p>Synology 側で次を確認します。</p>
+<ol><li>Container Manager が入っている</li><li>Tailscale が Synology に導入済みで、tailnet へ参加できている</li><li>保存用フォルダを作れる</li><li>管理者が 1 回だけ Tailscale CLI を実行できる</li></ol>
+<p>作るフォルダ例:</p>
+<ol><li><code>docker/kouku-kinou</code></li><li><code>docker/kouku-kinou/data</code></li></ol>
+<p>このフォルダに以下を置きます。</p>
+<ol><li><code>compose.yaml</code></li><li><code>.env</code></li><li><code>server.py</code></li><li><code>index.html</code></li><li><code>data</code> フォルダ</li></ol>
+<h2>.env の確認</h2>
+<p>実運用前に次を確認してください。</p>
+<ol><li><code>KOUKU_KINOU_AUTH_MODE=tailscale-or-password</code></li><li><code>KOUKU_KINOU_PASSWORD</code>: 管理者用の強いパスワードへ変更</li><li><code>KOUKU_KINOU_SECURE_COOKIE=1</code>: このままでよい</li><li><code>KOUKU_KINOU_DATA_DIR=./data</code>: Synology で迷う場合は <code>/volume1/docker/kouku-kinou/data</code> のような絶対パスへ変更</li><li><code>KOUKU_KINOU_ALLOWED_NETWORKS=</code>: 通常は空欄のままでよい</li><li><code>KOUKU_KINOU_TRUST_PROXY=0</code>: 通常はこのままでよい</li></ol>
+<p><code>tailscale-or-password</code> の意味:</p>
+<ol><li>利用者が Tailscale の HTTPS URL から入れば自動認証される</li><li>うまくヘッダーが届かない時だけ、管理者用パスワードでも入れる</li></ol>
+<p><code>KOUKU_KINOU_DATA_DIR</code> の考え方:</p>
+<ol><li>既定値の <code>./data</code> は <code>compose.yaml</code> と同じフォルダの <code>data</code> を使います</li><li>Synology で場所を明示したい場合は <code>/volume1/docker/kouku-kinou/data</code> のような共有フォルダ配下を指定します</li><li><code>unable to open database file</code> が出たときは、まずこの値と実フォルダの存在を見直します</li></ol>
+<h2>Container Manager で起動する手順</h2>
+<ol><li>DSM にログインします。</li><li>Container Manager を開きます。</li><li>「プロジェクト」を開きます。</li><li>「作成」を押します。</li><li>プロジェクト名を <code>kouku-kinou</code> にします。</li><li>フォルダに <code>docker/kouku-kinou</code> を指定します。</li><li><code>compose.yaml</code> を読み込ませます。</li><li>起動します。</li></ol>
+<p>起動後に確認すること:</p>
+<ol><li>コンテナ名が <code>kouku-kinou</code> になっている</li><li>ステータスが「実行中」になっている</li><li>healthcheck が有効な環境では <code>healthy</code> になっている</li><li>ログにエラーが出ていない</li></ol>
+<h2>ポート公開の考え方</h2>
+<p><code>compose.yaml</code> は次のように loopback のみに bind しています。</p>
+<pre><code class="language-yaml">ports:
+	- &quot;127.0.0.1:8010:8010&quot;</code></pre>
+<p>これにより、LAN から <code>http://NAS-IP:8010</code> で直接開かれにくくなり、Tailscale Serve を通す前提を守りやすくなります。</p>
+<h2>Tailscale Serve を有効にする</h2>
+<p>この作業は管理者が 1 回だけ行います。DSM の画面操作だけではなく、Synology へ SSH 接続して実行します。</p>
+<ol><li>DSM の Control Panel &gt; Terminal &amp; SNMP で SSH を有効にします。</li><li>PC から Synology に SSH 接続します。</li><li><code>sudo -i</code> で root 権限に切り替えます。</li><li><code>tailscale status</code> で CLI が使えるか確認します。</li><li><code>tailscale serve --bg 8010</code> を実行します。</li><li><code>tailscale serve status</code> で公開 URL を確認します。</li></ol>
+<p>基本コマンド:</p>
+<pre><code class="language-powershell">ssh 管理者ユーザー名@NASのIP
+sudo -i
+tailscale status
+tailscale serve --bg 8010
+tailscale serve status</code></pre>
+<p><code>tailscale</code> コマンドが見つからない場合は、Synology のパッケージ実体を直接呼びます。</p>
+<pre><code class="language-powershell">/var/packages/Tailscale/target/bin/tailscale status
+/var/packages/Tailscale/target/bin/tailscale serve --bg 8010
+/var/packages/Tailscale/target/bin/tailscale serve status</code></pre>
+<p>意味:</p>
+<ol><li><code>tailscale serve --bg 8010</code>: <code>https://diskstation.tail632bc4.ts.net/</code> を <code>http://127.0.0.1:8010</code> へ転送</li><li><code>tailscale serve status</code>: 現在の転送状態を確認</li></ol>
+<p>初回は HTTPS 有効化や同意のためにブラウザー画面が出ることがあります。表示された案内に従って許可してください。</p>
+<p>もし以前の設定を消してやり直したい場合は次です。</p>
+<pre><code class="language-powershell">tailscale serve reset
+tailscale serve --bg 8010</code></pre>
+<h2>公開確認</h2>
+<p>次の順で確認します。</p>
+<ol><li><code>tailscale serve status</code> に <code>proxy http://127.0.0.1:8010</code> が出る</li><li><code>https://diskstation.tail632bc4.ts.net/api/health</code> が開ける</li><li>Tailscale 接続済みの PC からトップ画面が開ける</li><li>同一利用者を保存するとき、生年月日未入力では保存できない</li><li>同一利用者・同一評価日の再保存が上書き更新になる</li><li>記録一覧の検索が使える</li><li>別の端末で同じ記録が見える</li></ol>
+<p>もし <code>https://diskstation.tail632bc4.ts.net/api/health</code> が <code>{&quot;status&quot;: &quot;error&quot;, &quot;error&quot;: &quot;unable to open database file&quot;}</code> を返した場合は次です。</p>
+<ol><li><code>data</code> フォルダを Synology 上で作成済みか確認する</li><li><code>.env</code> の <code>KOUKU_KINOU_DATA_DIR</code> を絶対パスへ変更する</li><li>Container Manager でプロジェクトを再ビルドする</li><li><code>data/records.db</code>、<code>data/records.db-wal</code>、<code>data/records.db-shm</code> が作成されるか確認する</li><li>それでも直らない場合はコンテナログで <code>/data</code> まわりの権限エラーを確認する</li></ol>
+<h2>利用者への配布</h2>
+<p>利用者には次の 2 つを渡します。</p>
+<ol><li>Tailscale の接続方法</li><li>アプリ URL または <code>TailscaleClientLauncher.cmd</code> 一式</li></ol>
+<p>Windows 利用者向けの簡易起動ツールは次の 3 ファイルです。</p>
+<ol><li><code>TailscaleClientLauncher.cmd</code></li><li><code>TailscaleClientLauncher.ps1</code></li><li><code>TailscaleClientLauncher.settings.json</code></li></ol>
+<p><code>TailscaleClientLauncher.settings.json</code> の <code>appUrl</code> は <code>https://diskstation.tail632bc4.ts.net/</code> に設定済みです。URL を変更した時だけ、このファイルも合わせて更新してください。</p>
+<p>配布前に <code>organizationName</code>、<code>appUrl</code>、<code>supportText</code>、<code>supportContact</code> を現場向けに更新してください。特に <code>supportContact</code> は、利用者が困ったときの連絡先になるため、空欄のまま配らないほうが安全です。</p>
+<p>操作手順も一緒に渡すなら、<code>TAILSCALE_CLIENT_GUIDE_JA.pdf</code> を同梱するとそのまま案内に使えます。</p>
+<p>タブレット利用者にはファイル一式を配るより、次の案内だけを渡すほうが簡単です。</p>
+<ol><li>App Store / Google Play で Tailscale を入れること</li><li>管理者が指定した方法で Tailscale にサインインすること</li><li><code>https://diskstation.tail632bc4.ts.net/</code> をブラウザーで開くこと</li></ol>
+<p>利用者向けの説明文は <a href="TAILSCALE_TABLET_GUIDE_JA.html">TAILSCALE_TABLET_GUIDE_JA.html</a> をそのまま使えます。</p>
+<p>短い配布メッセージは <a href="TAILSCALE_TABLET_MESSAGE_TEMPLATE_JA.html">TAILSCALE_TABLET_MESSAGE_TEMPLATE_JA.html</a>、紙で渡す案内は <a href="TAILSCALE_TABLET_QR_SHEET_JA.html">TAILSCALE_TABLET_QR_SHEET_JA.html</a> を使えます。</p>
+<p>配布用の見やすい版としては <code>TAILSCALE_TABLET_GUIDE_JA.pdf</code>、<code>TAILSCALE_TABLET_MESSAGE_TEMPLATE_JA.pdf</code>、<code>TAILSCALE_TABLET_QR_SHEET_JA.pdf</code> も使えます。</p>
+<h2>バックアップ</h2>
+<p>最重要なのは <code>data/records.db</code> です。記録本体と共有設定がここに入ります。</p>
+<p>おすすめ:</p>
+<ol><li>1 日 1 回バックアップ</li><li>別フォルダへ世代管理</li><li>週 1 回は復元テスト</li></ol>
+<p>担当者一覧とかかりつけ医一覧も <code>shared_settings</code> テーブルとしてこの DB に入るため、<code>records.db</code> のバックアップ 1 つで両方を保護できます。</p>
+<h2>更新手順</h2>
+<p>アプリを更新する流れは次のとおりです。</p>
+<ol><li>先に <code>data/records.db</code> をバックアップ</li><li>新しいファイルで <code>server.py</code>、<code>Dockerfile</code>、<code>README.html</code> などを上書き</li><li>Container Manager でプロジェクトを再ビルドして起動します。DSM の画面で再ビルド操作が見当たらない場合は、同じフォルダを指定してプロジェクトを作り直します。</li><li>必要なら <code>tailscale serve status</code> を確認</li><li><code>https://diskstation.tail632bc4.ts.net/</code> でログイン、保存、一覧表示、検索を確認</li><li>同一利用者・同一評価日の更新挙動を 1 件だけ確認</li></ol>
+<h3>今回のように <code>server.py</code> を更新した時の最短手順</h3>
+<p>今回の共有設定対応は <code>server.py</code> の再配備だけで反映できます。<code>data/records.db</code> はそのまま残してよく、初回起動時に不足している <code>shared_settings</code> テーブルを自動作成します。手作業の DB 変換は不要です。</p>
+<p>#### A. Container Manager の画面で反映する</p>
+<ol><li>DSM にログインします。</li><li>File Station で <code>docker/kouku-kinou/data/records.db</code> を <code>records.backup-YYYYMMDD-HHMM.db</code> のような名前でコピーします。</li><li>File Station で <code>docker/kouku-kinou/server.py</code> を新しいものへ上書きします。</li><li>今回 <code>Dockerfile</code> や <code>README.html</code> も変えた場合だけ、それらも同じフォルダへ上書きします。</li><li>Container Manager を開きます。</li><li>「プロジェクト」で <code>kouku-kinou</code> を選びます。</li><li>いったん停止します。</li><li>画面に「再作成」「ビルド」「更新」などの項目があれば、それを使って同じ <code>docker/kouku-kinou/compose.yaml</code> から再作成します。</li><li>その操作が見当たらない場合は、「作成」から同じフォルダ <code>docker/kouku-kinou</code> を指定し直し、同じ <code>compose.yaml</code> を読み込んで起動します。</li><li>コンテナ名が <code>kouku-kinou</code>、状態が「実行中」になっていることを確認します。</li><li>ログにエラーが出ていないことを確認します。</li></ol>
+<p>#### B. SSH で反映できる場合の最短コマンド</p>
+<p>SSH で Synology に入り、<code>docker compose</code> が使える環境なら次で反映できます。</p>
+<pre><code class="language-powershell">ssh 管理者ユーザー名@NASのIP
+sudo -i
+cd /volume1/docker/kouku-kinou
+cp data/records.db data/records.backup-$(date +%Y%m%d-%H%M).db
+docker compose up --build -d
+docker compose ps</code></pre>
+<p><code>docker compose</code> が使えない NAS では、上の A の Container Manager 手順を使ってください。</p>
+<p>#### 反映後に必ず確認すること</p>
+<ol><li><code>https://diskstation.tail632bc4.ts.net/api/health</code> が開ける</li><li>トップ画面が開く</li><li>ヘッダー右上の歯車から設定画面を開ける</li><li>担当者一覧またはかかりつけ医一覧へ 1 件追加し、保存できる</li><li>ページ再読込後もその候補が残る</li><li>利用者情報タブのプルダウンへ同じ候補が出る</li><li>確認用に追加した候補を削除し、再読込後に消える</li></ol>
+<p>#### 今回の変更で覚えておくこと</p>
+<ol><li>共有設定は <code>data/records.db</code> に入るので、NAS をまたいで別 DB を使わない限り端末ごとの差は出ません。</li><li>単なるコンテナ再起動だけでは古いイメージのままなので、<code>server.py</code> を差し替えた時は再ビルドまたは再作成が必要です。</li><li><code>tailscale serve</code> の設定はそのまま使えるので、通常はやり直し不要です。</li></ol>
+<p>補足:</p>
+<ol><li>この構成ではアプリ本体は Docker イメージに含まれます。コードやヘルプ文書を変えた時は、単なる再起動では古いイメージのままです。</li><li>永続化しているのは <code>./data:/data</code> だけなので、<code>data</code> フォルダを消さなければ <code>records.db</code> は残ります。</li></ol>
+<h2>困ったとき</h2>
+<h3>1. URL を開いても画面が出ない</h3>
+<ol><li>Container Manager でコンテナが起動しているか確認</li><li><code>tailscale serve status</code> に設定が残っているか確認</li><li><code>https://diskstation.tail632bc4.ts.net/api/health</code> を直接開いてみる</li></ol>
+<h3>2. 「Tailscale 接続が必要です」と出る</h3>
+<ol><li>利用者 PC 側で Tailscale が未接続</li><li><code>https://diskstation.tail632bc4.ts.net/</code> ではなく別 URL を開いている</li><li>Tailscale Serve を通らず直接アクセスしている</li></ol>
+<h3>3. パスワード画面が出る</h3>
+<ol><li><code>tailscale-or-password</code> では予備入口として正常</li><li>Tailscale 接続が不完全な可能性があるので、まず helper で再接続確認</li></ol>
+<h3>4. 保存できない</h3>
+<ol><li><code>data</code> フォルダの書き込み権限を確認</li><li><code>records.db</code> が作成されているか確認</li><li>生年月日が空でないか確認</li><li>コンテナログに SQLite エラーが出ていないか確認</li></ol>
+<h2>最後に</h2>
+<p>この構成では、公開経路を Tailscale のみに絞るのが安全です。独自ドメインや DSM リバースプロキシを足さず、<code>https://diskstation.tail632bc4.ts.net/</code> を正式な入口として統一してください。</p>
+            <div class="footer-note">Source: DEPLOY_SYNOLOGY_JA.md / Generated by build_docs.py</div>
+        </article>
+    </div>
+</body>
+</html>

@@ -25,4 +25,4 @@ services:
       retries: 3
       start_period: 10s
     volumes:
-      - ./data:/data
+      - "${KOUKU_KINOU_DATA_DIR:-./data}:/data"

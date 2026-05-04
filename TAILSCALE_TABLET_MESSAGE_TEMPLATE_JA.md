@@ -50,5 +50,5 @@ https://diskstation.tail632bc4.ts.net/
 ## 管理者メモ
 
 1. タブレット利用者には `TailscaleClientLauncher.cmd` 一式は不要です。
-2. 初心者向けには、URL だけでなく [TAILSCALE_TABLET_QR_SHEET_JA.md](TAILSCALE_TABLET_QR_SHEET_JA.md) を紙で配るほうが伝わりやすくなります。
+2. 初心者向けには、URL だけでなく [TAILSCALE_TABLET_QR_SHEET_JA.html](TAILSCALE_TABLET_QR_SHEET_JA.html) を紙で配るほうが伝わりやすくなります。
 3. パスワード運用を残している場合は、その案内文だけ別で追記してください。

@@ -7,6 +7,150 @@ from pathlib import Path
 import server
 
 
+ORAL_FIELD_PROFILES = {
+    "monitoring": {
+        "q1": "2.はい",
+        "q2": "1.いいえ",
+        "q3": "1.いいえ",
+        "q4": "2.片方だけできる",
+        "q5": "3.良い",
+        "q6": "3.ふつう",
+        "q7": "1.ない",
+        "q8": "2.多少ある",
+        "q9": "2.多少ある",
+        "q10": "3.ふつう",
+        "a1": "2強い",
+        "a2": "2強い",
+        "a3": "2ある",
+        "a4": "2ある",
+        "rsst_time": "30",
+        "rsst_count": "3",
+        "rsst_judge": "2やや不十分",
+        "bukubuku": "2やや不十分",
+        "gugugu": "2やや不十分",
+        "pa": "5.4",
+        "ta": "5.1",
+        "ka": "4.8",
+        "dryness": "なし",
+        "halitosis": "なし",
+        "conversation": "できる",
+        "toothbrushing": "あり",
+    },
+    "dry_mouth": {
+        "q1": "1.いいえ",
+        "q2": "1.いいえ",
+        "q3": "2.はい",
+        "q4": "1.面方でできる",
+        "q5": "3.良い",
+        "q6": "4.やや悪い",
+        "q7": "1.ない",
+        "q8": "2.多少ある",
+        "q9": "2.多少ある",
+        "q10": "3.ふつう",
+        "a1": "2強い",
+        "a2": "2強い",
+        "a3": "2ある",
+        "a4": "2ある",
+        "rsst_time": "30",
+        "rsst_count": "3",
+        "rsst_judge": "2やや不十分",
+        "bukubuku": "2やや不十分",
+        "gugugu": "2やや不十分",
+        "pa": "5.2",
+        "ta": "5.0",
+        "ka": "4.6",
+        "dryness": "あり",
+        "halitosis": "なし",
+        "conversation": "できる",
+        "toothbrushing": "あり",
+    },
+    "swallow_risk": {
+        "q1": "2.はい",
+        "q2": "2.はい",
+        "q3": "1.いいえ",
+        "q4": "2.片方だけできる",
+        "q5": "4.あまり良くない",
+        "q6": "4.やや悪い",
+        "q7": "1.ない",
+        "q8": "2.多少ある",
+        "q9": "3.多い",
+        "q10": "4.やや良い",
+        "a1": "2強い",
+        "a2": "2強い",
+        "a3": "2ある",
+        "a4": "2ある",
+        "rsst_time": "30",
+        "rsst_count": "2",
+        "rsst_judge": "3不十分",
+        "bukubuku": "2やや不十分",
+        "gugugu": "3不十分",
+        "pa": "4.9",
+        "ta": "4.6",
+        "ka": "4.2",
+        "dryness": "あり",
+        "halitosis": "あり",
+        "conversation": "のむ",
+        "toothbrushing": "あり",
+    },
+    "re_eval": {
+        "q1": "2.はい",
+        "q2": "2.はい",
+        "q3": "2.はい",
+        "q4": "3.どちらもできない",
+        "q5": "5.良くない",
+        "q6": "5.悪い",
+        "q7": "2.強い",
+        "q8": "1.ない",
+        "q9": "3.多い",
+        "q10": "5.乏しい",
+        "a1": "3無し",
+        "a2": "3無し",
+        "a3": "3多い",
+        "a4": "3多い",
+        "rsst_time": "30",
+        "rsst_count": "1",
+        "rsst_judge": "3不十分",
+        "bukubuku": "3不十分",
+        "gugugu": "3不十分",
+        "pa": "4.1",
+        "ta": "3.9",
+        "ka": "3.6",
+        "dryness": "あり",
+        "halitosis": "あり",
+        "conversation": "のむ",
+        "toothbrushing": "食べこぼし",
+    },
+    "completed": {
+        "q1": "1.いいえ",
+        "q2": "1.いいえ",
+        "q3": "1.いいえ",
+        "q4": "1.面方でできる",
+        "q5": "2.とても良い",
+        "q6": "1.よい",
+        "q7": "1.ない",
+        "q8": "3.多い",
+        "q9": "1.最高に良い",
+        "q10": "1.最高",
+        "a1": "1強い",
+        "a2": "1強い",
+        "a3": "1ない",
+        "a4": "1ない",
+        "rsst_time": "30",
+        "rsst_count": "4",
+        "rsst_judge": "1できる",
+        "bukubuku": "1できる",
+        "gugugu": "1できる",
+        "pa": "6.3",
+        "ta": "6.1",
+        "ka": "5.8",
+        "dryness": "なし",
+        "halitosis": "なし",
+        "conversation": "できる",
+        "toothbrushing": "あり",
+    },
+}
+
+
 SAMPLE_RECORDS = [
     {
         "name": "青木 恒一",
@@ -25,6 +169,7 @@ SAMPLE_RECORDS = [
         "staff": "山口 ST",
         "dentist": "青葉歯科",
         "denture": "あり",
+        "oral_profile": "monitoring",
         "mna_scores": {"a": 2, "b": 2, "c": 2, "d": 2, "e": 2, "f": 1},
     },
     {
@@ -44,6 +189,7 @@ SAMPLE_RECORDS = [
         "staff": "山口 ST",
         "dentist": "青葉歯科",
         "denture": "あり",
+        "oral_profile": "monitoring",
         "mna_scores": {"a": 2, "b": 3, "c": 2, "d": 2, "e": 2, "f": 1},
     },
     {
@@ -63,6 +209,7 @@ SAMPLE_RECORDS = [
         "staff": "佐藤 ST",
         "dentist": "ひまわり歯科",
         "denture": "あり",
+        "oral_profile": "swallow_risk",
         "mna_scores": {"a": 1, "b": 2, "c": 2, "d": 2, "e": 1, "f": 1},
     },
     {
@@ -82,6 +229,7 @@ SAMPLE_RECORDS = [
         "staff": "佐藤 ST",
         "dentist": "ひまわり歯科",
         "denture": "あり",
+        "oral_profile": "swallow_risk",
         "mna_scores": {"a": 2, "b": 2, "c": 2, "d": 2, "e": 1, "f": 1},
     },
     {
@@ -101,6 +249,7 @@ SAMPLE_RECORDS = [
         "staff": "高橋 ST",
         "dentist": "北町歯科",
         "denture": "なし",
+        "oral_profile": "re_eval",
         "mna_scores": {"a": 1, "b": 1, "c": 1, "d": 2, "e": 2, "f": 0},
     },
     {
@@ -120,6 +269,7 @@ SAMPLE_RECORDS = [
         "staff": "伊藤 ST",
         "dentist": "南台歯科",
         "denture": "なし",
+        "oral_profile": "completed",
         "mna_scores": {"a": 2, "b": 2, "c": 2, "d": 2, "e": 2, "f": 3},
         "mna_field_mode": "f2",
     },
@@ -140,6 +290,7 @@ SAMPLE_RECORDS = [
         "staff": "伊藤 ST",
         "dentist": "南台歯科",
         "denture": "なし",
+        "oral_profile": "completed",
         "mna_scores": {"a": 2, "b": 3, "c": 2, "d": 2, "e": 1, "f": 3},
         "mna_field_mode": "f2",
     },
@@ -160,6 +311,7 @@ SAMPLE_RECORDS = [
         "staff": "山口 ST",
         "dentist": "さくら歯科",
         "denture": "あり",
+        "oral_profile": "dry_mouth",
         "mna_scores": {"a": 1, "b": 1, "c": 1, "d": 2, "e": 2, "f": 1},
     },
     {
@@ -179,6 +331,7 @@ SAMPLE_RECORDS = [
         "staff": "高橋 ST",
         "dentist": "中央歯科",
         "denture": "なし",
+        "oral_profile": "swallow_risk",
         "mna_scores": {"a": 2, "b": 3, "c": 2, "d": 2, "e": 1, "f": 1},
     },
     {
@@ -198,6 +351,7 @@ SAMPLE_RECORDS = [
         "staff": "佐藤 ST",
         "dentist": "みなみ歯科",
         "denture": "あり",
+        "oral_profile": "re_eval",
         "mna_scores": {"a": 0, "b": 1, "c": 1, "d": 2, "e": 2, "f": 0},
     },
 ]
@@ -210,6 +364,17 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+def build_oral_fields(sample: dict[str, object], oral_biko: str) -> dict[str, str]:
+    profile_name = str(sample.get("oral_profile") or "monitoring")
+    base_fields = dict(ORAL_FIELD_PROFILES.get(profile_name, ORAL_FIELD_PROFILES["monitoring"]))
+    explicit_fields = sample.get("oral_fields") or {}
+    if isinstance(explicit_fields, dict):
+        base_fields.update({key: str(value) for key, value in explicit_fields.items()})
+    base_fields.setdefault("oral_note1", oral_biko)
+    base_fields.setdefault("oral_note2", oral_biko)
+    return base_fields
+
+
 def build_record(sample: dict[str, object]) -> dict[str, object]:
     oral_continue = str(sample["oral_continue"])
     oral_select_value = "なし（終了）" if "終了" in oral_continue else "あり（継続）"
@@ -218,6 +383,7 @@ def build_record(sample: dict[str, object]) -> dict[str, object]:
     oral_biko = str(sample.get("oral_biko") or sample["comment"])
     mna_scores = dict(sample.get("mna_scores") or {})
     mna_field_mode = str(sample.get("mna_field_mode") or "f1")
+    oral_fields = build_oral_fields(sample, oral_biko)
 
     fields = {
         "name": sample["name"],
@@ -240,6 +406,7 @@ def build_record(sample: dict[str, object]) -> dict[str, object]:
         "summary_comment": sample["comment"],
         "next_monitor": sample["next_monitor"],
     }
+    fields.update(oral_fields)
     return {
         "name": sample["name"],
         "furigana": sample["furigana"],

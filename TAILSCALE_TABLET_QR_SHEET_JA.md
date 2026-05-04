@@ -38,4 +38,4 @@ URL: https://diskstation.tail632bc4.ts.net/
 ## 管理者向けメモ
 
 1. この資料は印刷して配る想定です。
-2. 同時に [TAILSCALE_TABLET_GUIDE_JA.md](TAILSCALE_TABLET_GUIDE_JA.md) も渡すと、利用者が自分で見返しやすくなります。
+2. 同時に [TAILSCALE_TABLET_GUIDE_JA.html](TAILSCALE_TABLET_GUIDE_JA.html) も渡すと、利用者が自分で見返しやすくなります。

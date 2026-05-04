@@ -1,226 +1,167 @@
 <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="UTF-8">
-            <title>kouku-kinou</title>
-            <style>
-/* From extension vscode.github */
-/*---------------------------------------------------------------------------------------------
- *  Copyright (c) Microsoft Corporation. All rights reserved.
- *  Licensed under the MIT License. See License.txt in the project root for license information.
- *--------------------------------------------------------------------------------------------*/
-
-.vscode-dark img[src$=\#gh-light-mode-only],
-.vscode-light img[src$=\#gh-dark-mode-only],
-.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
-.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
-	display: none;
-}
-
-</style>
-            
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
-<style>
-            body {
-                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
-                font-size: 14px;
-                line-height: 1.6;
-            }
-        </style>
-        <style>
-.task-list-item {
-    list-style-type: none;
-}
-
-.task-list-item-checkbox {
-    margin-left: -20px;
-    vertical-align: middle;
-    pointer-events: none;
-}
-</style>
-<style>
-:root {
-  --color-note: #0969da;
-  --color-tip: #1a7f37;
-  --color-warning: #9a6700;
-  --color-severe: #bc4c00;
-  --color-caution: #d1242f;
-  --color-important: #8250df;
-}
-
-</style>
-<style>
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-note: #2f81f7;
-    --color-tip: #3fb950;
-    --color-warning: #d29922;
-    --color-severe: #db6d28;
-    --color-caution: #f85149;
-    --color-important: #a371f7;
-  }
-}
-
-</style>
-<style>
-.markdown-alert {
-  padding: 0.5rem 1rem;
-  margin-bottom: 16px;
-  color: inherit;
-  border-left: .25em solid #888;
-}
-
-.markdown-alert>:first-child {
-  margin-top: 0
-}
-
-.markdown-alert>:last-child {
-  margin-bottom: 0
-}
-
-.markdown-alert .markdown-alert-title {
-  display: flex;
-  font-weight: 500;
-  align-items: center;
-  line-height: 1
-}
-
-.markdown-alert .markdown-alert-title .octicon {
-  margin-right: 0.5rem;
-  display: inline-block;
-  overflow: visible !important;
-  vertical-align: text-bottom;
-  fill: currentColor;
-}
-
-.markdown-alert.markdown-alert-note {
-  border-left-color: var(--color-note);
-}
-
-.markdown-alert.markdown-alert-note .markdown-alert-title {
-  color: var(--color-note);
-}
-
-.markdown-alert.markdown-alert-important {
-  border-left-color: var(--color-important);
-}
-
-.markdown-alert.markdown-alert-important .markdown-alert-title {
-  color: var(--color-important);
-}
-
-.markdown-alert.markdown-alert-warning {
-  border-left-color: var(--color-warning);
-}
-
-.markdown-alert.markdown-alert-warning .markdown-alert-title {
-  color: var(--color-warning);
-}
-
-.markdown-alert.markdown-alert-tip {
-  border-left-color: var(--color-tip);
-}
-
-.markdown-alert.markdown-alert-tip .markdown-alert-title {
-  color: var(--color-tip);
-}
-
-.markdown-alert.markdown-alert-caution {
-  border-left-color: var(--color-caution);
-}
-
-.markdown-alert.markdown-alert-caution .markdown-alert-title {
-  color: var(--color-caution);
-}
-
-</style>
-        
-        </head>
-        <body class="vscode-body vscode-light">
-            <h1 id="kouku-kinou">kouku-kinou</h1>
-<p>口腔機能・栄養評価システムを Synology NAS / Docker で自己ホストし、Tailscale Serve で HTTPS 終端するための構成です。</p>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>口腔機能・栄養評価</title>
+    <style>
+        :root {
+            --ink: #1f2937;
+            --muted: #5b6472;
+            --line: #d6dbe4;
+            --accent: #0f766e;
+            --accent-soft: #ecfdf5;
+            --paper: #ffffff;
+            --page: #eef3f9;
+            --shadow: rgba(15, 23, 42, 0.08);
+            --code: #0f172a;
+            --code-bg: #f8fafc;
+        }
+        * { box-sizing: border-box; }
+        html { background: var(--page); }
+        body { margin: 0; background: var(--page); color: var(--ink); font-family: "BIZ UDPGothic", "Yu Gothic UI", Meiryo, sans-serif; line-height: 1.78; }
+        .toolbar { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 24px; border-bottom: 1px solid var(--line); background: rgba(255,255,255,0.94); backdrop-filter: blur(8px); }
+        .toolbar__title { font-size: 15px; font-weight: 700; letter-spacing: .02em; }
+        .toolbar__meta { color: var(--muted); font-size: 12px; }
+        .toolbar__actions { display: flex; gap: 10px; }
+        .button { appearance: none; border: 1px solid var(--accent); background: var(--accent); color: #fff; border-radius: 999px; padding: 10px 16px; font-size: 13px; font-weight: 700; cursor: pointer; }
+        .button--ghost { background: transparent; color: var(--accent); }
+        .page { width: min(100%, 980px); margin: 28px auto 56px; padding: 0 16px; }
+        .sheet { background: var(--paper); border-radius: 20px; box-shadow: 0 12px 32px var(--shadow); padding: 34px 42px 44px; }
+        .cover { margin-bottom: 28px; padding-bottom: 20px; border-bottom: 2px solid var(--line); }
+        .cover__badge { display: inline-block; margin-bottom: 12px; padding: 6px 12px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-size: 12px; font-weight: 700; letter-spacing: .02em; }
+        .cover h1 { margin: 0 0 10px; font-size: 32px; line-height: 1.3; color: #0f172a; }
+        .cover__subtitle { margin: 0 0 8px; color: var(--muted); font-size: 15px; }
+        .cover__meta { margin: 0; color: var(--muted); font-size: 12px; }
+        .print-tip { margin: 0 0 24px; padding: 12px 14px; border: 1px solid #b7d7d1; border-radius: 14px; background: #f0fdfa; color: #115e59; font-size: 13px; }
+        h2, h3, figure, pre { break-inside: avoid; page-break-inside: avoid; }
+        h2 { margin: 28px 0 14px; padding: 12px 16px; border-left: 6px solid var(--accent); background: var(--accent-soft); color: #0f172a; font-size: 24px; line-height: 1.45; break-after: avoid-page; page-break-after: avoid; }
+        h3 { margin: 26px 0 10px; color: #0f172a; font-size: 20px; line-height: 1.45; break-after: avoid-page; page-break-after: avoid; }
+        p { margin: 0 0 12px; font-size: 15px; }
+        ol, ul { margin: 0 0 16px 1.5em; padding: 0; }
+        li { margin-bottom: 6px; padding-left: 4px; }
+        p, li { orphans: 2; widows: 2; }
+        code { padding: 0.08em 0.35em; border-radius: 6px; background: #eef2ff; color: #1d4ed8; font-family: Consolas, "Cascadia Code", monospace; font-size: 0.95em; }
+        pre { margin: 0 0 18px; padding: 16px 18px; overflow: auto; border: 1px solid var(--line); border-radius: 14px; background: var(--code-bg); }
+        pre code { padding: 0; background: transparent; color: var(--code); font-size: 13px; white-space: pre-wrap; }
+        a { color: #0b57d0; text-decoration: none; }
+        strong { color: #0f172a; }
+        figure { margin: 18px 0 14px; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; background: #fff; }
+        figure img { display: block; width: 100%; height: auto; background: #f8fafc; }
+        .figure--screenshot { max-width: 820px; margin-left: auto; margin-right: auto; }
+        .figure--screenshot img { max-height: 72vh; object-fit: contain; }
+        .figure--qr { max-width: 420px; margin-left: auto; margin-right: auto; }
+        .figure--qr img { padding: 18px; object-fit: contain; }
+        figcaption { padding: 10px 14px; border-top: 1px solid var(--line); background: #f8fafc; color: var(--muted); font-size: 13px; }
+        .footer-note { margin-top: 28px; padding-top: 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; }
+        @page { size: A4; margin: 10mm 11mm 12mm; }
+        @media print {
+            html, body { background: #fff; }
+            .toolbar { display: none; }
+            .page { width: auto; margin: 0; padding: 0; }
+            .sheet { box-shadow: none; border-radius: 0; padding: 0; }
+            figure { margin: 10px 0 12px; }
+            .figure--screenshot { max-width: 168mm; }
+            .figure--screenshot img { max-height: 170mm; }
+            .figure--qr { max-width: 74mm; }
+            .figure--qr img { max-height: 74mm; padding: 10px; }
+            a { color: inherit; text-decoration: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="toolbar">
+        <div>
+            <div class="toolbar__title">資料ビュー</div>
+            <div class="toolbar__meta">口腔機能・栄養評価 / Generated from README.md / 2026-05-03 12:06</div>
+        </div>
+        <div class="toolbar__actions">
+            <button class="button button--ghost" type="button" onclick="window.print()">印刷</button>
+            <button class="button" type="button" onclick="window.scrollTo({ top: 0, behavior: 'smooth' })">先頭へ</button>
+        </div>
+    </div>
+    <div class="page">
+        <article class="sheet">
+            <header class="cover">
+                <div class="cover__badge">Overview</div>
+                <h1>口腔機能・栄養評価</h1>
+                <p class="cover__subtitle">配布・運用の全体像</p>
+                <p class="cover__meta">Generated from README.md / 2026-05-03 12:06</p>
+            </header>
+            <div class="print-tip">PDF 化するときは A4 でそのまま印刷できます。見出し、図、コードブロックが崩れにくく、改ページの空きが大きくなりすぎないように調整しています。</div>
+            <p>口腔機能・栄養評価システムを Synology NAS / Docker で自己ホストし、Tailscale Serve で HTTPS 終端するための構成です。</p>
 <p>このフォルダの <code>index.html</code> は Claude artifact の wrapper ですが、<code>server.py</code> がその中に埋め込まれた本体 HTML を抽出し、保存処理だけを SQLite API に差し替えて配信します。これにより、既存レイアウトをほぼそのまま維持しつつ、複数端末で記録を共有できます。</p>
-<h2 id="関連資料">関連資料</h2>
-<ul>
-<li>Synology + Tailscale 配置手順: <a href="DEPLOY_SYNOLOGY_JA.html">DEPLOY_SYNOLOGY_JA.md</a></li>
-<li>利用者向け Tailscale 接続ガイド: <a href="TAILSCALE_CLIENT_GUIDE_JA.html">TAILSCALE_CLIENT_GUIDE_JA.md</a></li>
-<li>初心者向け運用マニュアル: <a href="OPERATIONS_MANUAL_JA.html">OPERATIONS_MANUAL_JA.md</a></li>
-<li>Windows 用かんたん起動: <a href="TailscaleClientLauncher.cmd">TailscaleClientLauncher.cmd</a></li>
-<li>起動ツール設定: <a href="TailscaleClientLauncher.settings.json">TailscaleClientLauncher.settings.json</a></li>
-<li>実運用設定のひな形: <a href=".env.example">.env.example</a></li>
-<li>現在の実運用設定: <a href=".env">.env</a></li>
-</ul>
-<h2 id="想定構成">想定構成</h2>
-<ol>
-<li>アプリ本体は Synology Container Manager 上の Docker コンテナで動かします。</li>
-<li><code>compose.yaml</code> はホストの <code>127.0.0.1:8010</code> にだけ公開し、LAN から直接見えないようにします。</li>
-<li>Synology 上の Tailscale Serve が <code>https://&lt;device&gt;.&lt;tailnet&gt;.ts.net/</code> を終端し、ローカルの <code>http://127.0.0.1:8010</code> へ流します。</li>
-<li>利用者は Tailscale に接続したうえで、その HTTPS URL からアクセスします。</li>
-</ol>
+<h2>関連資料</h2>
+<ul><li>Synology + Tailscale 配置手順: <a href="DEPLOY_SYNOLOGY_JA.html">DEPLOY_SYNOLOGY_JA.html</a> / <a href="DEPLOY_SYNOLOGY_JA.pdf">DEPLOY_SYNOLOGY_JA.pdf</a></li><li>Windows 利用者向け Tailscale 接続ガイド: <a href="TAILSCALE_CLIENT_GUIDE_JA.html">TAILSCALE_CLIENT_GUIDE_JA.html</a> / <a href="TAILSCALE_CLIENT_GUIDE_JA.pdf">TAILSCALE_CLIENT_GUIDE_JA.pdf</a></li><li>タブレット利用者向け Tailscale 接続ガイド: <a href="TAILSCALE_TABLET_GUIDE_JA.html">TAILSCALE_TABLET_GUIDE_JA.html</a> / <a href="TAILSCALE_TABLET_GUIDE_JA.pdf">TAILSCALE_TABLET_GUIDE_JA.pdf</a></li><li>タブレット利用者向け案内文テンプレート: <a href="TAILSCALE_TABLET_MESSAGE_TEMPLATE_JA.html">TAILSCALE_TABLET_MESSAGE_TEMPLATE_JA.html</a> / <a href="TAILSCALE_TABLET_MESSAGE_TEMPLATE_JA.pdf">TAILSCALE_TABLET_MESSAGE_TEMPLATE_JA.pdf</a></li><li>タブレット利用者向け QR 案内シート: <a href="TAILSCALE_TABLET_QR_SHEET_JA.html">TAILSCALE_TABLET_QR_SHEET_JA.html</a> / <a href="TAILSCALE_TABLET_QR_SHEET_JA.pdf">TAILSCALE_TABLET_QR_SHEET_JA.pdf</a></li><li>初心者向け運用マニュアル: <a href="OPERATIONS_MANUAL_PDF_JA.html">OPERATIONS_MANUAL_PDF_JA.html</a> / <a href="OPERATIONS_MANUAL_JA.pdf">OPERATIONS_MANUAL_JA.pdf</a></li><li>Windows 用かんたん起動: <a href="TailscaleClientLauncher.cmd">TailscaleClientLauncher.cmd</a></li><li>起動ツール設定: <a href="TailscaleClientLauncher.settings.json">TailscaleClientLauncher.settings.json</a></li><li>実運用設定のひな形: <a href=".env.example">.env.example</a></li><li>現在の実運用設定: Git 管理対象外の .env を各環境で配置して使います。</li></ul>
+<p>アプリ画面右上の <code>?</code> ヘルプから開く <a href="README.html">README.html</a> では、配布向けの HTML / PDF 資料も直接開けます。</p>
+<h2>配布パッケージの作り方</h2>
+<p>配布用の PDF 再生成と package フォルダ作成は、<code>build_package.cmd</code> または <code>build_package.ps1</code> でまとめて実行できます。</p>
+<ol><li><code>build_package.cmd</code> をダブルクリックする</li><li>または PowerShell で <code>./build_package.ps1</code> を実行する</li><li>完了後に <code>package/</code> 配下へ管理者向け、Windows 利用者向け、タブレット配布向けのフォルダと ZIP が作成される</li></ol>
+<p>この処理では Markdown から <code>README.html</code> と各 HTML / PDF を作り直すため、README や配布資料を更新した後は再実行してください。</p>
+<h2>配布前チェック</h2>
+<ol><li>配布先に <code>.env</code> がなければ、<code>.env.example</code> をコピーして <code>.env</code> を作成します。</li><li><code>KOUKU_KINOU_PASSWORD</code> を本番用の強い値へ変更します。</li><li><code>TailscaleClientLauncher.settings.json</code> の <code>organizationName</code>、<code>appUrl</code>、<code>supportText</code>、<code>supportContact</code> を配布先に合わせて更新します。</li><li>Windows 利用者へは launcher 3 ファイルと <code>TAILSCALE_CLIENT_GUIDE_JA.pdf</code>、タブレット利用者へは URL と <code>TAILSCALE_TABLET_GUIDE_JA.pdf</code> / <code>TAILSCALE_TABLET_QR_SHEET_JA.pdf</code> を渡します。</li><li>配布前に <code>/api/health</code>、保存、検索、設定画面、アプリ内ヘルプの HTML / PDF / 画像表示を確認します。</li></ol>
+<h2>想定構成</h2>
+<ol><li>アプリ本体は Synology Container Manager 上の Docker コンテナで動かします。</li><li><code>compose.yaml</code> はホストの <code>127.0.0.1:8010</code> にだけ公開し、LAN から直接見えないようにします。</li><li>Synology 上の Tailscale Serve が <code>https://diskstation.tail632bc4.ts.net/</code> を終端し、ローカルの <code>http://127.0.0.1:8010</code> へ流します。</li><li>利用者は Tailscale に接続したうえで、その HTTPS URL からアクセスします。</li></ol>
 <p>DSM のリバースプロキシや独自ドメイン、ポート開放は前提にしていません。</p>
-<h2 id="認証とアクセス制御">認証とアクセス制御</h2>
+<h2>認証とアクセス制御</h2>
 <p>既定では認証を有効にして起動します。Tailscale 運用向けの既定値は <code>tailscale-or-password</code> です。</p>
 <p>主な環境変数:</p>
-<ul>
-<li><code>KOUKU_KINOU_AUTH_MODE</code>: <code>password</code> / <code>tailscale</code> / <code>tailscale-or-password</code></li>
-<li><code>KOUKU_KINOU_PASSWORD</code>: 管理者用パスワード。<code>tailscale-or-password</code> の予備入口として使います。</li>
-<li><code>KOUKU_KINOU_SESSION_TTL_MINUTES</code>: パスワードログイン時のセッション有効時間。既定 480 分</li>
-<li><code>KOUKU_KINOU_SECURE_COOKIE</code>: <code>1</code> で Secure Cookie を有効化。Tailscale HTTPS では <code>1</code> を維持します。</li>
-<li><code>KOUKU_KINOU_ALLOWED_NETWORKS</code>: 追加の IP 制限が必要な場合だけ使います。</li>
-<li><code>KOUKU_KINOU_TRUST_PROXY</code>: <code>X-Forwarded-For</code> ベースの制御が必要なときだけ <code>1</code> にします。</li>
-</ul>
+<ul><li><code>KOUKU_KINOU_AUTH_MODE</code>: <code>password</code> / <code>tailscale</code> / <code>tailscale-or-password</code></li><li><code>KOUKU_KINOU_PASSWORD</code>: 管理者用パスワード。<code>tailscale-or-password</code> の予備入口として使います。</li><li><code>KOUKU_KINOU_SESSION_TTL_MINUTES</code>: パスワードログイン時のセッション有効時間。既定 480 分</li><li><code>KOUKU_KINOU_SECURE_COOKIE</code>: <code>1</code> で Secure Cookie を有効化。Tailscale HTTPS では <code>1</code> を維持します。</li><li><code>KOUKU_KINOU_ALLOWED_NETWORKS</code>: 追加の IP 制限が必要な場合だけ使います。</li><li><code>KOUKU_KINOU_TRUST_PROXY</code>: <code>X-Forwarded-For</code> ベースの制御が必要なときだけ <code>1</code> にします。</li></ul>
 <p><code>tailscale-or-password</code> では、Tailscale の HTTPS URL から来た利用者はヘッダーで自動認証されます。Tailscale が使えない場合だけ、管理者用パスワードでの入口が残ります。</p>
-<h2 id="ローカル起動">ローカル起動</h2>
+<h2>ローカル起動</h2>
 <p><code>.env</code> がある場合は、<code>python server.py</code> 実行時にも自動で読み込みます。</p>
 <p>PowerShell 例:</p>
-<pre><code class="language-powershell">python server.py <span class="hljs-literal">--auth-mode</span> password <span class="hljs-literal">--host</span> <span class="hljs-number">127.0</span>.<span class="hljs-number">0.1</span> <span class="hljs-literal">--port</span> <span class="hljs-number">8010</span>
-</code></pre>
+<pre><code class="language-powershell">python server.py --auth-mode password --host 127.0.0.1 --port 8010</code></pre>
 <p>認証を切って画面確認だけしたい場合は以下です。</p>
-<pre><code class="language-powershell">python server.py <span class="hljs-literal">--no-auth</span> <span class="hljs-literal">--host</span> <span class="hljs-number">127.0</span>.<span class="hljs-number">0.1</span> <span class="hljs-literal">--port</span> <span class="hljs-number">8010</span>
-</code></pre>
+<pre><code class="language-powershell">python server.py --no-auth --host 127.0.0.1 --port 8010</code></pre>
 <p>起動後に以下へアクセスします。</p>
-<ul>
-<li><code>http://localhost:8010/</code></li>
-<li>ヘルスチェック: <code>http://localhost:8010/api/health</code></li>
-</ul>
+<ul><li><code>http://localhost:8010/</code></li><li>ヘルプ: <code>http://localhost:8010/readme.html</code></li><li>ヘルスチェック: <code>http://localhost:8010/api/health</code></li></ul>
 <p>SQLite の保存先は既定で <code>data/records.db</code> です。環境変数 <code>KOUKU_KINOU_DB</code> で変更できます。</p>
-<h2 id="docker--synology">Docker / Synology</h2>
-<p><code>.env</code> は作成済みです。まず中身を確認し、必要なら管理者用パスワードを変更してください。</p>
+<p>保存ルール:</p>
+<ul><li>利用者は <code>氏名 + 生年月日</code> で識別します</li><li>同じ利用者の同じ評価日は新規追加ではなく上書き更新します</li><li>同じ利用者でも評価日が違えば履歴として別記録を残します</li><li>記録一覧では氏名、ふりがな、生年月日、評価日で検索できます</li></ul>
+<p>確認用サンプル投入:</p>
+<pre><code class="language-powershell">python seed_sample_records.py</code></pre>
+<p>既存データを消して入れ直す場合は <code>python seed_sample_records.py --replace</code> を使います。</p>
+<h2>Docker / Synology</h2>
+<p>配布先に <code>.env</code> がなければ <code>.env.example</code> をコピーして <code>.env</code> を作成します。すでに <code>.env</code> がある場合も、まず中身を確認し、必要なら管理者用パスワードを変更してください。</p>
 <pre><code class="language-dotenv">KOUKU_KINOU_AUTH_MODE=tailscale-or-password
 KOUKU_KINOU_PASSWORD=change-this-admin-password
 KOUKU_KINOU_SESSION_TTL_MINUTES=480
 KOUKU_KINOU_SECURE_COOKIE=1
+KOUKU_KINOU_DATA_DIR=./data
 KOUKU_KINOU_ALLOWED_NETWORKS=
-KOUKU_KINOU_TRUST_PROXY=0
-</code></pre>
+KOUKU_KINOU_TRUST_PROXY=0</code></pre>
+<p>Synology で <code>unable to open database file</code> が出る場合は、<code>KOUKU_KINOU_DATA_DIR</code> を <code>./data</code> から NAS 上の実フォルダへ明示してください。例: <code>/volume1/docker/kouku-kinou/data</code></p>
 <p>コンテナ起動:</p>
-<pre><code class="language-powershell">docker compose up <span class="hljs-literal">--build</span> <span class="hljs-literal">-d</span>
-</code></pre>
+<pre><code class="language-powershell">docker compose up --build -d
+docker compose ps</code></pre>
+<p><code>docker compose ps</code> の <code>STATUS</code> で <code>healthy</code> になれば、<code>/api/health</code> まで含めて通っています。</p>
+<p><code>/api/health</code> が <code>{&quot;status&quot;: &quot;error&quot;, &quot;error&quot;: &quot;unable to open database file&quot;}</code> を返す場合は次を順に確認します。</p>
+<ol><li><code>.env</code> の <code>KOUKU_KINOU_DATA_DIR</code> が意図したフォルダを指している</li><li>そのフォルダが Synology 上に実在する</li><li>Container Manager でそのフォルダを読書きできる</li><li>再ビルド後に <code>records.db</code>、<code>records.db-wal</code>、<code>records.db-shm</code> が作成される</li></ol>
+<p>現在の公開 URL は <code>https://diskstation.tail632bc4.ts.net/</code> です。</p>
+<p>Synology では DSM で SSH を有効にしたうえで NAS に入り、root 権限で Tailscale Serve を設定します。</p>
 <p>Tailscale Serve 設定:</p>
-<pre><code class="language-powershell">tailscale serve <span class="hljs-literal">--bg</span> <span class="hljs-number">8010</span>
-tailscale serve status
-</code></pre>
+<pre><code class="language-powershell">tailscale serve --bg 8010
+tailscale serve status</code></pre>
+<p><code>tailscale</code> コマンドが見つからない場合は、Synology のパッケージ実体を直接呼びます。</p>
+<pre><code class="language-powershell">/var/packages/Tailscale/target/bin/tailscale serve --bg 8010
+/var/packages/Tailscale/target/bin/tailscale serve status</code></pre>
 <p><code>tailscale serve --bg 8010</code> は、Tailscale の HTTPS URL から <code>http://127.0.0.1:8010</code> へ転送します。初回は HTTPS 有効化の承認画面が開くことがあります。</p>
-<h2 id="利用者向け配布物">利用者向け配布物</h2>
+<h2>利用者向け配布物</h2>
 <p>Windows 利用者には、次の 3 ファイルをまとめて配布できます。</p>
-<ol>
-<li><code>TailscaleClientLauncher.cmd</code></li>
-<li><code>TailscaleClientLauncher.ps1</code></li>
-<li><code>TailscaleClientLauncher.settings.json</code></li>
-</ol>
-<p>管理者が <code>TailscaleClientLauncher.settings.json</code> の <code>appUrl</code> を実際の <code>https://...ts.net/</code> へ直しておけば、利用者はコマンド入力なしで Tailscale 導入とアプリ起動を進められます。</p>
-<h2 id="実装メモ">実装メモ</h2>
-<ul>
-<li>画面配信時に <code>localStorage</code> を使う元コードを API 呼び出しへ変換しています。</li>
-<li>記録は SQLite に JSON として保存されます。</li>
-<li>共有対象は同じ NAS 上の単一 DB なので、PC とタブレットで同じ記録一覧を参照できます。</li>
-<li><code>compose.yaml</code> は loopback のみに bind するため、Tailscale Serve を通らない直接アクセスを減らせます。</li>
-<li><code>tailscale</code> または <code>tailscale-or-password</code> では、Tailscale identity header を使った認証に対応しています。</li>
-<li><code>index.html</code> 自体は元 artifact のソースとして残しています。</li>
-</ul>
-
-            
-            
-        </body>
-        </html>
+<ol><li><code>TailscaleClientLauncher.cmd</code></li><li><code>TailscaleClientLauncher.ps1</code></li><li><code>TailscaleClientLauncher.settings.json</code></li></ol>
+<p>配布用の <code>TailscaleClientLauncher.settings.json</code> には <code>https://diskstation.tail632bc4.ts.net/</code> を設定済みです。利用者はコマンド入力なしで Tailscale 導入とアプリ起動を進められます。</p>
+<p>配布前に <code>organizationName</code>、<code>appUrl</code>、<code>supportText</code>、<code>supportContact</code> を現場向けに更新してください。特に <code>supportContact</code> は利用者が困ったときの連絡先になるため、空欄のまま配らないほうが安全です。</p>
+<p>Windows 利用者へ操作手順も渡す場合は <a href="TAILSCALE_CLIENT_GUIDE_JA.pdf">TAILSCALE_CLIENT_GUIDE_JA.pdf</a> を同梱すると、そのまま案内に使えます。</p>
+<p>タブレット利用者には、ファイル配布より次の 2 つだけを案内するほうが簡単です。</p>
+<ol><li>Tailscale の導入とサインイン方法</li><li>アプリ URL <code>https://diskstation.tail632bc4.ts.net/</code></li></ol>
+<p>タブレット向けの詳しい案内は <a href="TAILSCALE_TABLET_GUIDE_JA.html">TAILSCALE_TABLET_GUIDE_JA.html</a> にまとめています。 配布時にそのまま使う文面は <a href="TAILSCALE_TABLET_MESSAGE_TEMPLATE_JA.html">TAILSCALE_TABLET_MESSAGE_TEMPLATE_JA.html</a>、紙配布用の QR 案内は <a href="TAILSCALE_TABLET_QR_SHEET_JA.html">TAILSCALE_TABLET_QR_SHEET_JA.html</a> を使えます。</p>
+<p>配布用の見やすい版としては <a href="TAILSCALE_TABLET_GUIDE_JA.pdf">TAILSCALE_TABLET_GUIDE_JA.pdf</a>、<a href="TAILSCALE_TABLET_MESSAGE_TEMPLATE_JA.pdf">TAILSCALE_TABLET_MESSAGE_TEMPLATE_JA.pdf</a>、<a href="TAILSCALE_TABLET_QR_SHEET_JA.pdf">TAILSCALE_TABLET_QR_SHEET_JA.pdf</a> も同梱しています。</p>
+<h2>実装メモ</h2>
+<ul><li>画面配信時に <code>localStorage</code> を使う元コードを API 呼び出しへ変換しています。</li><li>記録は SQLite に JSON として保存されます。</li><li>利用者識別は <code>氏名 + 生年月日</code>、評価識別は <code>氏名 + 生年月日 + 評価日</code> です。</li><li>同一利用者・同一評価日の保存は上書き、別日の評価は履歴追加です。</li><li>記録一覧には検索欄があり、氏名、ふりがな、生年月日、評価日で絞り込みできます。</li><li>共有対象は同じ NAS 上の単一 DB なので、PC とタブレットで同じ記録一覧を参照できます。</li><li><code>compose.yaml</code> は loopback のみに bind するため、Tailscale Serve を通らない直接アクセスを減らせます。</li><li><code>compose.yaml</code> の healthcheck は <code>/api/health</code> で DB と画面テンプレートの準備完了を確認します。</li><li><code>tailscale</code> または <code>tailscale-or-password</code> では、Tailscale identity header を使った認証に対応しています。</li><li><code>README.html</code> から PDF 資料と <code>assets/</code> 配下の画像付きマニュアルを開けるようにしているため、配布後もブラウザーだけで資料確認を完結できます。</li><li><code>index.html</code> 自体は元 artifact のソースとして残しています。</li></ul>
+            <div class="footer-note">Source: README.md / Generated by build_docs.py</div>
+        </article>
+    </div>
+</body>
+</html>

@@ -2,7 +2,7 @@
 
 この資料は、Windows PC 利用者が コマンド入力なし で Tailscale を導入し、口腔機能・栄養評価システムを開くための案内です。
 
-iPad / Android タブレットで使う場合は、[TAILSCALE_TABLET_GUIDE_JA.md](TAILSCALE_TABLET_GUIDE_JA.md) を見てください。
+iPad / Android タブレットで使う場合は、[TAILSCALE_TABLET_GUIDE_JA.html](TAILSCALE_TABLET_GUIDE_JA.html) を見てください。
 
 ## 使うもの
 
@@ -25,6 +25,20 @@ iPad / Android タブレットで使う場合は、[TAILSCALE_TABLET_GUIDE_JA.md
 5. 表示に従ってサインインします。
 6. 「状態を確認」を押します。
 7. 接続済みになったら「アプリを開く」を押します。
+
+## アプリが開けたらこの画面です
+
+接続後に URL が正しく開くと、最初に次のような画面が出ます。
+
+![アプリを開いた直後の画面](assets/manual_beginner/01_app_open.png)
+
+画面の見方:
+
+1. 上部に「口腔機能・栄養評価システム」と出ていれば、正しい画面です。
+2. 右上の歯車は設定、`?` はヘルプです。
+3. 上のタブから、利用者情報、口腔機能、MNA-SF、総合評価、記録一覧へ移動できます。
+
+困ったときは、まずこの画面まで開けているかを確認してください。
 
 ## 毎日の使い方
 

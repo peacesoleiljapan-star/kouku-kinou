@@ -2,7 +2,7 @@
 
 この資料は、iPad や Android タブレットの利用者が、PC 用 launcher を使わずに Tailscale を導入して、口腔機能・栄養評価システムを開くための案内です。
 
-管理者が紙で案内する場合は、[TAILSCALE_TABLET_QR_SHEET_JA.md](TAILSCALE_TABLET_QR_SHEET_JA.md) も合わせて使えます。
+管理者が紙で案内する場合は、[TAILSCALE_TABLET_QR_SHEET_JA.html](TAILSCALE_TABLET_QR_SHEET_JA.html) も合わせて使えます。
 
 ## いちばん簡単な導入方法
 
@@ -37,6 +37,20 @@
 6. `VPN を追加しますか` や `接続を許可しますか` と表示されたら許可します。
 7. Tailscale の画面で接続済みになったことを確認します。
 8. Safari または Chrome で `https://diskstation.tail632bc4.ts.net/` を開きます。
+
+## アプリが開けたらこの画面です
+
+接続後に Safari または Chrome で URL が正しく開くと、最初に次のような画面が出ます。
+
+![アプリを開いた直後の画面](assets/manual_beginner/01_app_open.png)
+
+画面の見方:
+
+1. 上部に「口腔機能・栄養評価システム」と出ていれば、正しい画面です。
+2. 上のタブから、入力画面と記録一覧を切り替えます。
+3. 右上の `?` からヘルプ、歯車から設定を開けます。
+
+タブレットでは縦向きでも使えますが、入力時は横向きのほうが見やすいことがあります。
 
 ## 毎日の使い方
 
