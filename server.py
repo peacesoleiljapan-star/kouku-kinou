@@ -3706,10 +3706,36 @@ function installStage2Hooks() {
         const originalLoadRecord = loadRecord;
         loadRecord = function(...args) {
             const result = originalLoadRecord.apply(this, args);
+            const recordId = Number(args[0]);
+            const loadedRecord = Array.isArray(records)
+                ? records.find((record) => Number(record.id) === recordId)
+                : null;
+            if (loadedRecord) {
+                if (typeof calcBMI === 'function') {
+                    calcBMI();
+                }
+                currentMnaFieldMode = loadedRecord.mnaFieldMode || '';
+                mnaScores = { ...buildEmptyMnaScores(), ...(loadedRecord.mnaScores || {}) };
+                restoreMnaSelections();
+                calcMNAScore();
+                updateSummary();
+            }
             scheduleStage2Update();
             return result;
         };
         window.loadRecord = loadRecord;
+    }
+
+    if (typeof selectMNA === 'function') {
+        const originalSelectMNA = selectMNA;
+        selectMNA = function(...args) {
+            const result = originalSelectMNA.apply(this, args);
+            currentMnaFieldMode = getSelectedMnaFieldMode() || currentMnaFieldMode || '';
+            updateSummary();
+            scheduleStage2Update();
+            return result;
+        };
+        window.selectMNA = selectMNA;
     }
 
     if (typeof renderHistory === 'function') {
