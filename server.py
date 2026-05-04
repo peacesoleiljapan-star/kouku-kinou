@@ -3715,7 +3715,15 @@ function installStage2Hooks() {
                     calcBMI();
                 }
                 currentMnaFieldMode = loadedRecord.mnaFieldMode || '';
-                mnaScores = { ...buildEmptyMnaScores(), ...(loadedRecord.mnaScores || {}) };
+                const restoredMnaScores = { ...buildEmptyMnaScores(), ...(loadedRecord.mnaScores || {}) };
+                if (currentMnaFieldMode === 'f1' && loadedRecord.mnaScores && loadedRecord.mnaScores.f1 != null) {
+                    restoredMnaScores.f = loadedRecord.mnaScores.f1;
+                } else if (currentMnaFieldMode === 'f2' && loadedRecord.mnaScores && loadedRecord.mnaScores.f2 != null) {
+                    restoredMnaScores.f = loadedRecord.mnaScores.f2;
+                }
+                delete restoredMnaScores.f1;
+                delete restoredMnaScores.f2;
+                mnaScores = restoredMnaScores;
                 restoreMnaSelections();
                 calcMNAScore();
                 updateSummary();
@@ -3730,7 +3738,17 @@ function installStage2Hooks() {
         const originalSelectMNA = selectMNA;
         selectMNA = function(...args) {
             const result = originalSelectMNA.apply(this, args);
-            currentMnaFieldMode = getSelectedMnaFieldMode() || currentMnaFieldMode || '';
+            const selectedKey = args[0];
+            const selectedValue = Number(args[1]);
+            if ((selectedKey === 'f1' || selectedKey === 'f2') && Number.isFinite(selectedValue)) {
+                currentMnaFieldMode = selectedKey;
+                mnaScores.f = selectedValue;
+                delete mnaScores.f1;
+                delete mnaScores.f2;
+                calcMNAScore();
+            } else {
+                currentMnaFieldMode = getSelectedMnaFieldMode() || currentMnaFieldMode || '';
+            }
             updateSummary();
             scheduleStage2Update();
             return result;
@@ -4007,6 +4025,15 @@ def transform_client_html(
   if (r.mnaScores) {""",
     )
 
+    html = replace_once(
+        html,
+        "  mnaScores[key === 'f2' ? 'f' : key] = value;\n",
+        """  mnaScores[(key === 'f1' || key === 'f2') ? 'f' : key] = value;
+    if (key === 'f1' || key === 'f2') {
+        currentMnaFieldMode = key;
+    }
+""",
+    )
     html, count = MNA_RESTORE_PATTERN.subn(
         """
     restoreMnaSelections();
