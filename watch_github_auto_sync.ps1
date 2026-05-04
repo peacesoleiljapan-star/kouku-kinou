@@ -1,6 +1,7 @@
 param(
     [string]$RepoPath = (Split-Path -Parent $MyInvocation.MyCommand.Path),
-    [int]$DebounceSeconds = 60
+    [int]$DebounceSeconds = 60,
+    [int]$SyncIntervalMinutes = 15
 )
 
 $ErrorActionPreference = 'Stop'
@@ -10,9 +11,15 @@ if ($DebounceSeconds -lt 5) {
     throw 'DebounceSeconds must be 5 or greater.'
 }
 
-$resolvedRepoPath = (Resolve-Path -LiteralPath $RepoPath).Path
+if ($SyncIntervalMinutes -lt 1) {
+    throw 'SyncIntervalMinutes must be 1 or greater.'
+}
+
+$resolvedRepoPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($RepoPath)
 $scriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 $syncScript = Join-Path $scriptRoot 'git_auto_sync.ps1'
+$mutex = New-Object System.Threading.Mutex($false, 'Global\KoukuKinouGitWatch')
+$hasLock = $false
 
 if (-not (Test-Path -LiteralPath $syncScript)) {
     throw 'git_auto_sync.ps1 was not found.'
@@ -66,8 +73,14 @@ $subscriptions = @(
 
 $watcher.EnableRaisingEvents = $true
 $syncDeadlineUtc = $null
+$nextPeriodicSyncUtc = [DateTime]::UtcNow
 
 try {
+    $hasLock = $mutex.WaitOne(0)
+    if (-not $hasLock) {
+        exit 0
+    }
+
     while ($true) {
         $event = Wait-Event -Timeout 5
         if ($event) {
@@ -86,6 +99,12 @@ try {
         if ($syncDeadlineUtc -and [DateTime]::UtcNow -ge $syncDeadlineUtc) {
             $syncDeadlineUtc = $null
             & powershell.exe -NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File $syncScript -RepoPath $resolvedRepoPath -Quiet
+            $nextPeriodicSyncUtc = [DateTime]::UtcNow.AddMinutes($SyncIntervalMinutes)
+        }
+
+        if ([DateTime]::UtcNow -ge $nextPeriodicSyncUtc) {
+            & powershell.exe -NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File $syncScript -RepoPath $resolvedRepoPath -Quiet
+            $nextPeriodicSyncUtc = [DateTime]::UtcNow.AddMinutes($SyncIntervalMinutes)
         }
     }
 }
@@ -96,4 +115,10 @@ finally {
     }
 
     $watcher.Dispose()
+
+    if ($hasLock) {
+        $mutex.ReleaseMutex() | Out-Null
+    }
+
+    $mutex.Dispose()
 }

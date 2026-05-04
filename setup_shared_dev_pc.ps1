@@ -5,7 +5,7 @@ param(
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
-$repoRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
+$repoRoot = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath((Split-Path -Parent $MyInvocation.MyCommand.Path))
 
 if (-not (Get-Command git.exe -ErrorAction SilentlyContinue)) {
     throw 'git.exe was not found. Install Git for Windows first.'
@@ -22,9 +22,10 @@ if ([string]::IsNullOrWhiteSpace($PythonPath) -or -not (Test-Path -LiteralPath $
     throw 'Python was not found. Run this script with -PythonPath C:\path\to\python.exe or set KOUKU_KINOU_PYTHON first.'
 }
 
+$gitConfigPath = Join-Path $HOME '.gitconfig'
 $safeDirectory = $repoRoot -replace '\\', '/'
-$existingSafeDirectories = @(git config --global --get-all safe.directory 2>$null)
-if ($existingSafeDirectories -notcontains $safeDirectory) {
+$safeDirectoryLine = 'directory = ' + $safeDirectory
+if (-not ((Test-Path -LiteralPath $gitConfigPath) -and (Select-String -Path $gitConfigPath -SimpleMatch $safeDirectoryLine -Quiet))) {
     git config --global --add safe.directory $safeDirectory | Out-Null
 }
 

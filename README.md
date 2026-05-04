@@ -58,10 +58,11 @@
 1. すぐ反映したいときは `sync_to_github_now.cmd` をダブルクリックする
 2. 自動反映したいときは `setup_github_auto_sync.cmd` を 1 回だけ実行する
 
-`setup_github_auto_sync.cmd` を実行すると、Windows のタスク スケジューラへ次の 2 つを登録します。
+`setup_github_auto_sync.cmd` を実行すると、Windows のスタートアップへ自動起動を登録し、次を有効にします。
 
-1. `KoukuKinou-GitHub-Watch`: ログオン中にこのフォルダの保存済み変更を監視し、しばらく更新が止まったら自動で commit / push する
-2. `KoukuKinou-GitHub-Sync`: 定期的に同じ処理を実行し、監視が止まっていても GitHub へ追いつかせる
+1. Windows のスタートアップへ自動起動ランチャーを登録する
+2. ログオン中はこのフォルダの保存済み変更を監視し、しばらく更新が止まったら自動で commit / push する
+3. 変更がなくても定期的に同期処理を実行する
 
 初期設定では 60 秒ほど更新が止まると自動反映し、15 分ごとにも定期同期します。未保存の編集内容は GitHub へ送られないため、保存後に反映されます。
 

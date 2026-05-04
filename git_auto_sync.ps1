@@ -46,8 +46,29 @@ function Invoke-Git {
         [switch]$AllowFailure
     )
 
-    $output = & git @Arguments 2>&1
-    $exitCode = $LASTEXITCODE
+    $stdoutPath = Join-Path $stateRoot 'git-command.stdout.log'
+    $stderrPath = Join-Path $stateRoot 'git-command.stderr.log'
+
+    foreach ($path in @($stdoutPath, $stderrPath)) {
+        if (Test-Path -LiteralPath $path) {
+            Remove-Item -LiteralPath $path -Force
+        }
+    }
+
+    $argumentText = ($Arguments | ForEach-Object {
+        if ($_ -match '[\s"]') {
+            '"' + ($_ -replace '"', '\"') + '"'
+        }
+        else {
+            $_
+        }
+    }) -join ' '
+
+    $process = Start-Process -FilePath 'git.exe' -ArgumentList $argumentText -WorkingDirectory (Get-Location).Path -NoNewWindow -Wait -PassThru -RedirectStandardOutput $stdoutPath -RedirectStandardError $stderrPath
+    $stdoutLines = if (Test-Path -LiteralPath $stdoutPath) { @(Get-Content -LiteralPath $stdoutPath) } else { @() }
+    $stderrLines = if (Test-Path -LiteralPath $stderrPath) { @(Get-Content -LiteralPath $stderrPath) } else { @() }
+    $output = @($stdoutLines + $stderrLines)
+    $exitCode = $process.ExitCode
 
     if ($exitCode -ne 0 -and -not $AllowFailure) {
         $message = ($output | Out-String).Trim()
@@ -56,6 +77,12 @@ function Invoke-Git {
         }
 
         throw ('git {0} failed: {1}' -f ($Arguments -join ' '), $message)
+    }
+
+    foreach ($path in @($stdoutPath, $stderrPath)) {
+        if (Test-Path -LiteralPath $path) {
+            Remove-Item -LiteralPath $path -Force
+        }
     }
 
     return @($output)
@@ -75,7 +102,7 @@ try {
         throw 'git.exe was not found. Install Git for Windows first.'
     }
 
-    $resolvedRepoPath = (Resolve-Path -LiteralPath $RepoPath).Path
+    $resolvedRepoPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($RepoPath)
 
     Push-Location $resolvedRepoPath
     try {
