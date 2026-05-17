@@ -512,9 +512,18 @@ const FOOD_MAIN_OPTIONS = ['常食', '軟菜', '一口大カット', '刻み', '
 const WATER_TEXTURE_OPTIONS = ['とろみなし', '軽度とろみ（フレンチドレッシング状）', '中等度とろみ（とんかつソース状）', '重度とろみ（ケチャップ状）'];
 const NUTRITION_ACTION_ROLE_LABELS = {
     patientFamily: '① 本人・家族への対応',
-    st: '② ST対応',
+    rehab: '② リハビリ対応',
+    rehabSt: '② リハビリ対応（ST）',
+    rehabPt: '② リハビリ対応（PT）',
+    rehabOt: '② リハビリ対応（OT）',
     ns: '③ 看護師対応',
 };
+const NUTRITION_ACTION_ROLE_KEYS = ['patientFamily', 'rehabSt', 'rehabPt', 'rehabOt', 'ns'];
+const NUTRITION_REHAB_ROLE_CONFIGS = [
+    { key: 'rehabSt', shortLabel: 'ST' },
+    { key: 'rehabPt', shortLabel: 'PT' },
+    { key: 'rehabOt', shortLabel: 'OT' },
+];
 const NUTRITION_GUIDANCE_LIBRARY = {
     under: {
         label: '低栄養 / 低栄養リスク',
@@ -530,6 +539,12 @@ const NUTRITION_GUIDANCE_LIBRARY = {
                 st: [
                     '摂食嚥下機能と食べやすい食形態を評価する',
                     '食事姿勢や代償手段を調整する',
+                ],
+                pt: [
+                    '食事時の座位保持と体幹・頸部アライメントを調整する',
+                ],
+                ot: [
+                    '食具操作や自助具、配膳環境を整えて摂取量を確保する',
                 ],
                 ns: [
                     '体重と食事摂取率を定期モニタリングする',
@@ -547,6 +562,12 @@ const NUTRITION_GUIDANCE_LIBRARY = {
                     'VE/VFを含む嚥下評価を検討する',
                     '食形態ととろみ濃度を再評価する',
                 ],
+                pt: [
+                    '安全に摂食できる座位・移乗方法と呼吸状態を確認する',
+                ],
+                ot: [
+                    '一口量や食具選択、食事ペースを調整する',
+                ],
                 ns: [
                     '食事中・食後のむせやSpO2変化を観察する',
                     '口腔ケアと食後の体位管理を徹底する',
@@ -562,6 +583,12 @@ const NUTRITION_GUIDANCE_LIBRARY = {
                 st: [
                     '食行動や先行期の問題を評価する',
                     '嗜好や食感を活かして食べる意欲を引き出す',
+                ],
+                pt: [
+                    '離床や日中活動を整え、食欲につながる生活リズムをつくる',
+                ],
+                ot: [
+                    '食事への注意を向けやすい環境づくりと食事動作支援を行う',
                 ],
                 ns: [
                     '摂取量と好みの変化を記録する',
@@ -579,6 +606,12 @@ const NUTRITION_GUIDANCE_LIBRARY = {
                     '舌圧・口唇・咀嚼機能を評価する',
                     '口腔機能訓練と食形態調整を行う',
                 ],
+                pt: [
+                    '咀嚼しやすい姿勢と休息配分を調整する',
+                ],
+                ot: [
+                    '口腔ケアや食具操作を続けやすい手順と環境を整える',
+                ],
                 ns: [
                     '口腔ケア介助と義歯管理を行う',
                     '歯科・歯科衛生士との連携を調整する',
@@ -594,6 +627,12 @@ const NUTRITION_GUIDANCE_LIBRARY = {
                 st: [
                     '認知機能と摂食行動の関連を評価する',
                     '介助方法を家族・スタッフで統一する',
+                ],
+                pt: [
+                    '覚醒度と座位保持を整え、食事場面への参加を支える',
+                ],
+                ot: [
+                    '注意が向きやすい配置や手順の単純化で摂食行動を支援する',
                 ],
                 ns: [
                     '見守りと声かけ、食事環境調整を行う',
@@ -617,6 +656,12 @@ const NUTRITION_GUIDANCE_LIBRARY = {
                     '摂食ペースや丸飲み傾向を評価する',
                     '食行動修正に向けた関わり方を整理する',
                 ],
+                pt: [
+                    '食後の安全な活動や運動習慣を提案する',
+                ],
+                ot: [
+                    '早食いを防ぐ食具・配膳方法と間食管理を整える',
+                ],
                 ns: [
                     '食事量・間食量と体重推移を定期記録する',
                     '管理栄養士・医師と連携して量の調整を検討する',
@@ -632,6 +677,12 @@ const NUTRITION_GUIDANCE_LIBRARY = {
                 st: [
                     '食べやすさと偏食の関連を評価する',
                     '咀嚼能力に合うバランス食の形態を提案する',
+                ],
+                pt: [
+                    '活動量に見合った摂取量かを確認し、継続しやすい運動を提案する',
+                ],
+                ot: [
+                    '買い物・配膳・記録など生活行為から食習慣を見直す',
                 ],
                 ns: [
                     '食事内容と血液データを継続確認する',
@@ -649,6 +700,12 @@ const NUTRITION_GUIDANCE_LIBRARY = {
                     '姿勢・体幹機能や食事中の疲労を評価する',
                     'PT・OTと連携した包括的リハビリを検討する',
                 ],
+                pt: [
+                    '歩行・移動・体力を評価し活動量向上を支援する',
+                ],
+                ot: [
+                    '家事や余暇を活かして座位時間を減らす工夫を行う',
+                ],
                 ns: [
                     '活動量を増やす環境整備と声かけを行う',
                     '体重・体組成・褥瘡リスクを定期確認する',
@@ -664,6 +721,12 @@ const NUTRITION_GUIDANCE_LIBRARY = {
                 st: [
                     '口腔内環境と唾液クリアランスを評価する',
                     '歯科・歯科衛生士との連携を調整する',
+                ],
+                pt: [
+                    '食後に口腔ケアしやすい姿勢と動線を整える',
+                ],
+                ot: [
+                    'セルフケア手順の見える化と道具選択を支援する',
                 ],
                 ns: [
                     '口腔内の炎症や口臭の変化を観察する',
@@ -3697,6 +3760,23 @@ function ensureStage1Styles() {
             color: var(--text-light);
             margin-bottom: 8px;
         }
+        .nutrition-action-subgrid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 10px;
+        }
+        .nutrition-action-subgroup {
+            padding: 10px;
+            border: 1px solid #d9e8f4;
+            border-radius: 10px;
+            background: #fff;
+        }
+        .nutrition-action-subtitle {
+            margin-bottom: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #2f5675;
+        }
         .nutrition-action-list {
             display: grid;
             gap: 8px;
@@ -3712,17 +3792,6 @@ function ensureStage1Styles() {
         }
         .nutrition-action-item input {
             margin-top: 3px;
-        }
-        .nutrition-preview-panel {
-            position: sticky;
-            top: 12px;
-            z-index: 2;
-            margin-top: 12px;
-            border-color: #d9e8f4;
-            box-shadow: 0 6px 18px rgba(17, 63, 102, 0.08);
-        }
-        .nutrition-preview {
-            white-space: pre-line;
         }
         .nutrition-empty {
             color: var(--text-light);
@@ -4945,17 +5014,12 @@ function ensureNutritionAssessmentPanel() {
         <div class="stage2-panel__header">
             <div>
                 <div class="stage2-panel__title">栄養アセスメント・提案</div>
-                <div class="stage2-panel__hint">低栄養 / 過栄養を自動評価し、原因候補と対応方針をコメント欄へ反映します。</div>
+                <div class="stage2-panel__hint">BMI・MNA-SF・口腔機能をもとに自動評価し、原因候補と対応方針をコメント欄へ反映します。</div>
             </div>
         </div>
         <input type="hidden" id="${NUTRITION_SELECTION_FIELD_ID}" value="{}">
         <div id="nutritionAssessmentChips" class="metric-chip-list"></div>
-        <div id="nutritionAssessmentSummary" class="stage2-panel__summary">BMI と MNA-SF を入力すると自動評価を表示します。</div>
-        <section class="stage3-box stage3-box--wide nutrition-preview-panel">
-            <div class="section-label">総合評価コメントへの反映プレビュー</div>
-            <div id="nutritionCommentPreview" class="stage2-panel__summary nutrition-preview">提案が選択されるとここに表示します。</div>
-            <div id="nutritionAssessmentStatus" class="stage3-note">抽出された対応方針は総合評価コメントへ自動反映します。</div>
-        </section>
+        <div id="nutritionAssessmentSummary" class="stage2-panel__summary">BMI・MNA-SF・口腔機能を入力すると自動評価を表示します。</div>
         <div id="nutritionAssessmentCards" class="nutrition-cause-grid"></div>
     `;
 
@@ -5060,11 +5124,47 @@ function buildNutritionCause(modeId, causeId, reasons) {
         label: causeConfig.label,
         reasons: normalizedReasons,
         patientFamily: causeConfig.patientFamily || [],
-        st: causeConfig.st || [],
+        rehabSt: causeConfig.st || [],
+        rehabPt: causeConfig.pt || [],
+        rehabOt: causeConfig.ot || [],
         ns: causeConfig.ns || [],
         modeLabel: modeConfig.label,
         modeTone: modeConfig.chipTone,
     };
+}
+
+function getNutritionActionItems(cause, role) {
+    return cause && Array.isArray(cause[role]) ? cause[role] : [];
+}
+
+function countNutritionCauseActions(cause) {
+    return NUTRITION_ACTION_ROLE_KEYS.reduce((sum, role) => sum + getNutritionActionItems(cause, role).length, 0);
+}
+
+function countSelectedNutritionCauseActions(cause, selectionState) {
+    return NUTRITION_ACTION_ROLE_KEYS.reduce((sum, role) => {
+        return sum + getNutritionActionItems(cause, role).reduce((roleSum, item, index) => {
+            const actionKey = buildNutritionActionKey(cause.modeId, cause.causeId, role, index);
+            return roleSum + (selectionState[actionKey] !== false ? 1 : 0);
+        }, 0);
+    }, 0);
+}
+
+function buildNutritionActionListHtml(cause, role, selectionState) {
+    const items = getNutritionActionItems(cause, role);
+    if (!items.length) {
+        return '<div class="stage3-note">該当する提案はありません。</div>';
+    }
+    return items.map((item, index) => {
+        const actionKey = buildNutritionActionKey(cause.modeId, cause.causeId, role, index);
+        const checked = selectionState[actionKey] !== false ? 'checked' : '';
+        return `
+            <label class="nutrition-action-item">
+                <input type="checkbox" data-nutrition-key="${escapeHtml(actionKey)}" ${checked}>
+                <span>${escapeHtml(item)}</span>
+            </label>
+        `;
+    }).join('');
 }
 
 function buildNutritionAssessmentData() {
@@ -5266,7 +5366,7 @@ function buildNutritionAssessmentData() {
     }
 
     const summaryText = !modes.length
-        ? 'BMI と MNA-SF を入力すると、低栄養・過栄養の原因候補と提案を自動表示します。'
+        ? 'BMI・MNA-SF・口腔機能の入力から、低栄養・過栄養の原因候補と提案を自動表示します。'
         : `自動評価: ${modes.map((mode) => mode.label).join(' / ')}。気になる領域: ${dedupeTextItems(causes.map((cause) => cause.label)).join('、')}。`;
 
     return {
@@ -5285,11 +5385,11 @@ function buildNutritionCommentDraft(data, selectionState) {
     const modeLabels = dedupeTextItems((data.modes || []).map((mode) => mode.label));
     const causeLabels = dedupeTextItems((data.causes || []).map((cause) => cause.label));
     const reasonLines = dedupeTextItems((data.causes || []).flatMap((cause) => cause.reasons || []));
-    const selectedByRole = { patientFamily: [], st: [], ns: [] };
+    const selectedByRole = { patientFamily: [], rehabSt: [], rehabPt: [], rehabOt: [], ns: [] };
 
     (data.causes || []).forEach((cause) => {
-        ['patientFamily', 'st', 'ns'].forEach((role) => {
-            (cause[role] || []).forEach((item, index) => {
+        NUTRITION_ACTION_ROLE_KEYS.forEach((role) => {
+            getNutritionActionItems(cause, role).forEach((item, index) => {
                 const actionKey = buildNutritionActionKey(cause.modeId, cause.causeId, role, index);
                 if (selectionState[actionKey] !== false) {
                     selectedByRole[role].push(item);
@@ -5303,7 +5403,7 @@ function buildNutritionCommentDraft(data, selectionState) {
     if (reasonLines.length) {
         lines.push(`抽出根拠: ${joinCommentItems(reasonLines, 4)}`);
     }
-    ['patientFamily', 'st', 'ns'].forEach((role) => {
+    NUTRITION_ACTION_ROLE_KEYS.forEach((role) => {
         const items = dedupeTextItems(selectedByRole[role]).slice(0, 4);
         if (!items.length) {
             return;
@@ -5349,62 +5449,45 @@ function renderNutritionAssessmentPanel() {
     const chips = document.getElementById('nutritionAssessmentChips');
     const summary = document.getElementById('nutritionAssessmentSummary');
     const cards = document.getElementById('nutritionAssessmentCards');
-    const preview = document.getElementById('nutritionCommentPreview');
-    const status = document.getElementById('nutritionAssessmentStatus');
-    if (!chips || !summary || !cards || !preview || !status) {
+    if (!chips || !summary || !cards) {
         return;
     }
 
     const data = buildNutritionAssessmentData();
     const selectionState = getNutritionSelectionState();
-    const totalSelectableCount = data.causes.reduce((sum, cause) => {
-        return sum + (cause.patientFamily || []).length + (cause.st || []).length + (cause.ns || []).length;
-    }, 0);
-    const selectedCount = data.causes.reduce((sum, cause) => {
-        let causeCount = 0;
-        ['patientFamily', 'st', 'ns'].forEach((role) => {
-            (cause[role] || []).forEach((item, index) => {
-                const actionKey = buildNutritionActionKey(cause.modeId, cause.causeId, role, index);
-                if (selectionState[actionKey] !== false) {
-                    causeCount += 1;
-                }
-            });
-        });
-        return sum + causeCount;
-    }, 0);
 
     chips.innerHTML = data.chips.join('');
     summary.textContent = data.summaryText;
 
     if (!data.causes.length) {
         cards.innerHTML = '<section class="stage3-box nutrition-empty">低栄養・過栄養の評価条件を満たすと、ここに原因候補と対応方針を表示します。</section>';
-        preview.textContent = '提案が選択されるとここに表示します。';
-        status.textContent = '抽出された対応方針は総合評価コメントへ自動反映します。';
         latestNutritionAssessmentData = data;
         syncNutritionCommentDraft(data, selectionState);
         return;
     }
 
     cards.innerHTML = data.causes.map((cause) => {
-        const roleHtml = ['patientFamily', 'st', 'ns'].map((role) => {
-            const items = cause[role] || [];
-            const itemsHtml = items.map((item, index) => {
-                const actionKey = buildNutritionActionKey(cause.modeId, cause.causeId, role, index);
-                const checked = selectionState[actionKey] !== false ? 'checked' : '';
-                return `
-                    <label class="nutrition-action-item">
-                        <input type="checkbox" data-nutrition-key="${escapeHtml(actionKey)}" ${checked}>
-                        <span>${escapeHtml(item)}</span>
-                    </label>
-                `;
-            }).join('');
-            return `
-                <div class="nutrition-action-group">
-                    <div class="nutrition-action-group__title">${escapeHtml(NUTRITION_ACTION_ROLE_LABELS[role])}</div>
-                    <div class="nutrition-action-list">${itemsHtml}</div>
+        const roleHtml = `
+            <div class="nutrition-action-group">
+                <div class="nutrition-action-group__title">${escapeHtml(NUTRITION_ACTION_ROLE_LABELS.patientFamily)}</div>
+                <div class="nutrition-action-list">${buildNutritionActionListHtml(cause, 'patientFamily', selectionState)}</div>
+            </div>
+            <div class="nutrition-action-group">
+                <div class="nutrition-action-group__title">${escapeHtml(NUTRITION_ACTION_ROLE_LABELS.rehab)}</div>
+                <div class="nutrition-action-subgrid">
+                    ${NUTRITION_REHAB_ROLE_CONFIGS.map((roleConfig) => `
+                        <div class="nutrition-action-subgroup">
+                            <div class="nutrition-action-subtitle">${escapeHtml(roleConfig.shortLabel)}</div>
+                            <div class="nutrition-action-list">${buildNutritionActionListHtml(cause, roleConfig.key, selectionState)}</div>
+                        </div>
+                    `).join('')}
                 </div>
-            `;
-        }).join('');
+            </div>
+            <div class="nutrition-action-group">
+                <div class="nutrition-action-group__title">${escapeHtml(NUTRITION_ACTION_ROLE_LABELS.ns)}</div>
+                <div class="nutrition-action-list">${buildNutritionActionListHtml(cause, 'ns', selectionState)}</div>
+            </div>
+        `;
 
         return `
             <section class="stage3-box nutrition-cause-card">
@@ -5420,8 +5503,11 @@ function renderNutritionAssessmentPanel() {
     }).join('');
 
     const draft = buildNutritionCommentDraft(data, selectionState);
-    preview.textContent = stripNutritionCommentMarkers(draft) || '提案が選択されるとここに表示します。';
-    status.textContent = `${selectedCount} / ${totalSelectableCount} 件の対応方針を総合評価コメントへ自動反映しています。`;
+    const totalSelectableCount = data.causes.reduce((sum, cause) => sum + countNutritionCauseActions(cause), 0);
+    const selectedCount = data.causes.reduce((sum, cause) => sum + countSelectedNutritionCauseActions(cause, selectionState), 0);
+    if (totalSelectableCount > 0) {
+        summary.textContent = `${data.summaryText} ${selectedCount} / ${totalSelectableCount} 件を総合評価コメントへ自動反映しています。`;
+    }
     latestNutritionAssessmentData = { ...data, commentDraft: draft };
     syncNutritionCommentDraft(data, selectionState);
 }
