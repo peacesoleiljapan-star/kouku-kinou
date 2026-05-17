@@ -1,4 +1,4 @@
-# 口腔機能・栄養評価
+# kouku-kinou
 
 口腔機能・栄養評価システムを Synology NAS / Docker で自己ホストし、Tailscale Serve で HTTPS 終端するための構成です。
 
@@ -6,91 +6,17 @@
 
 ## 関連資料
 
-- Synology + Tailscale 配置手順: [DEPLOY_SYNOLOGY_JA.html](DEPLOY_SYNOLOGY_JA.html) / [DEPLOY_SYNOLOGY_JA.pdf](DEPLOY_SYNOLOGY_JA.pdf)
-- Windows 利用者向け Tailscale 接続ガイド: [TAILSCALE_CLIENT_GUIDE_JA.html](TAILSCALE_CLIENT_GUIDE_JA.html) / [TAILSCALE_CLIENT_GUIDE_JA.pdf](TAILSCALE_CLIENT_GUIDE_JA.pdf)
-- タブレット利用者向け Tailscale 接続ガイド: [TAILSCALE_TABLET_GUIDE_JA.html](TAILSCALE_TABLET_GUIDE_JA.html) / [TAILSCALE_TABLET_GUIDE_JA.pdf](TAILSCALE_TABLET_GUIDE_JA.pdf)
-- タブレット利用者向け案内文テンプレート: [TAILSCALE_TABLET_MESSAGE_TEMPLATE_JA.html](TAILSCALE_TABLET_MESSAGE_TEMPLATE_JA.html) / [TAILSCALE_TABLET_MESSAGE_TEMPLATE_JA.pdf](TAILSCALE_TABLET_MESSAGE_TEMPLATE_JA.pdf)
-- タブレット利用者向け QR 案内シート: [TAILSCALE_TABLET_QR_SHEET_JA.html](TAILSCALE_TABLET_QR_SHEET_JA.html) / [TAILSCALE_TABLET_QR_SHEET_JA.pdf](TAILSCALE_TABLET_QR_SHEET_JA.pdf)
-- 初心者向け運用マニュアル: [OPERATIONS_MANUAL_PDF_JA.html](OPERATIONS_MANUAL_PDF_JA.html) / [OPERATIONS_MANUAL_JA.pdf](OPERATIONS_MANUAL_JA.pdf)
+- Synology + Tailscale 配置手順: [DEPLOY_SYNOLOGY_JA.md](DEPLOY_SYNOLOGY_JA.md)
+- GitHub Actions 自動反映手順: [AUTO_DEPLOY_GITHUB_ACTIONS_JA.md](AUTO_DEPLOY_GITHUB_ACTIONS_JA.md)
+- Windows 利用者向け Tailscale 接続ガイド: [TAILSCALE_CLIENT_GUIDE_JA.md](TAILSCALE_CLIENT_GUIDE_JA.md)
+- タブレット利用者向け Tailscale 接続ガイド: [TAILSCALE_TABLET_GUIDE_JA.md](TAILSCALE_TABLET_GUIDE_JA.md)
+- タブレット利用者向け案内文テンプレート: [TAILSCALE_TABLET_MESSAGE_TEMPLATE_JA.md](TAILSCALE_TABLET_MESSAGE_TEMPLATE_JA.md)
+- タブレット利用者向け QR 案内シート: [TAILSCALE_TABLET_QR_SHEET_JA.md](TAILSCALE_TABLET_QR_SHEET_JA.md)
+- 初心者向け運用マニュアル: [OPERATIONS_MANUAL_JA.md](OPERATIONS_MANUAL_JA.md)
 - Windows 用かんたん起動: [TailscaleClientLauncher.cmd](TailscaleClientLauncher.cmd)
 - 起動ツール設定: [TailscaleClientLauncher.settings.json](TailscaleClientLauncher.settings.json)
 - 実運用設定のひな形: [.env.example](.env.example)
 - 現在の実運用設定: Git 管理対象外の .env を各環境で配置して使います。
-
-アプリ画面右上の `?` ヘルプから開く [README.html](README.html) では、配布向けの HTML / PDF 資料も直接開けます。
-
-## 配布パッケージの作り方
-
-配布用の PDF 再生成と package フォルダ作成は、`build_package.cmd` または `build_package.ps1` でまとめて実行できます。
-
-1. `build_package.cmd` をダブルクリックする
-2. または PowerShell で `./build_package.ps1` を実行する
-3. 完了後に `package/` 配下へ管理者向け、Windows 利用者向け、タブレット配布向けのフォルダと ZIP が作成される
-
-この処理では Markdown から `README.html` と各 HTML / PDF を作り直すため、README や配布資料を更新した後は再実行してください。
-
-## 共有開発の運用ルール
-
-今後の役割は次で固定します。
-
-1. 開発フォルダ: `\\192.168.11.200\全社共有\IT\アプリ開発\神谷\kouku-kinou`
-2. 運用フォルダ: `\\192.168.11.200\docker\kouku-kinou`
-3. GitHub: `https://github.com/peacesoleiljapan-star/kouku-kinou.git`
-
-考え方:
-
-1. コード、文書、配布資料の更新は開発フォルダだけで行います。
-2. 運用フォルダは Container Manager に読ませる配備先です。原則として `.env` と `data/` 以外を直接編集しません。
-3. GitHub は履歴管理と復旧元です。開発フォルダで変更したものを commit / push して残します。
-
-各 PC の Python 環境:
-
-1. `.venv` を共有フォルダの中に置かないでください。
-2. 各 PC ごとにローカルの Python / venv を使います。
-3. `build_package.ps1` は環境変数 `KOUKU_KINOU_PYTHON` があれば、その `python.exe` を優先して使います。
-4. この PC では `KOUKU_KINOU_PYTHON=C:\Users\user\Documents\vscrepo\.venv\Scripts\python.exe` を設定済みです。
-5. 別の PC では、共有開発フォルダ直下の `setup_shared_dev_pc.cmd` を 1 回実行すれば、`git safe.directory` と `KOUKU_KINOU_PYTHON` の設定を入れられます。必要なら `setup_shared_dev_pc.ps1 -PythonPath C:\path\to\python.exe` を使います。
-
-## GitHub への反映
-
-このフォルダはすでに GitHub の `peacesoleiljapan-star/kouku-kinou` と接続済みです。今後は次の 2 通りで反映できます。
-
-1. すぐ反映したいときは `sync_to_github_now.cmd` をダブルクリックする
-2. 自動反映したいときは `setup_github_auto_sync.cmd` を 1 回だけ実行する
-
-`setup_github_auto_sync.cmd` を実行すると、Windows のスタートアップへ自動起動を登録し、次を有効にします。
-
-1. Windows のスタートアップへ自動起動ランチャーを登録する
-2. ログオン中はこのフォルダの保存済み変更を監視し、しばらく更新が止まったら自動で commit / push する
-3. 変更がなくても定期的に同期処理を実行する
-
-初期設定では 60 秒ほど更新が止まると自動反映し、15 分ごとにも定期同期します。未保存の編集内容は GitHub へ送られないため、保存後に反映されます。
-
-最小の作業手順:
-
-1. 開発フォルダで `git pull`
-2. ファイルを編集する
-3. `build_package.ps1` で package を作る
-4. 必要な配布物を運用フォルダへ反映する
-5. 動作確認後に `git add -A` → `git commit -m "変更内容"` → `git push`
-
-GitHub の最低限のコマンド:
-
-```powershell
-git pull
-git status
-git add -A
-git commit -m "変更内容"
-git push
-```
-
-## 配布前チェック
-
-1. 配布先に `.env` がなければ、`.env.example` をコピーして `.env` を作成します。
-2. `KOUKU_KINOU_PASSWORD` を本番用の強い値へ変更します。
-3. `TailscaleClientLauncher.settings.json` の `organizationName`、`appUrl`、`supportText`、`supportContact` を配布先に合わせて更新します。
-4. Windows 利用者へは launcher 3 ファイルと `TAILSCALE_CLIENT_GUIDE_JA.pdf`、タブレット利用者へは URL と `TAILSCALE_TABLET_GUIDE_JA.pdf` / `TAILSCALE_TABLET_QR_SHEET_JA.pdf` を渡します。
-5. 配布前に `/api/health`、保存、検索、設定画面、アプリ内ヘルプの HTML / PDF / 画像表示を確認します。
 
 ## 想定構成
 
@@ -135,7 +61,6 @@ python server.py --no-auth --host 127.0.0.1 --port 8010
 起動後に以下へアクセスします。
 
 - `http://localhost:8010/`
-- ヘルプ: `http://localhost:8010/readme.html`
 - ヘルスチェック: `http://localhost:8010/api/health`
 
 SQLite の保存先は既定で `data/records.db` です。環境変数 `KOUKU_KINOU_DB` で変更できます。
@@ -157,19 +82,16 @@ python seed_sample_records.py
 
 ## Docker / Synology
 
-配布先に `.env` がなければ `.env.example` をコピーして `.env` を作成します。すでに `.env` がある場合も、まず中身を確認し、必要なら管理者用パスワードを変更してください。
+`.env` は作成済みです。まず中身を確認し、必要なら管理者用パスワードを変更してください。
 
 ```dotenv
 KOUKU_KINOU_AUTH_MODE=tailscale-or-password
 KOUKU_KINOU_PASSWORD=change-this-admin-password
 KOUKU_KINOU_SESSION_TTL_MINUTES=480
 KOUKU_KINOU_SECURE_COOKIE=1
-KOUKU_KINOU_DATA_DIR=./data
 KOUKU_KINOU_ALLOWED_NETWORKS=
 KOUKU_KINOU_TRUST_PROXY=0
 ```
-
-Synology で `unable to open database file` が出る場合は、`KOUKU_KINOU_DATA_DIR` を `./data` から NAS 上の実フォルダへ明示してください。例: `/volume1/docker/kouku-kinou/data`
 
 コンテナ起動:
 
@@ -180,14 +102,15 @@ docker compose ps
 
 `docker compose ps` の `STATUS` で `healthy` になれば、`/api/health` まで含めて通っています。
 
-`/api/health` が `{"status": "error", "error": "unable to open database file"}` を返す場合は次を順に確認します。
-
-1. `.env` の `KOUKU_KINOU_DATA_DIR` が意図したフォルダを指している
-2. そのフォルダが Synology 上に実在する
-3. Container Manager でそのフォルダを読書きできる
-4. 再ビルド後に `records.db`、`records.db-wal`、`records.db-shm` が作成される
-
 現在の公開 URL は `https://diskstation.tail632bc4.ts.net/` です。
+
+GitHub のブラウザから `index.html` を上書きして本番へ自動反映したい場合は、[AUTO_DEPLOY_GITHUB_ACTIONS_JA.md](AUTO_DEPLOY_GITHUB_ACTIONS_JA.md) の GitHub Actions + Tailscale + Synology SSH 構成を使ってください。
+
+Synology 側の SSH 鍵設定をやり直す必要があるときは、Windows から [setup_synology_actions_ssh.cmd](setup_synology_actions_ssh.cmd) を再実行してください。
+
+GitHub Actions の Variables / SSH secrets を再登録したいときは、Windows から [setup_github_actions_deploy.cmd](setup_github_actions_deploy.cmd) を実行してください。
+
+Synology で Docker 実行に root 権限が必要な場合は、先に [setup_synology_actions_ssh.cmd](setup_synology_actions_ssh.cmd) を `-RegisterRootKey` 付きで実行し、その後 [setup_github_actions_deploy.cmd](setup_github_actions_deploy.cmd) を `-User root` 付きで実行してください。
 
 Synology では DSM で SSH を有効にしたうえで NAS に入り、root 権限で Tailscale Serve を設定します。
 
@@ -217,19 +140,13 @@ Windows 利用者には、次の 3 ファイルをまとめて配布できます
 
 配布用の `TailscaleClientLauncher.settings.json` には `https://diskstation.tail632bc4.ts.net/` を設定済みです。利用者はコマンド入力なしで Tailscale 導入とアプリ起動を進められます。
 
-配布前に `organizationName`、`appUrl`、`supportText`、`supportContact` を現場向けに更新してください。特に `supportContact` は利用者が困ったときの連絡先になるため、空欄のまま配らないほうが安全です。
-
-Windows 利用者へ操作手順も渡す場合は [TAILSCALE_CLIENT_GUIDE_JA.pdf](TAILSCALE_CLIENT_GUIDE_JA.pdf) を同梱すると、そのまま案内に使えます。
-
 タブレット利用者には、ファイル配布より次の 2 つだけを案内するほうが簡単です。
 
 1. Tailscale の導入とサインイン方法
 2. アプリ URL `https://diskstation.tail632bc4.ts.net/`
 
-タブレット向けの詳しい案内は [TAILSCALE_TABLET_GUIDE_JA.html](TAILSCALE_TABLET_GUIDE_JA.html) にまとめています。
-配布時にそのまま使う文面は [TAILSCALE_TABLET_MESSAGE_TEMPLATE_JA.html](TAILSCALE_TABLET_MESSAGE_TEMPLATE_JA.html)、紙配布用の QR 案内は [TAILSCALE_TABLET_QR_SHEET_JA.html](TAILSCALE_TABLET_QR_SHEET_JA.html) を使えます。
-
-配布用の見やすい版としては [TAILSCALE_TABLET_GUIDE_JA.pdf](TAILSCALE_TABLET_GUIDE_JA.pdf)、[TAILSCALE_TABLET_MESSAGE_TEMPLATE_JA.pdf](TAILSCALE_TABLET_MESSAGE_TEMPLATE_JA.pdf)、[TAILSCALE_TABLET_QR_SHEET_JA.pdf](TAILSCALE_TABLET_QR_SHEET_JA.pdf) も同梱しています。
+タブレット向けの詳しい案内は [TAILSCALE_TABLET_GUIDE_JA.md](TAILSCALE_TABLET_GUIDE_JA.md) にまとめています。
+配布時にそのまま使う文面は [TAILSCALE_TABLET_MESSAGE_TEMPLATE_JA.md](TAILSCALE_TABLET_MESSAGE_TEMPLATE_JA.md)、紙配布用の QR 案内は [TAILSCALE_TABLET_QR_SHEET_JA.md](TAILSCALE_TABLET_QR_SHEET_JA.md) を使えます。
 
 ## 実装メモ
 
@@ -242,5 +159,4 @@ Windows 利用者へ操作手順も渡す場合は [TAILSCALE_CLIENT_GUIDE_JA.pd
 - `compose.yaml` は loopback のみに bind するため、Tailscale Serve を通らない直接アクセスを減らせます。
 - `compose.yaml` の healthcheck は `/api/health` で DB と画面テンプレートの準備完了を確認します。
 - `tailscale` または `tailscale-or-password` では、Tailscale identity header を使った認証に対応しています。
-- `README.html` から PDF 資料と `assets/` 配下の画像付きマニュアルを開けるようにしているため、配布後もブラウザーだけで資料確認を完結できます。
 - `index.html` 自体は元 artifact のソースとして残しています。

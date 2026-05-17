@@ -1,0 +1,106 @@
+name: Deploy to Synology
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - index.html
+      - assets/**
+      - README.html
+      - README.md
+      - DEPLOY_SYNOLOGY_JA.md
+      - OPERATIONS_MANUAL_JA.md
+      - TAILSCALE_CLIENT_GUIDE_JA.md
+      - TAILSCALE_TABLET_GUIDE_JA.md
+      - TAILSCALE_TABLET_MESSAGE_TEMPLATE_JA.md
+      - TAILSCALE_TABLET_QR_SHEET_JA.md
+      - TailscaleClientLauncher.cmd
+      - TailscaleClientLauncher.ps1
+      - TailscaleClientLauncher.settings.json
+      - server.py
+      - Dockerfile
+      - compose.yaml
+      - scripts/deploy_synology.sh
+      - .github/workflows/deploy-synology.yml
+  workflow_dispatch:
+    inputs:
+      force_rebuild:
+        description: Force docker compose rebuild on Synology
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: synology-production-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      TS_TAGS: tag:ci
+      TS_HOST: ${{ vars.TS_NAS_HOST }}
+      TS_USER: ${{ vars.TS_NAS_SSH_USER }}
+      TS_PORT: ${{ vars.TS_NAS_SSH_PORT }}
+      TS_REPO_DIR: ${{ vars.TS_REPO_DIR }}
+      FORCE_REBUILD: ${{ inputs.force_rebuild && '1' || '0' }}
+    steps:
+      - name: Validate workflow variables
+        run: |
+          test -n "$TS_HOST"
+          test -n "$TS_USER"
+          test -n "$TS_REPO_DIR"
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Connect Tailscale with workload identity
+        if: ${{ secrets.TS_OAUTH_CLIENT_ID != '' && secrets.TS_AUDIENCE != '' }}
+        uses: tailscale/github-action@v4
+        with:
+          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+          audience: ${{ secrets.TS_AUDIENCE }}
+          tags: ${{ env.TS_TAGS }}
+          version: latest
+          ping: ${{ env.TS_HOST }}
+
+      - name: Connect Tailscale with auth key fallback
+        if: ${{ !(secrets.TS_OAUTH_CLIENT_ID != '' && secrets.TS_AUDIENCE != '') }}
+        uses: tailscale/github-action@v4
+        with:
+          authkey: ${{ secrets.TAILSCALE_AUTHKEY }}
+          version: latest
+          ping: ${{ env.TS_HOST }}
+
+      - name: Prepare SSH client
+        shell: bash
+        env:
+          TS_SSH_PRIVATE_KEY: ${{ secrets.TS_NAS_SSH_PRIVATE_KEY }}
+          TS_KNOWN_HOSTS: ${{ secrets.TS_NAS_KNOWN_HOSTS }}
+        run: |
+          test -n "$TS_SSH_PRIVATE_KEY"
+          TS_PORT="${TS_PORT:-22}"
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$TS_SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          if [ -n "$TS_KNOWN_HOSTS" ]; then
+            printf '%s\n' "$TS_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          else
+            ssh-keyscan -p "$TS_PORT" "$TS_HOST" > ~/.ssh/known_hosts
+          fi
+          chmod 600 ~/.ssh/known_hosts
+
+      - name: Deploy on Synology over SSH
+        shell: bash
+        run: |
+          chmod +x scripts/deploy_synology.sh
+          TS_PORT="${TS_PORT:-22}"
+          ssh -i ~/.ssh/id_ed25519 -p "$TS_PORT" -o BatchMode=yes -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes "${TS_USER}@${TS_HOST}" \
+            "DEPLOY_REPO_DIR='${TS_REPO_DIR}' DEPLOY_REPO_URL='${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}.git' DEPLOY_BRANCH='${GITHUB_REF_NAME}' DEPLOY_REMOTE='origin' DEPLOY_FORCE_REBUILD='${FORCE_REBUILD}' sh -s" \
+            < scripts/deploy_synology.sh

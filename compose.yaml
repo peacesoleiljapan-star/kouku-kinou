@@ -25,4 +25,18 @@ services:
       retries: 3
       start_period: 10s
     volumes:
-      - "${KOUKU_KINOU_DATA_DIR:-./data}:/data"
+      - ./data:/data
+      - ./index.html:/app/index.html:ro
+      - ./README.html:/app/README.html:ro
+      - ./README.md:/app/README.md:ro
+      - ./DEPLOY_SYNOLOGY_JA.md:/app/DEPLOY_SYNOLOGY_JA.md:ro
+      - ./OPERATIONS_MANUAL_JA.md:/app/OPERATIONS_MANUAL_JA.md:ro
+      - ./TAILSCALE_CLIENT_GUIDE_JA.md:/app/TAILSCALE_CLIENT_GUIDE_JA.md:ro
+      - ./TAILSCALE_TABLET_GUIDE_JA.md:/app/TAILSCALE_TABLET_GUIDE_JA.md:ro
+      - ./TAILSCALE_TABLET_MESSAGE_TEMPLATE_JA.md:/app/TAILSCALE_TABLET_MESSAGE_TEMPLATE_JA.md:ro
+      - ./TAILSCALE_TABLET_QR_SHEET_JA.md:/app/TAILSCALE_TABLET_QR_SHEET_JA.md:ro
+      - ./TailscaleClientLauncher.cmd:/app/TailscaleClientLauncher.cmd:ro
+      - ./TailscaleClientLauncher.ps1:/app/TailscaleClientLauncher.ps1:ro
+      - ./TailscaleClientLauncher.settings.json:/app/TailscaleClientLauncher.settings.json:ro
+      - ./.env.example:/app/.env.example:ro
+      - ./assets:/app/assets:ro

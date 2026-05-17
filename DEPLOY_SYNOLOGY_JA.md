@@ -15,6 +15,8 @@
 2. tailnet 名: `tail632bc4`
 3. 現在のアプリ URL: `https://diskstation.tail632bc4.ts.net/`
 
+GitHub の `index.html` 更新をそのまま本番へ自動反映したい場合は、[AUTO_DEPLOY_GITHUB_ACTIONS_JA.md](AUTO_DEPLOY_GITHUB_ACTIONS_JA.md) を併用してください。
+
 ## この構成でやらないこと
 
 1. Synology 独自ドメインの取得
@@ -30,12 +32,9 @@ Synology に置く主なものは次のとおりです。
 
 1. `compose.yaml`: アプリ全体を起動する設定
 2. `.env`: 認証モードや管理者パスワード
-3. `Dockerfile`: Container Manager で build するときに使う定義
-4. `assets/`: HTML 資料と画面内参照で使う画像類
-5. `server.py`: アプリ本体を配信するサーバー
-6. `index.html`: 元の画面ソース
-7. `README.html` などの配布資料: ヘルプと配布物で使う HTML / PDF
-8. `data/records.db`: 記録データと共有設定。最重要ファイル
+3. `server.py`: アプリ本体を配信するサーバー
+4. `index.html`: 元の画面ソース
+5. `data/records.db`: 記録データと共有設定。最重要ファイル
 
 ## 事前準備
 
@@ -51,23 +50,12 @@ Synology 側で次を確認します。
 1. `docker/kouku-kinou`
 2. `docker/kouku-kinou/data`
 
-いちばん確実なのは、配布物の `package/kouku-kinou-admin-deploy` の中身をそのまま `docker/kouku-kinou` へコピーする方法です。
-
-最低限でも、`docker/kouku-kinou` 直下に次を置きます。
+このフォルダに以下を置きます。
 
 1. `compose.yaml`
 2. `.env`
-3. `Dockerfile`
-4. `server.py`
-5. `index.html`
-6. `assets` フォルダ
-7. `README.html` などの HTML / PDF 資料一式
-8. `data` フォルダ
-
-`data` フォルダの中には、少なくとも次を置きます。
-
-1. `records.db`
-2. 必要に応じて `records.backup-*.db`
+3. `server.py`
+4. `index.html`
 
 ## .env の確認
 
@@ -76,20 +64,13 @@ Synology 側で次を確認します。
 1. `KOUKU_KINOU_AUTH_MODE=tailscale-or-password`
 2. `KOUKU_KINOU_PASSWORD`: 管理者用の強いパスワードへ変更
 3. `KOUKU_KINOU_SECURE_COOKIE=1`: このままでよい
-4. `KOUKU_KINOU_DATA_DIR=./data`: Synology で迷う場合は `/volume1/docker/kouku-kinou/data` のような絶対パスへ変更
-5. `KOUKU_KINOU_ALLOWED_NETWORKS=`: 通常は空欄のままでよい
-6. `KOUKU_KINOU_TRUST_PROXY=0`: 通常はこのままでよい
+4. `KOUKU_KINOU_ALLOWED_NETWORKS=`: 通常は空欄のままでよい
+5. `KOUKU_KINOU_TRUST_PROXY=0`: 通常はこのままでよい
 
 `tailscale-or-password` の意味:
 
 1. 利用者が Tailscale の HTTPS URL から入れば自動認証される
 2. うまくヘッダーが届かない時だけ、管理者用パスワードでも入れる
-
-`KOUKU_KINOU_DATA_DIR` の考え方:
-
-1. 既定値の `./data` は `compose.yaml` と同じフォルダの `data` を使います
-2. Synology で場所を明示したい場合は `/volume1/docker/kouku-kinou/data` のような共有フォルダ配下を指定します
-3. `unable to open database file` が出たときは、まずこの値と実フォルダの存在を見直します
 
 ## Container Manager で起動する手順
 
@@ -175,14 +156,6 @@ tailscale serve --bg 8010
 6. 記録一覧の検索が使える
 7. 別の端末で同じ記録が見える
 
-もし `https://diskstation.tail632bc4.ts.net/api/health` が `{"status": "error", "error": "unable to open database file"}` を返した場合は次です。
-
-1. `data` フォルダを Synology 上で作成済みか確認する
-2. `.env` の `KOUKU_KINOU_DATA_DIR` を絶対パスへ変更する
-3. Container Manager でプロジェクトを再ビルドする
-4. `data/records.db`、`data/records.db-wal`、`data/records.db-shm` が作成されるか確認する
-5. それでも直らない場合はコンテナログで `/data` まわりの権限エラーを確認する
-
 ## 利用者への配布
 
 利用者には次の 2 つを渡します。
@@ -198,21 +171,15 @@ Windows 利用者向けの簡易起動ツールは次の 3 ファイルです。
 
 `TailscaleClientLauncher.settings.json` の `appUrl` は `https://diskstation.tail632bc4.ts.net/` に設定済みです。URL を変更した時だけ、このファイルも合わせて更新してください。
 
-配布前に `organizationName`、`appUrl`、`supportText`、`supportContact` を現場向けに更新してください。特に `supportContact` は、利用者が困ったときの連絡先になるため、空欄のまま配らないほうが安全です。
-
-操作手順も一緒に渡すなら、`TAILSCALE_CLIENT_GUIDE_JA.pdf` を同梱するとそのまま案内に使えます。
-
 タブレット利用者にはファイル一式を配るより、次の案内だけを渡すほうが簡単です。
 
 1. App Store / Google Play で Tailscale を入れること
 2. 管理者が指定した方法で Tailscale にサインインすること
 3. `https://diskstation.tail632bc4.ts.net/` をブラウザーで開くこと
 
-利用者向けの説明文は [TAILSCALE_TABLET_GUIDE_JA.html](TAILSCALE_TABLET_GUIDE_JA.html) をそのまま使えます。
+利用者向けの説明文は [TAILSCALE_TABLET_GUIDE_JA.md](TAILSCALE_TABLET_GUIDE_JA.md) をそのまま使えます。
 
-短い配布メッセージは [TAILSCALE_TABLET_MESSAGE_TEMPLATE_JA.html](TAILSCALE_TABLET_MESSAGE_TEMPLATE_JA.html)、紙で渡す案内は [TAILSCALE_TABLET_QR_SHEET_JA.html](TAILSCALE_TABLET_QR_SHEET_JA.html) を使えます。
-
-配布用の見やすい版としては `TAILSCALE_TABLET_GUIDE_JA.pdf`、`TAILSCALE_TABLET_MESSAGE_TEMPLATE_JA.pdf`、`TAILSCALE_TABLET_QR_SHEET_JA.pdf` も使えます。
+短い配布メッセージは [TAILSCALE_TABLET_MESSAGE_TEMPLATE_JA.md](TAILSCALE_TABLET_MESSAGE_TEMPLATE_JA.md)、紙で渡す案内は [TAILSCALE_TABLET_QR_SHEET_JA.md](TAILSCALE_TABLET_QR_SHEET_JA.md) を使えます。
 
 ## バックアップ
 

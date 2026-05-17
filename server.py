@@ -3,7 +3,6 @@ from __future__ import annotations
 import argparse
 import ipaddress
 import json
-import mimetypes
 import os
 import re
 import secrets
@@ -22,7 +21,6 @@ from urllib.parse import parse_qs, quote, urlparse
 
 BASE_DIR = Path(__file__).resolve().parent
 DOTENV_PATH = BASE_DIR / ".env"
-ASSETS_DIR = BASE_DIR / "assets"
 
 
 def load_dotenv_file(dotenv_path: Path) -> None:
@@ -47,6 +45,8 @@ load_dotenv_file(DOTENV_PATH)
 
 SOURCE_ARTIFACT_PATH = BASE_DIR / "index.html"
 README_HTML_PATH = BASE_DIR / "README.html"
+ASSETS_DIR = BASE_DIR / "assets"
+ASSETS_DIR_RESOLVED = ASSETS_DIR.resolve()
 DEFAULT_DB_PATH = Path(os.environ.get("KOUKU_KINOU_DB", BASE_DIR / "data" / "records.db"))
 DEFAULT_SESSION_TTL_MINUTES = int(os.environ.get("KOUKU_KINOU_SESSION_TTL_MINUTES", "480"))
 DEFAULT_ALLOWED_NETWORKS = os.environ.get("KOUKU_KINOU_ALLOWED_NETWORKS", "")
@@ -75,66 +75,30 @@ DEFAULT_SHARED_SETTINGS = {
 }
 SHARED_SETTINGS_KEYS = tuple(DEFAULT_SHARED_SETTINGS.keys())
 
+ASSET_CONTENT_TYPES = {
+    ".gif": "image/gif",
+    ".jpeg": "image/jpeg",
+    ".jpg": "image/jpeg",
+    ".png": "image/png",
+    ".svg": "image/svg+xml; charset=utf-8",
+    ".webp": "image/webp",
+}
+
 HELP_STATIC_ROUTES: dict[str, tuple[Path, str]] = {
     "/readme.html": (README_HTML_PATH, "text/html; charset=utf-8"),
     "/README.html": (README_HTML_PATH, "text/html; charset=utf-8"),
     "/README.md": (BASE_DIR / "README.md", "text/markdown; charset=utf-8"),
-    "/README.pdf": (BASE_DIR / "README.pdf", "application/pdf"),
-    "/DEPLOY_SYNOLOGY_JA.html": (BASE_DIR / "DEPLOY_SYNOLOGY_JA.html", "text/html; charset=utf-8"),
     "/DEPLOY_SYNOLOGY_JA.md": (BASE_DIR / "DEPLOY_SYNOLOGY_JA.md", "text/markdown; charset=utf-8"),
-    "/DEPLOY_SYNOLOGY_JA.pdf": (BASE_DIR / "DEPLOY_SYNOLOGY_JA.pdf", "application/pdf"),
-    "/OPERATIONS_MANUAL_PDF_JA.html": (BASE_DIR / "OPERATIONS_MANUAL_PDF_JA.html", "text/html; charset=utf-8"),
     "/OPERATIONS_MANUAL_JA.md": (BASE_DIR / "OPERATIONS_MANUAL_JA.md", "text/markdown; charset=utf-8"),
-    "/OPERATIONS_MANUAL_JA.pdf": (BASE_DIR / "OPERATIONS_MANUAL_JA.pdf", "application/pdf"),
-    "/TAILSCALE_CLIENT_GUIDE_JA.html": (BASE_DIR / "TAILSCALE_CLIENT_GUIDE_JA.html", "text/html; charset=utf-8"),
     "/TAILSCALE_CLIENT_GUIDE_JA.md": (BASE_DIR / "TAILSCALE_CLIENT_GUIDE_JA.md", "text/markdown; charset=utf-8"),
-    "/TAILSCALE_CLIENT_GUIDE_JA.pdf": (BASE_DIR / "TAILSCALE_CLIENT_GUIDE_JA.pdf", "application/pdf"),
-    "/TAILSCALE_TABLET_GUIDE_JA.html": (BASE_DIR / "TAILSCALE_TABLET_GUIDE_JA.html", "text/html; charset=utf-8"),
     "/TAILSCALE_TABLET_GUIDE_JA.md": (BASE_DIR / "TAILSCALE_TABLET_GUIDE_JA.md", "text/markdown; charset=utf-8"),
-    "/TAILSCALE_TABLET_GUIDE_JA.pdf": (BASE_DIR / "TAILSCALE_TABLET_GUIDE_JA.pdf", "application/pdf"),
-    "/TAILSCALE_TABLET_MESSAGE_TEMPLATE_JA.html": (BASE_DIR / "TAILSCALE_TABLET_MESSAGE_TEMPLATE_JA.html", "text/html; charset=utf-8"),
     "/TAILSCALE_TABLET_MESSAGE_TEMPLATE_JA.md": (BASE_DIR / "TAILSCALE_TABLET_MESSAGE_TEMPLATE_JA.md", "text/markdown; charset=utf-8"),
-    "/TAILSCALE_TABLET_MESSAGE_TEMPLATE_JA.pdf": (BASE_DIR / "TAILSCALE_TABLET_MESSAGE_TEMPLATE_JA.pdf", "application/pdf"),
-    "/TAILSCALE_TABLET_QR_SHEET_JA.html": (BASE_DIR / "TAILSCALE_TABLET_QR_SHEET_JA.html", "text/html; charset=utf-8"),
     "/TAILSCALE_TABLET_QR_SHEET_JA.md": (BASE_DIR / "TAILSCALE_TABLET_QR_SHEET_JA.md", "text/markdown; charset=utf-8"),
-    "/TAILSCALE_TABLET_QR_SHEET_JA.pdf": (BASE_DIR / "TAILSCALE_TABLET_QR_SHEET_JA.pdf", "application/pdf"),
     "/TailscaleClientLauncher.cmd": (BASE_DIR / "TailscaleClientLauncher.cmd", "text/plain; charset=utf-8"),
     "/TailscaleClientLauncher.ps1": (BASE_DIR / "TailscaleClientLauncher.ps1", "text/plain; charset=utf-8"),
     "/TailscaleClientLauncher.settings.json": (BASE_DIR / "TailscaleClientLauncher.settings.json", "application/json; charset=utf-8"),
     "/.env.example": (BASE_DIR / ".env.example", "text/plain; charset=utf-8"),
 }
-
-
-def resolve_latest_pdf_path(asset_path: Path) -> Path:
-    if asset_path.suffix.lower() != ".pdf":
-        return asset_path
-
-    updated_path = asset_path.with_name(f"{asset_path.stem}.updated.pdf")
-    if not updated_path.exists():
-        return asset_path
-
-    if asset_path.exists() and asset_path.stat().st_mtime > updated_path.stat().st_mtime:
-        return asset_path
-
-    return updated_path
-
-
-def resolve_help_static_asset(request_path: str) -> tuple[Path, str] | None:
-    static_asset = HELP_STATIC_ROUTES.get(request_path)
-    if static_asset:
-        asset_path, content_type = static_asset
-        return resolve_latest_pdf_path(asset_path), content_type
-
-    if not request_path.startswith("/assets/"):
-        return None
-
-    asset_path = (BASE_DIR / request_path.lstrip("/")).resolve()
-    if not asset_path.is_relative_to(ASSETS_DIR.resolve()) or not asset_path.is_file():
-        return None
-
-    guessed_type, _ = mimetypes.guess_type(asset_path.name)
-    content_type = guessed_type or "application/octet-stream"
-    return asset_path, content_type
 
 STATE_LINE = "let records = JSON.parse(localStorage.getItem('oralNutritionRecords') || '[]');"
 SAVE_DEF = "function saveRecord() {"
@@ -180,13 +144,20 @@ RESPONSIVE_REPLACEMENT = """/* RESPONSIVE */
 
     /* NOTIFICATION */"""
 PATIENT_DENTIST_FIELD_NEW = '''<div class="form-group">
-                <label>かかりつけ医</label>
-                <input type="text" id="dentist" value="" style="display:none" aria-hidden="true">
-                <select id="dentist_select" data-skip-persist="1">
+                <label>かかりつけ歯科</label>
+                <select id="dentist_has">
                     <option value="">選択</option>
-                    <option value="__custom__">その他（自由入力）</option>
+                    <option value="あり">あり</option>
+                    <option value="なし">なし</option>
                 </select>
-                <input type="text" id="dentist_custom" data-skip-persist="1" placeholder="かかりつけ医を入力" style="display:none;margin-top:8px">
+                <div id="dentist_name_group" style="display:none;margin-top:8px" aria-hidden="true">
+                    <input type="text" id="dentist" value="" style="display:none" aria-hidden="true">
+                    <select id="dentist_select" data-skip-persist="1">
+                        <option value="">選択</option>
+                        <option value="__custom__">その他（自由入力）</option>
+                    </select>
+                    <input type="text" id="dentist_custom" data-skip-persist="1" placeholder="歯科名を入力" style="display:none;margin-top:8px">
+                </div>
             </div>'''
 PATIENT_STAFF_FIELD_NEW = '''<div class="form-group full">
                 <label>担当者</label>
@@ -202,7 +173,7 @@ SETTINGS_TAB_HTML = '''<!-- ==================== TAB 6: 設定 =================
     <div class="card">
         <div class="card-header">
             <div class="icon" style="background:#fff5e8">⚙️</div>
-            <div><h2>設定</h2><div class="subtitle">担当者・かかりつけ医の候補管理</div></div>
+            <div><h2>設定</h2><div class="subtitle">担当者・かかりつけ歯科の候補管理</div></div>
         </div>
         <div class="info-box">このサーバーで共有する候補一覧を編集します。追加・削除すると利用者情報タブのプルダウンへ即時反映されます。</div>
         <div class="settings-grid">
@@ -216,10 +187,10 @@ SETTINGS_TAB_HTML = '''<!-- ==================== TAB 6: 設定 =================
                 <div id="staffSettingsList" class="settings-list"></div>
             </section>
             <section class="settings-panel">
-                <div class="settings-panel__title">かかりつけ医一覧</div>
-                <div class="settings-panel__hint">よく使う医院名を登録しておくと患者入力が速くなります。</div>
+                <div class="settings-panel__title">かかりつけ歯科一覧</div>
+                <div class="settings-panel__hint">よく使う歯科名を登録しておくと患者入力が速くなります。</div>
                 <div class="settings-panel__editor">
-                    <input id="dentistSettingsInput" class="settings-panel__input" type="text" data-skip-persist="1" placeholder="かかりつけ医を追加">
+                    <input id="dentistSettingsInput" class="settings-panel__input" type="text" data-skip-persist="1" placeholder="かかりつけ歯科を追加">
                     <button id="addDentistSettingButton" type="button" class="btn btn-outline">追加</button>
                 </div>
                 <div id="dentistSettingsList" class="settings-list"></div>
@@ -259,32 +230,9 @@ RENDER_HISTORY_BLOCK = (
 RENDER_HISTORY_REPLACEMENT = (
     "function renderHistory() {\n"
     "  ensureHistoryTools();\n"
-    "  const tbody = document.getElementById('historyBody');\n"
     "  const filteredRecords = getFilteredRecords();\n"
     "  updateHistoryStats(filteredRecords.length);\n"
-    "  renderLatestPatients(filteredRecords);\n"
-    "  if (filteredRecords.length === 0) {\n"
-    "    const emptyMessage = records.length === 0 ? '保存された記録はありません' : '検索条件に一致する記録はありません';\n"
-    "    tbody.innerHTML = `<tr><td colspan=\"6\"><div class=\"empty-state\"><div class=\"icon\">📂</div>${emptyMessage}</div></td></tr>`;\n"
-    "    return;\n"
-    "  }\n"
-    "  tbody.innerHTML = filteredRecords.map((r) => {\n"
-    "    const tagClass = r.mnaLabel === '良好' ? 'tag-good' : r.mnaLabel === 'At risk' ? 'tag-risk' : r.mnaLabel === '低栄養' ? 'tag-bad' : '';\n"
-    "    const oralClass = r.oralContinue && r.oralContinue.includes('継続') ? 'tag-risk' : r.oralContinue && r.oralContinue.includes('終了') ? 'tag-good' : '';\n"
-    "    const identityLine = buildHistoryIdentityLine(r);\n"
-    "    const scoreLabel = r.mnaScore !== null && r.mnaScore !== undefined ? `${r.mnaScore}/14` : '―';\n"
-    "    return `<tr>\n"
-    "      <td>${escapeHtml(r.date || '')}</td>\n"
-    "      <td><strong>${escapeHtml(r.name || '')}</strong>${identityLine ? `<br><small style=\"color:var(--text-light)\">${identityLine}</small>` : ''}</td>\n"
-    "      <td><strong>${escapeHtml(scoreLabel)}</strong></td>\n"
-    "      <td><span class=\"tag ${tagClass}\">${escapeHtml(r.mnaLabel || '―')}</span></td>\n"
-    "      <td><span class=\"tag ${oralClass}\">${escapeHtml(r.oralContinue || '―')}</span></td>\n"
-    "      <td>\n"
-    "        <button class=\"btn btn-outline btn-sm\" onclick=\"loadRecord(${Number(r.id)})\">読込</button>\n"
-    "        <button class=\"btn btn-danger btn-sm\" style=\"margin-left:4px\" onclick=\"deleteRecord(${Number(r.id)})\">削除</button>\n"
-    "      </td>\n"
-    "    </tr>`;\n"
-    "  }).join('');\n"
+    "  renderActiveHistoryView(filteredRecords);\n"
     "}"
 )
 PRINT_RECORD_BLOCK = (
@@ -506,7 +454,7 @@ PRINT_CSS_APPEND = """  .print-sheet { display: none; }
 CLIENT_BRIDGE = """
 const API_ROOT = '/api/records';
 const SETTINGS_API_ROOT = '/api/settings';
-const HISTORY_FILTER_STATE = { query: '' };
+const HISTORY_FILTER_STATE = { query: '', view: 'latest', sort: 'evalDate' };
 let currentMnaFieldMode = '';
 const DRAFT_STORAGE_KEY = 'koukuKinouDraftsV1';
 const IMPORT_INPUT_ID = 'recordImportInput';
@@ -519,6 +467,9 @@ const NEXT_MONITOR_ALERT_DAYS = 30;
 const ODK_REFERENCE_PER_SECOND = 6.0;
 const CLINICAL_COMMENT_START_MARKER = '【口腔機能メモ】';
 const CLINICAL_COMMENT_END_MARKER = '【口腔機能メモここまで】';
+const NUTRITION_COMMENT_START_MARKER = '【栄養アセスメント】';
+const NUTRITION_COMMENT_END_MARKER = '【栄養アセスメントここまで】';
+const NUTRITION_SELECTION_FIELD_ID = 'nutrition_selection_state';
 const MANAGED_SELECT_CUSTOM_VALUE = '__custom__';
 const DEFAULT_STAFF_OPTIONS = ['本澤　真奈美', '兵働　めぐみ', '川原　奈緒美', '水野　永子', '宇井　くるみ', '近藤　祥子', '加治木　綾華', '伊藤　言美', '間島　大心', '村松　由姫香', '権田　万智子', '多和　佑恭'];
 const MANAGED_FIELD_CONFIGS = [
@@ -543,28 +494,333 @@ const MANAGED_FIELD_CONFIGS = [
         selectId: 'dentist_select',
         customId: 'dentist_custom',
         settingKey: 'dentistList',
-        label: 'かかりつけ医',
+        label: 'かかりつけ歯科',
         settingsInputId: 'dentistSettingsInput',
         settingsListId: 'dentistSettingsList',
         addButtonId: 'addDentistSettingButton',
-        emptyText: '登録されたかかりつけ医はありません',
-        addSuccessMessage: 'かかりつけ医を追加しました',
-        removeSuccessMessage: 'かかりつけ医を削除しました',
-        duplicateMessage: 'そのかかりつけ医は既に登録されています',
-        confirmDeleteMessage: 'このかかりつけ医を一覧から削除しますか？',
+        emptyText: '登録されたかかりつけ歯科はありません',
+        addSuccessMessage: 'かかりつけ歯科を追加しました',
+        removeSuccessMessage: 'かかりつけ歯科を削除しました',
+        duplicateMessage: 'そのかかりつけ歯科は既に登録されています',
+        confirmDeleteMessage: 'このかかりつけ歯科を一覧から削除しますか？',
         defaults: [],
     },
 ];
-const NON_RECORD_FIELD_IDS = new Set(['historySearch', 'printModeSelect', IMPORT_INPUT_ID, 'staff_select', 'staff_custom', 'dentist_select', 'dentist_custom', 'staffSettingsInput', 'dentistSettingsInput']);
+const NON_RECORD_FIELD_IDS = new Set(['historySearch', 'historyViewSelect', 'historySortSelect', 'printModeSelect', IMPORT_INPUT_ID, 'staff_select', 'staff_custom', 'dentist_select', 'dentist_custom', 'staffSettingsInput', 'dentistSettingsInput']);
+const FOOD_STAPLE_OPTIONS = ['米飯', '軟飯', '粥', 'ペースト', 'ゼリー'];
+const FOOD_MAIN_OPTIONS = ['常食', '軟菜', '一口大カット', '刻み', 'ソフト', 'ペースト', 'ゼリー'];
+const WATER_TEXTURE_OPTIONS = ['とろみなし', '軽度とろみ（フレンチドレッシング状）', '中等度とろみ（とんかつソース状）', '重度とろみ（ケチャップ状）'];
+const NUTRITION_ACTION_ROLE_LABELS = {
+    patientFamily: '① 本人・家族への対応',
+    st: '② ST対応',
+    ns: '③ 看護師対応',
+};
+const NUTRITION_GUIDANCE_LIBRARY = {
+    under: {
+        label: '低栄養 / 低栄養リスク',
+        chipTone: 'alert',
+        causes: {
+            weight: {
+                icon: '⚖️',
+                label: '体重減少・るいそう',
+                patientFamily: [
+                    '1回の食事量が少なくても、回数を増やして補うことを説明する',
+                    '高カロリー・高タンパク食品や栄養補助食品の活用を提案する',
+                ],
+                st: [
+                    '摂食嚥下機能と食べやすい食形態を評価する',
+                    '食事姿勢や代償手段を調整する',
+                ],
+                ns: [
+                    '体重と食事摂取率を定期モニタリングする',
+                    '医師・管理栄養士・NSTへ早期共有する',
+                ],
+            },
+            dysphagia: {
+                icon: '🍵',
+                label: '摂食・嚥下障害',
+                patientFamily: [
+                    'ゆっくり少量ずつ食べることと食事姿勢を説明する',
+                    'とろみや食形態調整の理由を丁寧に共有する',
+                ],
+                st: [
+                    'VE/VFを含む嚥下評価を検討する',
+                    '食形態ととろみ濃度を再評価する',
+                ],
+                ns: [
+                    '食事中・食後のむせやSpO2変化を観察する',
+                    '口腔ケアと食後の体位管理を徹底する',
+                ],
+            },
+            anorexia: {
+                icon: '🍽️',
+                label: '食欲不振・摂取量低下',
+                patientFamily: [
+                    '少量高頻度で食べられる時間帯を活かすよう提案する',
+                    '食前口腔ケアや食事環境づくりを案内する',
+                ],
+                st: [
+                    '食行動や先行期の問題を評価する',
+                    '嗜好や食感を活かして食べる意欲を引き出す',
+                ],
+                ns: [
+                    '摂取量と好みの変化を記録する',
+                    '薬剤影響や心理面の要因を確認する',
+                ],
+            },
+            oral: {
+                icon: '🦷',
+                label: '口腔機能低下',
+                patientFamily: [
+                    '義歯不適合や口腔乾燥時は歯科相談を勧める',
+                    '毎食後の口腔ケアと保湿を説明する',
+                ],
+                st: [
+                    '舌圧・口唇・咀嚼機能を評価する',
+                    '口腔機能訓練と食形態調整を行う',
+                ],
+                ns: [
+                    '口腔ケア介助と義歯管理を行う',
+                    '歯科・歯科衛生士との連携を調整する',
+                ],
+            },
+            cognitive: {
+                icon: '🧠',
+                label: '認知機能低下・行動変化',
+                patientFamily: [
+                    '一品ずつ出す、手づかみ食にするなど環境調整を提案する',
+                    '静かな食事環境と無理強いしない関わりを共有する',
+                ],
+                st: [
+                    '認知機能と摂食行動の関連を評価する',
+                    '介助方法を家族・スタッフで統一する',
+                ],
+                ns: [
+                    '見守りと声かけ、食事環境調整を行う',
+                    '拒食のタイミングや背景を記録し家族支援につなげる',
+                ],
+            },
+        },
+    },
+    over: {
+        label: '過栄養',
+        chipTone: 'info',
+        causes: {
+            overeating: {
+                icon: '🍱',
+                label: '過食・摂取量過多',
+                patientFamily: [
+                    '食べる速度をゆっくりにし、小さい食器を使う工夫を提案する',
+                    '間食の内容とタイミングを記録して見直す',
+                ],
+                st: [
+                    '摂食ペースや丸飲み傾向を評価する',
+                    '食行動修正に向けた関わり方を整理する',
+                ],
+                ns: [
+                    '食事量・間食量と体重推移を定期記録する',
+                    '管理栄養士・医師と連携して量の調整を検討する',
+                ],
+            },
+            imbalance: {
+                icon: '🥗',
+                label: '栄養バランスの偏り',
+                patientFamily: [
+                    '主食・主菜・副菜をそろえる目安を説明する',
+                    '甘い飲料を水やお茶へ切り替えることを提案する',
+                ],
+                st: [
+                    '食べやすさと偏食の関連を評価する',
+                    '咀嚼能力に合うバランス食の形態を提案する',
+                ],
+                ns: [
+                    '食事内容と血液データを継続確認する',
+                    '服薬と食事内容の相互作用を確認する',
+                ],
+            },
+            activity: {
+                icon: '🚶',
+                label: '活動量低下・代謝低下',
+                patientFamily: [
+                    '座位体操や食後の短時間活動を提案する',
+                    '転倒に配慮した安全な活動環境を整える',
+                ],
+                st: [
+                    '姿勢・体幹機能や食事中の疲労を評価する',
+                    'PT・OTと連携した包括的リハビリを検討する',
+                ],
+                ns: [
+                    '活動量を増やす環境整備と声かけを行う',
+                    '体重・体組成・褥瘡リスクを定期確認する',
+                ],
+            },
+            oral_hygiene: {
+                icon: '🦠',
+                label: '口腔衛生・生活習慣関連',
+                patientFamily: [
+                    '食後・就寝前の口腔ケアと歯科受診を勧める',
+                    '糖分の多い飲食物の摂取頻度を見直す',
+                ],
+                st: [
+                    '口腔内環境と唾液クリアランスを評価する',
+                    '歯科・歯科衛生士との連携を調整する',
+                ],
+                ns: [
+                    '口腔内の炎症や口臭の変化を観察する',
+                    'GERDや睡眠時無呼吸の兆候を観察し共有する',
+                ],
+            },
+        },
+    },
+};
+const ORAL_REFERENCE_IMAGE_CONFIG = {
+    a3: {
+        title: '歯や義歯の汚れ 参考画像',
+        src: '/assets/manual_beginner/oral_reference_teeth_photo.jpg',
+        alt: '歯や義歯の汚れを3段階で示した参考画像。1 ない、2 ある、3 多い。',
+        note: '1 ない / 2 ある / 3 多い の目安',
+    },
+    a4: {
+        title: '舌の汚れ 参考画像',
+        src: '/assets/manual_beginner/oral_reference_tongue_photo.jpg',
+        alt: '舌の汚れを3段階で示した参考画像。1 ない、2 ある、3 多い。',
+        note: '1 ない / 2 ある / 3 多い の目安',
+    },
+};
+const BIRTHDATE_YEAR_MIN = 1900;
+const EVAL_DATE_YEAR_RANGE_PAST = 20;
+const EVAL_DATE_YEAR_RANGE_FUTURE = 2;
+const NEXT_MONITOR_YEAR_RANGE = 6;
+const ODK_TIMER_SECONDS = 10;
+const ORAL_SELECT_CONFIG = {
+    q6: {
+        label: 'お口の健康状態',
+        options: [
+            { value: '1', label: '良い: 口や歯のことで苦痛や不自由は感じていない' },
+            { value: '2', label: 'やや良い: 口や歯のことで苦痛や不自由を殆ど感じていない' },
+            { value: '3', label: 'ふつう: 時折不自由を感じることはあるが、調子が良いこともある' },
+            { value: '4', label: 'やや悪い: 口や歯のことでしばしば苦痛や不自由を感じる' },
+            { value: '5', label: '悪い: 口や歯のことでいつも苦痛や不自由を感じる' },
+        ],
+    },
+    q7: {
+        label: '口臭',
+        options: [
+            { value: '1', label: 'ない: 口臭を全くまたは殆ど感じない' },
+            { value: '2', label: '弱い: 口臭はあるが、弱く我慢できる程度' },
+            { value: '3', label: '強い: 近づかなくても口臭を感じる、会話しにくい' },
+        ],
+    },
+    q8: {
+        label: '口腔清掃習慣',
+        options: [
+            { value: '3', label: 'ある: 毎日の自発的な口腔ケア行動がある' },
+            { value: '2', label: '多少ある: 毎日ではないが、週に数回は自発的な口腔ケア行動がある' },
+            { value: '1', label: 'ない: 声かけしないと全く口腔ケア行動を行わない' },
+        ],
+    },
+    q9: {
+        label: 'むせ（食事中や食後のむせ）',
+        options: [
+            { value: '1', label: 'ない: 特に認めない' },
+            { value: '2', label: '多少ある: 時々むせがある' },
+            { value: '3', label: 'ある: むせにより食事が中断してしまう' },
+        ],
+    },
+    q10: {
+        label: '食べこぼし（食事中）',
+        options: [
+            { value: '1', label: 'ない: 食べこぼしが全くない、ほとんどない' },
+            { value: '2', label: '多少ある: 殆ど毎回少量の食べこぼしがある' },
+            { value: '3', label: 'ある: 殆ど毎日食べこぼしがある、目立つ' },
+        ],
+    },
+    q11: {
+        label: '表情の豊かさ',
+        options: [
+            { value: '1', label: '豊富: 頬や口角が上がった、はっきりとした笑顔が多い' },
+            { value: '2', label: 'やや豊富: 頬や口角がやや上がった笑顔が多い' },
+            { value: '3', label: 'ふつう: どちらともいえない' },
+            { value: '4', label: 'やや乏しい: 表情の変化が少ない、笑顔がわかりにくい' },
+            { value: '5', label: '乏しい: 表情が殆ど変化しない、笑顔が殆どない' },
+        ],
+    },
+    a1: {
+        label: '右側・咬合の収縮の確認',
+        options: [
+            { value: '1', label: '強い: 指先が強く押される、硬くなっているのが明確に触診できる' },
+            { value: '2', label: '弱い: 指先が弱く押される、硬くなっているのが殆ど触診できない' },
+            { value: '3', label: '無し: 指先が押される感覚がない' },
+        ],
+    },
+    a2: {
+        label: '左側・咬合の収縮の確認',
+        options: [
+            { value: '1', label: '強い: 指先が強く押される、硬くなっているのが明確に触診できる' },
+            { value: '2', label: '弱い: 指先が弱く押される、硬くなっているのが殆ど触診できない' },
+            { value: '3', label: '無し: 指先が押される感覚がない' },
+        ],
+    },
+    a3: {
+        label: '② 歯や義歯の汚れ',
+        options: [
+            { value: '1', label: 'ない: 歯と歯の間、歯と歯肉の境目に汚れが見られない' },
+            { value: '2', label: 'ある: 歯と歯の間、歯と歯肉の境目に白色〜クリーム色の汚れがみられる' },
+            { value: '3', label: '多い: 歯と歯の間、歯と歯肉の境目以外にも汚れや食物残渣がみられる' },
+        ],
+    },
+    a4: {
+        label: '③ 舌の汚れ',
+        options: [
+            { value: '1', label: 'ない: 舌全体が一様な赤色〜ピンク色をしている' },
+            { value: '2', label: 'ある: 舌の一部（半分未満）が白色、黄色、褐色など汚れに覆われている' },
+            { value: '3', label: '多い: 舌の半分以上が白色、黄色、褐色など汚れに覆われている' },
+        ],
+    },
+    rsst_judge: {
+        label: '専門職の判断（RSST）',
+        options: [
+            { value: '1', label: '問題なし: 30秒で3回以上' },
+            { value: '2', label: '問題あり: 30秒で3回未満' },
+        ],
+    },
+    bukubuku: {
+        label: 'ブクブクうがい',
+        options: [
+            { value: '1', label: 'できる: 頬を何度も膨らまし、同時に舌も動かすことができる' },
+            { value: '2', label: '不十分: 頬の膨らましが小さい（1回または2回程度）、舌の動きが弱い' },
+            { value: '3', label: 'できない: 唇を閉じることができない、頬の膨らましができない' },
+        ],
+    },
+    oral_eval2: {
+        label: '② 事業またはサービスの継続の必要性',
+        options: [
+            { value: 'あり（継続） 口腔清掃・唾液分泌・咀嚼・嚥下・食事摂取などの口腔機能の低下が認められる状態の者', label: 'あり（継続）: 口腔清掃・唾液分泌・咀嚼・嚥下・食事摂取などの口腔機能の低下が認められる状態の者' },
+            { value: 'あり（継続） 口腔機能向上サービスを継続しないことにより、口腔機能が著しく低下するおそれのある者', label: 'あり（継続）: 口腔機能向上サービスを継続しないことにより、口腔機能が著しく低下するおそれのある者' },
+            { value: 'なし（終了） 口腔機能向上の効果が十分であり、自立した状態', label: 'なし（終了）: 口腔機能向上の効果が十分であり、自立した状態' },
+        ],
+    },
+    oral_eval3: {
+        label: '③ 事業またはサービスの継続の必要性（モニタリング後）',
+        options: [
+            { value: 'あり（継続）', label: 'あり（継続）' },
+            { value: 'なし（終了）', label: 'なし（終了）' },
+        ],
+    },
+};
 let autosaveHandle = 0;
 let rsstTimerHandle = 0;
 let rsstRemainingSeconds = RSST_DEFAULT_SECONDS;
+let odkTimerHandles = { pa: 0, ta: 0, ka: 0 };
+let odkRemainingSeconds = { pa: ODK_TIMER_SECONDS, ta: ODK_TIMER_SECONDS, ka: ODK_TIMER_SECONDS };
 let draftListenersBound = false;
 let stage2UpdateHandle = 0;
 let stage2HooksInstalled = false;
 let stage2ListenersBound = false;
+let summaryHooksInstalled = false;
 let managedFieldHooksInstalled = false;
 let latestClinicalSupportData = null;
+let latestNutritionAssessmentData = null;
 let sharedSettingsState = { staffList: [], dentistList: [] };
 
 async function readJsonIfAvailable(response) {
@@ -703,6 +959,34 @@ function collectFieldValues() {
     return fields;
 }
 
+function getCompatibleSelectValue(selectElement, rawValue) {
+    const text = String(rawValue ?? '').trim();
+    if (!text) {
+        return '';
+    }
+
+    const directMatch = Array.from(selectElement.options).find((option) => option.value === text);
+    if (directMatch) {
+        return directMatch.value;
+    }
+
+    const numericCode = parseChoiceCode(text);
+    if (numericCode !== null) {
+        const codedMatch = Array.from(selectElement.options).find((option) => parseChoiceCode(option.value) === numericCode);
+        if (codedMatch) {
+            return codedMatch.value;
+        }
+    }
+
+    if (selectElement.id === 'oral_eval2' && text === 'あり（継続）') {
+        return 'あり（継続） 口腔清掃・唾液分泌・咀嚼・嚥下・食事摂取などの口腔機能の低下が認められる状態';
+    }
+    if (selectElement.id === 'oral_eval2' && text === 'なし（終了）') {
+        return 'なし（終了） 口腔機能向上の効果が十分であり、自立した状態';
+    }
+    return text;
+}
+
 function restoreFieldValues(fields) {
     Object.entries(fields || {}).forEach(([id, value]) => {
         const element = document.getElementById(id);
@@ -712,10 +996,23 @@ function restoreFieldValues(fields) {
         if (element.type === 'radio' || element.type === 'checkbox') {
             return;
         }
+        if (element.tagName === 'SELECT') {
+            element.value = getCompatibleSelectValue(element, value);
+            return;
+        }
         element.value = value ?? '';
     });
     if (typeof syncManagedPersonSelectors === 'function') {
         syncManagedPersonSelectors();
+    }
+    if (typeof syncDentistPresenceField === 'function') {
+        syncDentistPresenceField({ preserveValue: true });
+    }
+    if (typeof syncCustomDateSelectors === 'function') {
+        syncCustomDateSelectors();
+    }
+    if (typeof syncOdkHelperFieldsFromRates === 'function') {
+        syncOdkHelperFieldsFromRates();
     }
 }
 
@@ -772,6 +1069,153 @@ function buildHistoryIdentityLine(record) {
     return parts.join(' / ');
 }
 
+function getHistoryDisplayMode() {
+    return HISTORY_FILTER_STATE.view === 'records' ? 'records' : 'latest';
+}
+
+function getHistorySortMode() {
+    return String(HISTORY_FILTER_STATE.sort || 'evalDate').trim() || 'evalDate';
+}
+
+function getHistoryDisplayConfig() {
+    if (getHistoryDisplayMode() === 'records') {
+        return {
+            title: '評価日一覧',
+            hint: '評価日の新しい順や優先順で、主要項目だけを縦に読みやすく整理しています。',
+        };
+    }
+    return {
+        title: '患者別最新評価',
+        hint: '同じ利用者ごとに最新の評価日だけをまとめて表示します。',
+    };
+}
+
+function updateHistoryDisplayHeading() {
+    const title = document.getElementById('historyDisplayTitle');
+    const hint = document.getElementById('historyDisplayHint');
+    const config = getHistoryDisplayConfig();
+    if (title) {
+        title.textContent = config.title;
+    }
+    if (hint) {
+        hint.textContent = config.hint;
+    }
+}
+
+function compareTextAsc(left, right) {
+    return String(left || '').localeCompare(String(right || ''), 'ja');
+}
+
+function getHistoryNameSortKey(record) {
+    return String(record.furigana || record.name || '').trim();
+}
+
+function getNutritionSortRank(label) {
+    const text = String(label || '').trim();
+    if (text === '低栄養') {
+        return 0;
+    }
+    if (text === 'At risk') {
+        return 1;
+    }
+    if (text === '良好') {
+        return 2;
+    }
+    return 3;
+}
+
+function getNextMonitorSortValue(record) {
+    const text = String(record?.nextMonitor || '').trim();
+    if (!text) {
+        return Number.POSITIVE_INFINITY;
+    }
+    if (isYearMonthValue(text)) {
+        const parts = parseYearMonthParts(text);
+        return parts ? Date.UTC(parts.year, parts.month - 1, 1) : Number.POSITIVE_INFINITY;
+    }
+    const parts = parseYmdParts(text);
+    return parts ? Date.UTC(parts.year, parts.month - 1, parts.day) : Number.POSITIVE_INFINITY;
+}
+
+function compareRecordsByHistorySort(left, right) {
+    const sortMode = getHistorySortMode();
+    if (sortMode === 'name') {
+        const byName = compareTextAsc(getHistoryNameSortKey(left), getHistoryNameSortKey(right));
+        return byName || compareRecordsByDateDesc(left, right);
+    }
+    if (sortMode === 'nutrition') {
+        const byNutrition = getNutritionSortRank(left?.mnaLabel) - getNutritionSortRank(right?.mnaLabel);
+        return byNutrition || compareRecordsByDateDesc(left, right);
+    }
+    if (sortMode === 'nextMonitor') {
+        const byNextMonitor = getNextMonitorSortValue(left) - getNextMonitorSortValue(right);
+        if (!Number.isNaN(byNextMonitor) && byNextMonitor !== 0) {
+            return byNextMonitor;
+        }
+        return compareTextAsc(getHistoryNameSortKey(left), getHistoryNameSortKey(right)) || compareRecordsByDateDesc(left, right);
+    }
+    return compareRecordsByDateDesc(left, right);
+}
+
+function sortRecordsForHistoryDisplay(sourceRecords) {
+    return [...sourceRecords].sort(compareRecordsByHistorySort);
+}
+
+function getNutritionTagClass(label) {
+    const text = String(label || '').trim();
+    if (text === '良好') {
+        return 'tag-good';
+    }
+    if (text === 'At risk') {
+        return 'tag-risk';
+    }
+    if (text === '低栄養') {
+        return 'tag-bad';
+    }
+    return '';
+}
+
+function getOralContinueTagClass(label) {
+    const text = String(label || '').trim();
+    if (!text) {
+        return '';
+    }
+    if (text.includes('終了')) {
+        return 'tag-good';
+    }
+    if (text.includes('再評価')) {
+        return 'tag-bad';
+    }
+    if (text.includes('継続')) {
+        return 'tag-risk';
+    }
+    return '';
+}
+
+function buildHistoryFieldHtml(label, valueHtml) {
+    return `
+        <section class="history-field">
+            <div class="history-field__label">${escapeHtml(label)}</div>
+            <div class="history-field__value">${valueHtml}</div>
+        </section>
+    `;
+}
+
+function buildHistoryTagBlockHtml(text, className = '', note = '') {
+    const valueText = String(text || '').trim();
+    const noteText = String(note || '').trim();
+    if (!valueText) {
+        return '―';
+    }
+    const tagClass = className ? `tag ${className}` : 'tag';
+    return `
+        <div class="history-tag-block">
+            <span class="${tagClass}">${escapeHtml(valueText)}</span>
+            ${noteText ? `<div class="history-field__note">${escapeHtml(noteText)}</div>` : ''}
+        </div>
+    `;
+}
+
 function buildPatientLookupKey(name, birthdate) {
     const normalizedName = normalizeSearchText(name);
     const normalizedBirthdate = String(birthdate ?? '').trim();
@@ -788,6 +1232,62 @@ function parseYmdParts(value) {
         month: Number.parseInt(match[2], 10),
         day: Number.parseInt(match[3], 10),
     };
+}
+
+function parseYearMonthParts(value) {
+    const text = String(value || '').trim();
+    const monthOnlyMatch = text.match(/^(\\d{4})-(\\d{2})$/);
+    if (monthOnlyMatch) {
+        return {
+            year: Number.parseInt(monthOnlyMatch[1], 10),
+            month: Number.parseInt(monthOnlyMatch[2], 10),
+        };
+    }
+
+    const fullDateParts = parseYmdParts(text);
+    if (!fullDateParts) {
+        return null;
+    }
+    return {
+        year: fullDateParts.year,
+        month: fullDateParts.month,
+    };
+}
+
+function isYearMonthValue(value) {
+    return /^(\\d{4})-(\\d{2})$/.test(String(value || '').trim());
+}
+
+function formatYearMonthDisplay(value) {
+    const parts = parseYearMonthParts(value);
+    if (!parts) {
+        return String(value || '').trim();
+    }
+    return `${parts.year}年${parts.month}月`;
+}
+
+function getMonthsUntil(value) {
+    const parts = parseYearMonthParts(value);
+    if (!parts) {
+        return null;
+    }
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth() + 1;
+    return (parts.year - currentYear) * 12 + (parts.month - currentMonth);
+}
+
+function isNextMonitorDueSoon(value) {
+    const text = String(value || '').trim();
+    if (!text) {
+        return false;
+    }
+    if (isYearMonthValue(text)) {
+        const months = getMonthsUntil(text);
+        return months !== null && months <= 1;
+    }
+    const days = getDaysUntil(text);
+    return days !== null && days <= NEXT_MONITOR_ALERT_DAYS;
 }
 
 function ymdPartsToUtc(parts) {
@@ -959,6 +1459,8 @@ function buildOralAssessmentState(readValue) {
     const q7Value = String(readValue('q7') || '').trim();
     const q8Value = String(readValue('q8') || '').trim();
     const q9Value = String(readValue('q9') || '').trim();
+    const q10Value = String(readValue('q10') || '').trim();
+    const q11Value = String(readValue('q11') || '').trim();
     const rsstJudgeValue = String(readValue('rsst_judge') || '').trim();
     const bukubukuValue = String(readValue('bukubuku') || '').trim();
     const guguguValue = String(readValue('gugugu') || '').trim();
@@ -984,6 +1486,10 @@ function buildOralAssessmentState(readValue) {
         q8Code: parseChoiceCode(q8Value),
         q9Value,
         q9Code: parseChoiceCode(q9Value),
+        q10Value,
+        q10Code: parseChoiceCode(q10Value),
+        q11Value,
+        q11Code: parseChoiceCode(q11Value),
         rsstCount: toMetricNumber(readValue('rsst_count')),
         rsstJudgeValue,
         rsstJudgeCode: parseChoiceCode(rsstJudgeValue),
@@ -1021,6 +1527,8 @@ function hasOralAssessmentData(state) {
         state.q7Code,
         state.q8Code,
         state.q9Code,
+        state.q10Code,
+        state.q11Code,
         state.rsstJudgeCode,
         state.bukubukuCode,
         state.guguguCode,
@@ -1101,6 +1609,13 @@ function hasMeaningfulDrop(currentValue, previousValue, threshold) {
     return currentValue <= previousValue - threshold;
 }
 
+function hasMeaningfulRise(currentValue, previousValue, threshold) {
+    if (currentValue === null || previousValue === null) {
+        return false;
+    }
+    return currentValue >= previousValue + threshold;
+}
+
 function getDaysUntil(dateText) {
     const target = parseYmdParts(dateText);
     const today = parseYmdParts(new Date().toISOString().slice(0, 10));
@@ -1116,6 +1631,21 @@ function buildNextMonitorHtml(dateText) {
     const text = String(dateText || '').trim();
     if (!text) {
         return '―';
+    }
+    if (isYearMonthValue(text)) {
+        const months = getMonthsUntil(text);
+        if (months === null) {
+            return escapeHtml(formatYearMonthDisplay(text));
+        }
+        let suffix = months === 0 ? '今月予定' : `${months}か月後`;
+        let className = '';
+        if (months < 0) {
+            suffix = `${Math.abs(months)}か月超過`;
+            className = 'monitor-status--overdue';
+        } else if (months <= 1) {
+            className = 'monitor-status--soon';
+        }
+        return `${escapeHtml(formatYearMonthDisplay(text))}<br><small class="monitor-status ${className}">${escapeHtml(suffix)}</small>`;
     }
     const days = getDaysUntil(text);
     if (days === null) {
@@ -1188,7 +1718,7 @@ function getLatestPatientRecords(filteredRecords) {
 
 function updateLatestPatientsStats(latestRecords) {
     const latestCount = latestRecords.length;
-    const stats = document.getElementById('latestPatientsStats');
+    const stats = document.getElementById('historyDisplayStats');
     if (!stats) {
         return;
     }
@@ -1197,7 +1727,7 @@ function updateLatestPatientsStats(latestRecords) {
     const query = normalizeSearchText(HISTORY_FILTER_STATE.query);
     stats.textContent = query ? `${latestCount} / ${totalPatients}名を表示` : `${latestCount}名を表示`;
 
-    const summary = document.getElementById('latestPatientsSummary');
+    const summary = document.getElementById('historyDisplaySummary');
     if (!summary) {
         return;
     }
@@ -1214,8 +1744,7 @@ function updateLatestPatientsStats(latestRecords) {
         return bmi !== null && reference && bmi < reference.low;
     }).length;
     const dueSoonCount = latestRecords.filter((record) => {
-        const days = getDaysUntil(record.nextMonitor);
-        return days !== null && days <= NEXT_MONITOR_ALERT_DAYS;
+        return isNextMonitorDueSoon(record.nextMonitor);
     }).length;
     const riskCount = latestRecords.filter((record) => {
         const label = String(record.mnaLabel || '').trim();
@@ -1225,65 +1754,185 @@ function updateLatestPatientsStats(latestRecords) {
     summary.innerHTML = [
         buildMetricChipHtml('表示中', `${latestCount}名`, 'info'),
         buildMetricChipHtml('BMI要確認', `${bmiAttentionCount}名`, bmiAttentionCount ? 'alert' : 'success'),
-        buildMetricChipHtml('30日以内フォロー', `${dueSoonCount}名`, dueSoonCount ? 'alert' : 'success'),
+        buildMetricChipHtml('近日フォロー', `${dueSoonCount}名`, dueSoonCount ? 'alert' : 'success'),
         buildMetricChipHtml('栄養注意', `${riskCount}名`, riskCount ? 'alert' : 'success'),
     ].join('');
 }
 
+function updateHistoryRecordStats(filteredRecords) {
+    const stats = document.getElementById('historyDisplayStats');
+    if (!stats) {
+        return;
+    }
+
+    const query = normalizeSearchText(HISTORY_FILTER_STATE.query);
+    stats.textContent = query ? `${filteredRecords.length} / ${records.length}件を表示` : `${filteredRecords.length}件を表示`;
+
+    const summary = document.getElementById('historyDisplaySummary');
+    if (!summary) {
+        return;
+    }
+
+    if (!filteredRecords.length) {
+        summary.innerHTML = '';
+        return;
+    }
+
+    const dueSoonCount = filteredRecords.filter((record) => isNextMonitorDueSoon(record.nextMonitor)).length;
+    const riskCount = filteredRecords.filter((record) => {
+        const label = String(record.mnaLabel || '').trim();
+        return label && label !== '良好' && label !== '―';
+    }).length;
+    const reEvalCount = filteredRecords.filter((record) => String(record.oralContinue || '').includes('再評価')).length;
+
+    summary.innerHTML = [
+        buildMetricChipHtml('表示中', `${filteredRecords.length}件`, 'info'),
+        buildMetricChipHtml('栄養注意', `${riskCount}件`, riskCount ? 'alert' : 'success'),
+        buildMetricChipHtml('近日フォロー', `${dueSoonCount}件`, dueSoonCount ? 'alert' : 'success'),
+        buildMetricChipHtml('要再評価', `${reEvalCount}件`, reEvalCount ? 'alert' : 'success'),
+    ].join('');
+}
+
+function buildLatestPatientCardHtml(record, patientHistory) {
+    const previousRecord = patientHistory[1] || null;
+    const visitCount = patientHistory.length;
+    const currentWeight = toMetricNumber(record.weight ?? record.fields?.weight);
+    const previousWeight = previousRecord ? toMetricNumber(previousRecord.weight ?? previousRecord.fields?.weight) : null;
+    const currentBmi = toMetricNumber(record.bmi ?? record.fields?.bmi);
+    const previousBmi = previousRecord ? toMetricNumber(previousRecord.bmi ?? previousRecord.fields?.bmi) : null;
+    const age = calculateAgeAtDate(record.birthdate, record.date);
+    const identityParts = [];
+    if (record.birthdate) {
+        identityParts.push(escapeHtml(record.birthdate));
+    }
+    if (age !== null) {
+        identityParts.push(`${age}歳`);
+    }
+    if (record.furigana) {
+        identityParts.push(escapeHtml(record.furigana));
+    }
+
+    const metricParts = [];
+    if (currentWeight !== null) {
+        metricParts.push(`<strong>${escapeHtml(formatMetricValue(currentWeight, 'kg'))}</strong>`);
+    }
+    if (currentBmi !== null) {
+        metricParts.push(`<div class="history-field__note">BMI ${escapeHtml(formatMetricValue(currentBmi))}</div>`);
+    }
+
+    const nutritionLabel = String(record.mnaLabel || '').trim() || '―';
+    const scoreLabel = record.mnaScore !== null && record.mnaScore !== undefined ? `${record.mnaScore}/14` : 'MNA未入力';
+
+    return `
+        <article class="history-card history-card--latest">
+            <div class="history-card__header">
+                <div class="history-card__lead">
+                    <div class="history-card__title">${escapeHtml(record.name || '名称未設定')}</div>
+                    <div class="history-card__subline">${identityParts.length ? identityParts.join(' / ') : '患者情報なし'}</div>
+                </div>
+                <div class="history-card__date-block">
+                    <div class="history-card__date-label">最新評価日</div>
+                    <div class="history-card__date">${escapeHtml(record.date || '―')}</div>
+                </div>
+            </div>
+            <div class="history-card__grid">
+                ${buildHistoryFieldHtml('体重 / BMI', metricParts.length ? metricParts.join('') : '―')}
+                ${buildHistoryFieldHtml('前回比', [
+                    buildTrendDeltaHtml(currentWeight, previousWeight, 'kg', '体重'),
+                    buildTrendDeltaHtml(currentBmi, previousBmi, '', 'BMI'),
+                ].join('<br>'))}
+                ${buildHistoryFieldHtml('栄養判定', buildHistoryTagBlockHtml(nutritionLabel, getNutritionTagClass(nutritionLabel), scoreLabel))}
+                ${buildHistoryFieldHtml('次回モニタリング', buildNextMonitorHtml(record.nextMonitor))}
+            </div>
+            <div class="history-card__footer">
+                <div class="history-card__chips">${buildMetricChipHtml('評価回数', `${visitCount}件`, visitCount > 1 ? 'info' : 'success')}</div>
+                <div class="history-card__actions">
+                    <button class="btn btn-outline btn-sm" onclick="loadRecord(${Number(record.id)})">最新を読込</button>
+                </div>
+            </div>
+        </article>
+    `;
+}
+
+function buildHistoryRecordCardHtml(record) {
+    const identityLine = buildHistoryIdentityLine(record) || '患者情報なし';
+    const nutritionLabel = String(record.mnaLabel || '').trim() || '―';
+    const oralLabel = String(record.oralContinue || '').trim() || '―';
+    const scoreLabel = record.mnaScore !== null && record.mnaScore !== undefined ? `${record.mnaScore}/14` : 'MNA未入力';
+
+    return `
+        <article class="history-card history-card--record">
+            <div class="history-card__header">
+                <div class="history-card__lead">
+                    <div class="history-card__title-row">
+                        <div class="history-card__date-pill">${escapeHtml(record.date || '―')}</div>
+                        <div class="history-card__title">${escapeHtml(record.name || '名称未設定')}</div>
+                    </div>
+                    <div class="history-card__subline">${identityLine}</div>
+                </div>
+                <div class="history-card__actions">
+                    <button class="btn btn-outline btn-sm" onclick="loadRecord(${Number(record.id)})">読込</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteRecord(${Number(record.id)})">削除</button>
+                </div>
+            </div>
+            <div class="history-card__grid history-card__grid--compact">
+                ${buildHistoryFieldHtml('栄養判定', buildHistoryTagBlockHtml(nutritionLabel, getNutritionTagClass(nutritionLabel), scoreLabel))}
+                ${buildHistoryFieldHtml('口腔継続', buildHistoryTagBlockHtml(oralLabel, getOralContinueTagClass(oralLabel)))}
+                ${buildHistoryFieldHtml('次回モニタリング', buildNextMonitorHtml(record.nextMonitor))}
+            </div>
+        </article>
+    `;
+}
+
+function renderHistoryRecords(filteredRecords) {
+    const container = document.getElementById('historyDisplayBody');
+    if (!container) {
+        return;
+    }
+
+    updateHistoryDisplayHeading();
+    updateHistoryRecordStats(filteredRecords);
+
+    if (filteredRecords.length === 0) {
+        const emptyMessage = records.length === 0 ? '保存された記録はありません' : '検索条件に一致する記録はありません';
+        container.innerHTML = `<div class="empty-state"><div class="icon">📂</div>${emptyMessage}</div>`;
+        return;
+    }
+
+    container.innerHTML = sortRecordsForHistoryDisplay(filteredRecords)
+        .map((record) => buildHistoryRecordCardHtml(record))
+        .join('');
+}
+
 function renderLatestPatients(filteredRecords) {
-    const tbody = document.getElementById('latestPatientsBody');
-    if (!tbody) {
+    const container = document.getElementById('historyDisplayBody');
+    if (!container) {
         return;
     }
 
     const { latestRecords, patientGroups } = getLatestPatientRecords(filteredRecords);
+    updateHistoryDisplayHeading();
     updateLatestPatientsStats(latestRecords);
 
     if (latestRecords.length === 0) {
         const emptyMessage = records.length === 0 ? '保存された利用者はありません' : '検索条件に一致する利用者はありません';
-        tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="icon">👥</div>${emptyMessage}</div></td></tr>`;
+        container.innerHTML = `<div class="empty-state"><div class="icon">👥</div>${emptyMessage}</div>`;
         return;
     }
 
-    tbody.innerHTML = latestRecords.map((record) => {
+    container.innerHTML = sortRecordsForHistoryDisplay(latestRecords).map((record) => {
         const patientKey = getRecordPatientKey(record);
         const patientHistory = patientGroups.get(patientKey) || [record];
-        const previousRecord = patientHistory[1] || null;
-        const tagClass = record.mnaLabel === '良好' ? 'tag-good' : record.mnaLabel === 'At risk' ? 'tag-risk' : record.mnaLabel === '低栄養' ? 'tag-bad' : '';
-        const scoreLabel = record.mnaScore !== null && record.mnaScore !== undefined ? `${record.mnaScore}/14` : '―';
-        const visitCount = patientHistory.length;
-        const currentWeight = toMetricNumber(record.weight ?? record.fields?.weight);
-        const previousWeight = previousRecord ? toMetricNumber(previousRecord.weight ?? previousRecord.fields?.weight) : null;
-        const currentBmi = toMetricNumber(record.bmi ?? record.fields?.bmi);
-        const previousBmi = previousRecord ? toMetricNumber(previousRecord.bmi ?? previousRecord.fields?.bmi) : null;
-        const age = calculateAgeAtDate(record.birthdate, record.date);
-        const identityParts = [escapeHtml(record.birthdate || '―')];
-        if (age !== null) {
-            identityParts.push(`${age}歳`);
-        }
-        if (record.furigana) {
-            identityParts.push(escapeHtml(record.furigana));
-        }
-
-        const metricLines = [];
-        if (currentWeight !== null) {
-            metricLines.push(`<strong>${escapeHtml(formatMetricValue(currentWeight, 'kg'))}</strong>`);
-        }
-        if (currentBmi !== null) {
-            metricLines.push(`<small class="metric-subline">BMI ${escapeHtml(formatMetricValue(currentBmi))}</small>`);
-        }
-
-        return `<tr>
-          <td><strong>${escapeHtml(record.name || '')}</strong><br><small class="metric-subline">${identityParts.join(' / ')}</small></td>
-          <td>${escapeHtml(record.date || '―')}</td>
-          <td>${metricLines.length ? metricLines.join('<br>') : '―'}</td>
-          <td>${buildTrendDeltaHtml(currentWeight, previousWeight, 'kg', '体重')}<br>${buildTrendDeltaHtml(currentBmi, previousBmi, '', 'BMI')}</td>
-          <td><span class="tag ${tagClass}">${escapeHtml(record.mnaLabel || '―')}</span><br><small class="metric-subline">${escapeHtml(scoreLabel)}</small></td>
-          <td>${buildNextMonitorHtml(record.nextMonitor)}</td>
-          <td>${visitCount}件</td>
-          <td><button class="btn btn-outline btn-sm" onclick="loadRecord(${Number(record.id)})">最新を読込</button></td>
-        </tr>`;
+        return buildLatestPatientCardHtml(record, patientHistory);
     }).join('');
+}
+
+function renderActiveHistoryView(filteredRecords) {
+    if (getHistoryDisplayMode() === 'records') {
+        renderHistoryRecords(filteredRecords);
+        return;
+    }
+    renderLatestPatients(filteredRecords);
 }
 
 function getFilteredRecords() {
@@ -1323,65 +1972,81 @@ function ensureHistoryTools() {
 
     const historyWrapper = historyTable.parentElement;
     const historyCard = historyWrapper.parentElement;
+    historyWrapper.classList.add('history-records-wrapper');
+    historyWrapper.hidden = true;
+    historyWrapper.setAttribute('aria-hidden', 'true');
+    Array.from(historyTable.querySelectorAll('thead th')).forEach((header) => header.classList.add('history-table__heading'));
+    [0, 2, 3, 4, 5].forEach((index) => {
+        historyTable.querySelector(`thead th:nth-child(${index + 1})`)?.classList.add('history-table__nowrap');
+    });
 
     const toolbar = document.createElement('div');
-    toolbar.style.display = 'flex';
-    toolbar.style.flexWrap = 'wrap';
-    toolbar.style.alignItems = 'center';
-    toolbar.style.justifyContent = 'space-between';
-    toolbar.style.gap = '10px';
-    toolbar.style.margin = '0 0 14px';
+    toolbar.className = 'history-toolbar';
 
     toolbar.innerHTML = `
-      <label style="display:flex;align-items:center;gap:8px;flex:1 1 280px;min-width:220px;">
-        <span style="font-size:13px;color:var(--text-light);white-space:nowrap;">利用者検索</span>
-                                <input id="historySearch" type="search" data-skip-persist="1" placeholder="氏名・ふりがな・生年月日・評価日で検索" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:#fff;font:inherit;">
+      <label class="history-toolbar__search">
+        <span class="history-toolbar__label">利用者検索</span>
+        <input id="historySearch" class="history-toolbar__input" type="search" data-skip-persist="1" placeholder="氏名・ふりがな・生年月日・評価日で検索">
       </label>
-      <div id="historyStats" style="font-size:12px;color:var(--text-light);white-space:nowrap;"></div>
+      <div id="historyStats" class="history-stats"></div>
     `;
 
-        const patientPanel = document.createElement('div');
-        patientPanel.id = 'latestPatientsPanel';
-        patientPanel.style.margin = '0 0 14px';
-        patientPanel.innerHTML = `
-            <div style="border:1px solid var(--border);border-radius:12px;background:var(--section-bg);padding:14px 14px 10px;">
-                <div style="display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:10px;margin-bottom:10px;">
-                    <div>
-                        <div style="font-size:16px;font-weight:700;color:var(--text);">患者別最新評価</div>
-                        <div style="font-size:12px;color:var(--text-light);">同じ利用者ごとに最新の評価日だけをまとめて表示します。</div>
-                    </div>
-                    <div id="latestPatientsStats" style="font-size:12px;color:var(--text-light);white-space:nowrap;"></div>
-                </div>
-                <div id="latestPatientsSummary" class="metric-chip-list"></div>
-                <div style="overflow-x:auto;">
-                    <table class="history-table" id="latestPatientsTable">
-                        <thead>
-                            <tr>
-                                <th>氏名</th>
-                                <th>最新評価日</th>
-                                <th>体重 / BMI</th>
-                                <th>前回比</th>
-                                <th>栄養判定</th>
-                                <th>次回モニタリング</th>
-                                <th>評価回数</th>
-                                <th>操作</th>
-                            </tr>
-                        </thead>
-                        <tbody id="latestPatientsBody">
-                            <tr><td colspan="8"><div class="empty-state"><div class="icon">👥</div>利用者データを読み込み中です</div></td></tr>
-                        </tbody>
-                    </table>
-                </div>
+    const patientPanel = document.createElement('section');
+    patientPanel.id = 'historyDisplayPanel';
+    patientPanel.className = 'history-panel';
+    patientPanel.innerHTML = `
+        <div class="history-panel__header">
+            <div>
+                <div id="historyDisplayTitle" class="history-panel__title">患者別最新評価</div>
+                <div id="historyDisplayHint" class="history-section-hint">同じ利用者ごとに最新の評価日だけをまとめて表示します。</div>
             </div>
-        `;
+            <div id="historyDisplayStats" class="history-stats"></div>
+        </div>
+        <div class="history-panel__summary-bar">
+            <div id="historyDisplaySummary" class="metric-chip-list"></div>
+            <div class="history-panel__controls">
+                <label class="history-toolbar__field">
+                    <span class="history-toolbar__label">表示</span>
+                    <select id="historyViewSelect" class="history-toolbar__select" data-skip-persist="1">
+                        <option value="latest">患者別最新評価</option>
+                        <option value="records">評価日一覧</option>
+                    </select>
+                </label>
+                <label class="history-toolbar__field">
+                    <span class="history-toolbar__label">並び替え</span>
+                    <select id="historySortSelect" class="history-toolbar__select" data-skip-persist="1">
+                        <option value="evalDate">評価日</option>
+                        <option value="name">氏名</option>
+                        <option value="nutrition">栄養判定</option>
+                        <option value="nextMonitor">次回モニタリング</option>
+                    </select>
+                </label>
+            </div>
+        </div>
+        <div id="historyDisplayBody" class="history-card-list">
+            <div class="empty-state"><div class="icon">👥</div>利用者データを読み込み中です</div>
+        </div>
+    `;
 
-        historyCard.insertBefore(toolbar, historyWrapper);
-        historyCard.insertBefore(patientPanel, historyWrapper);
+    historyCard.insertBefore(toolbar, historyWrapper);
+    historyCard.insertBefore(patientPanel, historyWrapper);
 
     const searchInput = document.getElementById('historySearch');
-        searchInput.value = HISTORY_FILTER_STATE.query;
+    const viewSelect = document.getElementById('historyViewSelect');
+    const sortSelect = document.getElementById('historySortSelect');
+    searchInput.value = HISTORY_FILTER_STATE.query;
+    viewSelect.value = getHistoryDisplayMode();
+    sortSelect.value = getHistorySortMode();
     searchInput.addEventListener('input', (event) => {
         HISTORY_FILTER_STATE.query = event.target.value || '';
+        renderHistory();
+    });
+    viewSelect.addEventListener('change', (event) => {
+        HISTORY_FILTER_STATE.view = event.target.value === 'records' ? 'records' : 'latest';
+        renderHistory();
+    });
+    sortSelect.addEventListener('change', (event) => {
+        HISTORY_FILTER_STATE.sort = String(event.target.value || 'evalDate').trim() || 'evalDate';
         renderHistory();
     });
 }
@@ -1413,6 +2078,760 @@ function ensurePrintControls() {
 function getSelectedPrintMode() {
         const select = document.getElementById(PRINT_MODE_SELECT_ID);
         return select ? String(select.value || 'summary') : 'summary';
+}
+
+function padDatePart(value) {
+    return String(value || '').padStart(2, '0');
+}
+
+function getDaysInMonth(year, month) {
+    if (!year || !month) {
+        return 31;
+    }
+    return new Date(Number(year), Number(month), 0).getDate();
+}
+
+function renderSelectOptions(selectElement, options, placeholderLabel, formatter = null) {
+    if (!selectElement) {
+        return;
+    }
+    const placeholder = `<option value="">${escapeHtml(placeholderLabel)}</option>`;
+    const renderedOptions = options.map((option) => {
+        const value = String(option.value);
+        const label = formatter ? formatter(option) : String(option.label ?? option.value);
+        return `<option value="${escapeHtml(value)}">${escapeHtml(label)}</option>`;
+    }).join('');
+    selectElement.innerHTML = placeholder + renderedOptions;
+}
+
+function buildPatientSelectGroup(id, label, options) {
+    const group = document.createElement('div');
+    group.className = 'form-group';
+    group.id = `${id}_group`;
+    group.innerHTML = `<label>${escapeHtml(label)}</label><select id="${id}"><option value="">選択</option></select>`;
+    const select = group.querySelector('select');
+    renderSelectOptions(
+        select,
+        options.map((option) => ({ value: option })),
+        '選択',
+        (option) => option.value,
+    );
+    return group;
+}
+
+function ensurePatientAgeField(anchorGroup) {
+    let ageGroup = document.getElementById('patientAgeGroup');
+    if (!ageGroup) {
+        ageGroup = document.createElement('div');
+        ageGroup.className = 'form-group';
+        ageGroup.id = 'patientAgeGroup';
+        ageGroup.innerHTML = '<label>年齢（自動計算）</label><input type="text" id="patientAgeDisplay" data-skip-persist="1" readonly style="background:#f0f4f8;font-weight:700;">';
+        anchorGroup.insertAdjacentElement('afterend', ageGroup);
+    }
+}
+
+function updatePatientAgeDisplay() {
+    const ageDisplay = document.getElementById('patientAgeDisplay');
+    if (!ageDisplay) {
+        return;
+    }
+    const birthdate = getFieldElementValue('birthdate').trim();
+    const evalDate = getFieldElementValue('evalDate').trim() || new Date().toISOString().slice(0, 10);
+    const age = calculateAgeAtDate(birthdate, evalDate);
+    ageDisplay.value = age === null ? '' : `${age}歳`;
+}
+
+function ensureDateSelectorRow(groupElement, rowId, html) {
+    let row = document.getElementById(rowId);
+    if (row) {
+        return row;
+    }
+    row = document.createElement('div');
+    row.id = rowId;
+    row.className = 'date-selector-row';
+    row.style.display = 'flex';
+    row.style.flexWrap = 'wrap';
+    row.style.alignItems = 'center';
+    row.style.gap = '8px';
+    row.style.marginTop = '8px';
+    row.innerHTML = html;
+    groupElement.appendChild(row);
+    return row;
+}
+
+function populateBirthdateYearMonthSelectors() {
+    const yearSelect = document.getElementById('birthdate_year');
+    const monthSelect = document.getElementById('birthdate_month');
+    if (!yearSelect || !monthSelect || yearSelect.dataset.ready === '1') {
+        return;
+    }
+    const currentYear = new Date().getFullYear();
+    renderSelectOptions(
+        yearSelect,
+        Array.from({ length: currentYear - BIRTHDATE_YEAR_MIN + 1 }, (_, index) => ({ value: String(currentYear - index) })),
+        '年',
+        (option) => option.value,
+    );
+    renderSelectOptions(
+        monthSelect,
+        Array.from({ length: 12 }, (_, index) => ({ value: padDatePart(index + 1), label: `${index + 1}` })),
+        '月',
+        (option) => option.label,
+    );
+    yearSelect.dataset.ready = '1';
+}
+
+function populateBirthdateDaySelector(selectedDay = '') {
+    const year = document.getElementById('birthdate_year')?.value || '';
+    const month = document.getElementById('birthdate_month')?.value || '';
+    const daySelect = document.getElementById('birthdate_day');
+    if (!daySelect) {
+        return;
+    }
+    const dayCount = getDaysInMonth(year, month);
+    renderSelectOptions(
+        daySelect,
+        Array.from({ length: dayCount }, (_, index) => ({ value: padDatePart(index + 1), label: `${index + 1}` })),
+        '日',
+        (option) => option.label,
+    );
+    daySelect.value = selectedDay && Number(selectedDay) <= dayCount ? padDatePart(selectedDay) : '';
+}
+
+function syncBirthdateHiddenFromSelectors() {
+    const hiddenInput = document.getElementById('birthdate');
+    const year = document.getElementById('birthdate_year')?.value || '';
+    const month = document.getElementById('birthdate_month')?.value || '';
+    const day = document.getElementById('birthdate_day')?.value || '';
+    if (!hiddenInput) {
+        return;
+    }
+    hiddenInput.value = year && month && day ? `${year}-${month}-${day}` : '';
+    hiddenInput.dispatchEvent(new Event('input', { bubbles: true }));
+    updatePatientAgeDisplay();
+}
+
+function syncBirthdateSelectorsFromHidden() {
+    const hiddenInput = document.getElementById('birthdate');
+    if (!hiddenInput) {
+        return;
+    }
+    populateBirthdateYearMonthSelectors();
+    const parts = parseYmdParts(hiddenInput.value);
+    const yearSelect = document.getElementById('birthdate_year');
+    const monthSelect = document.getElementById('birthdate_month');
+    if (!yearSelect || !monthSelect) {
+        return;
+    }
+    yearSelect.value = parts ? String(parts.year) : '';
+    monthSelect.value = parts ? padDatePart(parts.month) : '';
+    populateBirthdateDaySelector(parts ? parts.day : '');
+    updatePatientAgeDisplay();
+}
+
+function ensureBirthdateSelector() {
+    const birthInput = document.getElementById('birthdate');
+    if (!birthInput) {
+        return;
+    }
+    const birthGroup = birthInput.closest('.form-group');
+    if (!birthGroup) {
+        return;
+    }
+    birthInput.type = 'hidden';
+    birthInput.style.display = 'none';
+    birthInput.setAttribute('aria-hidden', 'true');
+    birthInput.tabIndex = -1;
+    const label = birthGroup.querySelector('label');
+    if (label) {
+        label.textContent = '生年月日';
+    }
+    ensureDateSelectorRow(
+        birthGroup,
+        'birthdateSelectorRow',
+        '<select id="birthdate_year" data-skip-persist="1" style="flex:1 1 110px;min-width:90px;"></select><span>年</span><select id="birthdate_month" data-skip-persist="1" style="width:88px;"></select><span>月</span><select id="birthdate_day" data-skip-persist="1" style="width:88px;"></select><span>日</span>',
+    );
+    ensurePatientAgeField(birthGroup);
+    populateBirthdateYearMonthSelectors();
+    populateBirthdateDaySelector();
+
+    const yearSelect = document.getElementById('birthdate_year');
+    const monthSelect = document.getElementById('birthdate_month');
+    const daySelect = document.getElementById('birthdate_day');
+    if (yearSelect && !yearSelect.dataset.boundBirthdate) {
+        const handleChange = () => {
+            populateBirthdateDaySelector(daySelect?.value || '');
+            syncBirthdateHiddenFromSelectors();
+        };
+        yearSelect.addEventListener('change', handleChange);
+        monthSelect?.addEventListener('change', handleChange);
+        daySelect?.addEventListener('change', syncBirthdateHiddenFromSelectors);
+        yearSelect.dataset.boundBirthdate = '1';
+    }
+    syncBirthdateSelectorsFromHidden();
+}
+
+function populateEvalDateYearMonthSelectors() {
+    const yearSelect = document.getElementById('evalDate_year');
+    const monthSelect = document.getElementById('evalDate_month');
+    if (!yearSelect || !monthSelect || yearSelect.dataset.ready === '1') {
+        return;
+    }
+    const currentYear = new Date().getFullYear();
+    const startYear = currentYear + EVAL_DATE_YEAR_RANGE_FUTURE;
+    const optionCount = EVAL_DATE_YEAR_RANGE_PAST + EVAL_DATE_YEAR_RANGE_FUTURE + 1;
+    renderSelectOptions(
+        yearSelect,
+        Array.from({ length: optionCount }, (_, index) => ({ value: String(startYear - index) })),
+        '年',
+        (option) => option.value,
+    );
+    renderSelectOptions(
+        monthSelect,
+        Array.from({ length: 12 }, (_, index) => ({ value: padDatePart(index + 1), label: `${index + 1}` })),
+        '月',
+        (option) => option.label,
+    );
+    yearSelect.dataset.ready = '1';
+}
+
+function populateEvalDateDaySelector(selectedDay = '') {
+    const year = document.getElementById('evalDate_year')?.value || '';
+    const month = document.getElementById('evalDate_month')?.value || '';
+    const daySelect = document.getElementById('evalDate_day');
+    if (!daySelect) {
+        return;
+    }
+    const dayCount = getDaysInMonth(year, month);
+    renderSelectOptions(
+        daySelect,
+        Array.from({ length: dayCount }, (_, index) => ({ value: padDatePart(index + 1), label: `${index + 1}` })),
+        '日',
+        (option) => option.label,
+    );
+    daySelect.value = selectedDay && Number(selectedDay) <= dayCount ? padDatePart(selectedDay) : '';
+}
+
+function syncEvalDateHiddenFromSelectors() {
+    const hiddenInput = document.getElementById('evalDate');
+    const year = document.getElementById('evalDate_year')?.value || '';
+    const month = document.getElementById('evalDate_month')?.value || '';
+    const day = document.getElementById('evalDate_day')?.value || '';
+    if (!hiddenInput) {
+        return;
+    }
+    hiddenInput.value = year && month && day ? `${year}-${month}-${day}` : '';
+    hiddenInput.dispatchEvent(new Event('input', { bubbles: true }));
+    updatePatientAgeDisplay();
+}
+
+function syncEvalDateSelectorsFromHidden() {
+    const hiddenInput = document.getElementById('evalDate');
+    if (!hiddenInput) {
+        return;
+    }
+    populateEvalDateYearMonthSelectors();
+    const parts = parseYmdParts(hiddenInput.value);
+    const yearSelect = document.getElementById('evalDate_year');
+    const monthSelect = document.getElementById('evalDate_month');
+    if (!yearSelect || !monthSelect) {
+        return;
+    }
+    yearSelect.value = parts ? String(parts.year) : '';
+    monthSelect.value = parts ? padDatePart(parts.month) : '';
+    populateEvalDateDaySelector(parts ? parts.day : '');
+}
+
+function ensureEvalDateSelector() {
+    const evalDateInput = document.getElementById('evalDate');
+    if (!evalDateInput) {
+        return;
+    }
+    const evalDateGroup = evalDateInput.closest('.form-group');
+    if (!evalDateGroup) {
+        return;
+    }
+    evalDateInput.type = 'hidden';
+    evalDateInput.style.display = 'none';
+    evalDateInput.setAttribute('aria-hidden', 'true');
+    evalDateInput.tabIndex = -1;
+    const label = evalDateGroup.querySelector('label');
+    if (label) {
+        label.textContent = '評価日';
+    }
+    ensureDateSelectorRow(
+        evalDateGroup,
+        'evalDateSelectorRow',
+        '<select id="evalDate_year" data-skip-persist="1" style="flex:1 1 110px;min-width:90px;"></select><span>年</span><select id="evalDate_month" data-skip-persist="1" style="width:88px;"></select><span>月</span><select id="evalDate_day" data-skip-persist="1" style="width:88px;"></select><span>日</span>',
+    );
+    populateEvalDateYearMonthSelectors();
+    populateEvalDateDaySelector();
+
+    const yearSelect = document.getElementById('evalDate_year');
+    const monthSelect = document.getElementById('evalDate_month');
+    const daySelect = document.getElementById('evalDate_day');
+    if (yearSelect && !yearSelect.dataset.boundEvalDate) {
+        const handleChange = () => {
+            populateEvalDateDaySelector(daySelect?.value || '');
+            syncEvalDateHiddenFromSelectors();
+        };
+        yearSelect.addEventListener('change', handleChange);
+        monthSelect?.addEventListener('change', handleChange);
+        daySelect?.addEventListener('change', syncEvalDateHiddenFromSelectors);
+        yearSelect.dataset.boundEvalDate = '1';
+    }
+    syncEvalDateSelectorsFromHidden();
+}
+
+function populateNextMonitorSelectors() {
+    const yearSelect = document.getElementById('next_monitor_year');
+    const monthSelect = document.getElementById('next_monitor_month');
+    if (!yearSelect || !monthSelect || yearSelect.dataset.ready === '1') {
+        return;
+    }
+    const currentYear = new Date().getFullYear();
+    renderSelectOptions(
+        yearSelect,
+        Array.from({ length: NEXT_MONITOR_YEAR_RANGE + 2 }, (_, index) => ({ value: String(currentYear - 1 + index) })),
+        '年',
+        (option) => option.value,
+    );
+    renderSelectOptions(
+        monthSelect,
+        Array.from({ length: 12 }, (_, index) => ({ value: padDatePart(index + 1), label: `${index + 1}` })),
+        '月',
+        (option) => option.label,
+    );
+    yearSelect.dataset.ready = '1';
+}
+
+function syncNextMonitorHiddenFromSelectors() {
+    const hiddenInput = document.getElementById('next_monitor');
+    const year = document.getElementById('next_monitor_year')?.value || '';
+    const month = document.getElementById('next_monitor_month')?.value || '';
+    if (!hiddenInput) {
+        return;
+    }
+    hiddenInput.value = year && month ? `${year}-${month}` : '';
+    hiddenInput.dispatchEvent(new Event('input', { bubbles: true }));
+}
+
+function syncNextMonitorSelectorsFromHidden() {
+    const hiddenInput = document.getElementById('next_monitor');
+    if (!hiddenInput) {
+        return;
+    }
+    populateNextMonitorSelectors();
+    const parts = parseYearMonthParts(hiddenInput.value);
+    const yearSelect = document.getElementById('next_monitor_year');
+    const monthSelect = document.getElementById('next_monitor_month');
+    if (!yearSelect || !monthSelect) {
+        return;
+    }
+    yearSelect.value = parts ? String(parts.year) : '';
+    monthSelect.value = parts ? padDatePart(parts.month) : '';
+    if (parts) {
+        hiddenInput.value = `${parts.year}-${padDatePart(parts.month)}`;
+    }
+}
+
+function ensureNextMonitorSelector() {
+    const nextMonitorInput = document.getElementById('next_monitor');
+    if (!nextMonitorInput) {
+        return;
+    }
+    const nextMonitorGroup = nextMonitorInput.closest('.form-group');
+    if (!nextMonitorGroup) {
+        return;
+    }
+    nextMonitorInput.type = 'hidden';
+    nextMonitorInput.style.display = 'none';
+    nextMonitorInput.setAttribute('aria-hidden', 'true');
+    nextMonitorInput.tabIndex = -1;
+    const label = nextMonitorGroup.querySelector('label');
+    if (label) {
+        label.textContent = '次回モニタリング予定年月';
+    }
+    ensureDateSelectorRow(
+        nextMonitorGroup,
+        'nextMonitorSelectorRow',
+        '<select id="next_monitor_year" data-skip-persist="1" style="flex:1 1 120px;min-width:96px;"></select><span>年</span><select id="next_monitor_month" data-skip-persist="1" style="width:88px;"></select><span>月</span>',
+    );
+    populateNextMonitorSelectors();
+
+    const yearSelect = document.getElementById('next_monitor_year');
+    const monthSelect = document.getElementById('next_monitor_month');
+    if (yearSelect && !yearSelect.dataset.boundNextMonitor) {
+        const handleChange = () => syncNextMonitorHiddenFromSelectors();
+        yearSelect.addEventListener('change', handleChange);
+        monthSelect?.addEventListener('change', handleChange);
+        yearSelect.dataset.boundNextMonitor = '1';
+    }
+    syncNextMonitorSelectorsFromHidden();
+}
+
+function ensurePatientFieldOrder() {
+    const furiganaInput = document.getElementById('furigana');
+    const nameInput = document.getElementById('name');
+    if (!furiganaInput || !nameInput) {
+        return;
+    }
+    const furiganaGroup = furiganaInput.closest('.form-group');
+    const nameGroup = nameInput.closest('.form-group');
+    const patientGrid = furiganaGroup?.parentElement;
+    if (!furiganaGroup || !nameGroup || !patientGrid) {
+        return;
+    }
+    patientGrid.insertBefore(nameGroup, furiganaGroup);
+    const nameLabel = nameGroup.querySelector('label');
+    if (nameLabel) {
+        nameLabel.textContent = '氏名';
+    }
+    const furiganaLabel = furiganaGroup.querySelector('label');
+    if (furiganaLabel) {
+        furiganaLabel.textContent = 'ふりがな';
+    }
+}
+
+function removeLegacyServiceFields() {
+    ['serviceStart', 'serviceEnd'].forEach((id) => {
+        const element = document.getElementById(id);
+        const group = element?.closest('.form-group');
+        if (group) {
+            group.remove();
+        }
+    });
+}
+
+function ensureFoodTextureFields() {
+    const bmiInput = document.getElementById('bmi');
+    if (!bmiInput || document.getElementById('food_staple')) {
+        return;
+    }
+    const bmiGroup = bmiInput.closest('.form-group');
+    if (!bmiGroup) {
+        return;
+    }
+    const stapleGroup = buildPatientSelectGroup('food_staple', '現在の食形態（主食）', FOOD_STAPLE_OPTIONS);
+    const mainGroup = buildPatientSelectGroup('food_main', '現在の食形態（主菜）', FOOD_MAIN_OPTIONS);
+    const waterGroup = buildPatientSelectGroup('water_texture', '現在の水分形態', WATER_TEXTURE_OPTIONS);
+    bmiGroup.insertAdjacentElement('afterend', stapleGroup);
+    stapleGroup.insertAdjacentElement('afterend', mainGroup);
+    mainGroup.insertAdjacentElement('afterend', waterGroup);
+}
+
+function syncCustomDateSelectors() {
+    syncBirthdateSelectorsFromHidden();
+    syncEvalDateSelectorsFromHidden();
+    syncNextMonitorSelectorsFromHidden();
+    updatePatientAgeDisplay();
+}
+
+function ensurePatientFormEnhancements() {
+    ensurePatientFieldOrder();
+    ensureBirthdateSelector();
+    ensureEvalDateSelector();
+    ensureFoodTextureFields();
+    removeLegacyServiceFields();
+    ensureNextMonitorSelector();
+    bindDentistPresenceField();
+    syncDentistPresenceField({ preserveValue: true });
+    const evalDateInput = document.getElementById('evalDate');
+    if (evalDateInput && !evalDateInput.dataset.boundAgeDisplay) {
+        evalDateInput.addEventListener('input', updatePatientAgeDisplay);
+        evalDateInput.dataset.boundAgeDisplay = '1';
+    }
+    updatePatientAgeDisplay();
+}
+
+function findNearestSectionLabelElement(fieldElement) {
+    let cursor = fieldElement?.closest('.form-group') || fieldElement?.parentElement || null;
+    while (cursor) {
+        let sibling = cursor.previousElementSibling;
+        while (sibling) {
+            if (sibling.classList?.contains('section-label')) {
+                return sibling;
+            }
+            const nested = typeof sibling.querySelector === 'function' ? sibling.querySelector('.section-label') : null;
+            if (nested) {
+                return nested;
+            }
+            sibling = sibling.previousElementSibling;
+        }
+        cursor = cursor.parentElement;
+    }
+    return null;
+}
+
+function applySelectConfig(fieldId, config, options = {}) {
+    const selectElement = document.getElementById(fieldId);
+    if (!selectElement || selectElement.tagName !== 'SELECT' || !config) {
+        return;
+    }
+    const currentValue = String(selectElement.value || '').trim();
+    renderSelectOptions(selectElement, config.options || [], '選択', (option) => option.label);
+    const label = selectElement.closest('.form-group')?.querySelector('label');
+    if (label && config.label && !options.useSectionLabelOnly) {
+        label.textContent = config.label;
+    }
+    if (config.label && options.sectionLabel) {
+        const sectionLabel = findNearestSectionLabelElement(selectElement);
+        if (sectionLabel) {
+            sectionLabel.textContent = config.label;
+        }
+    }
+    selectElement.value = getCompatibleSelectValue(selectElement, currentValue);
+}
+
+function ensureOralEvaluationFields() {
+    const oralEval2 = document.getElementById('oral_eval2');
+    if (!oralEval2) {
+        return;
+    }
+
+    const oralEval2Group = oralEval2.closest('.form-group');
+    let oralEval3 = document.getElementById('oral_eval3');
+    if (!oralEval3 && oralEval2Group) {
+        const group = document.createElement('div');
+        group.className = 'form-group';
+        group.style.marginBottom = '10px';
+        group.innerHTML = '<label>③ 事業またはサービスの継続の必要性（モニタリング後）</label><select id="oral_eval3"><option value="">選択</option></select>';
+        oralEval2Group.insertAdjacentElement('afterend', group);
+        oralEval3 = group.querySelector('select');
+    }
+
+    const oralBiko = document.getElementById('oral_biko');
+    const oralBikoLabel = oralBiko?.closest('.form-group')?.querySelector('label');
+    if (oralBikoLabel) {
+        oralBikoLabel.textContent = '④ 備考';
+    }
+
+    applySelectConfig('oral_eval2', ORAL_SELECT_CONFIG.oral_eval2);
+    applySelectConfig('oral_eval3', ORAL_SELECT_CONFIG.oral_eval3);
+}
+
+function ensureOralDyskinesiaInlineLayout() {
+    const paInput = document.getElementById('pa');
+    const taInput = document.getElementById('ta');
+    const kaInput = document.getElementById('ka');
+    const paGroup = paInput?.closest('.form-group');
+    const taGroup = taInput?.closest('.form-group');
+    const kaGroup = kaInput?.closest('.form-group');
+    const container = paGroup?.parentElement;
+    if (!paGroup || !taGroup || !kaGroup || !container) {
+        return;
+    }
+    if (!container.contains(taGroup) || !container.contains(kaGroup)) {
+        return;
+    }
+    container.classList.add('odk-inline-grid');
+    [paGroup, taGroup, kaGroup].forEach((group) => group.classList.add('odk-inline-grid__item'));
+}
+
+function getOdkHelperLabel(fieldId) {
+    return fieldId === 'pa' ? 'パ' : fieldId === 'ta' ? 'タ' : 'カ';
+}
+
+function getOdkCountInput(fieldId) {
+    return document.getElementById(`${fieldId}_count`);
+}
+
+function getOdkTimerDisplay(fieldId) {
+    return document.getElementById(`${fieldId}TimerDisplay`);
+}
+
+function updateOdkDisplay(fieldId) {
+    const display = getOdkTimerDisplay(fieldId);
+    if (!display) {
+        return;
+    }
+    display.textContent = `${odkRemainingSeconds[fieldId]}秒`;
+}
+
+function syncOdkRateFromCount(fieldId) {
+    const countInput = getOdkCountInput(fieldId);
+    const rateInput = document.getElementById(fieldId);
+    if (!countInput || !rateInput) {
+        return;
+    }
+    const count = Number.parseInt(countInput.value || '0', 10) || 0;
+    rateInput.value = count > 0 ? (count / ODK_TIMER_SECONDS).toFixed(1) : '';
+    rateInput.dispatchEvent(new Event('input', { bubbles: true }));
+}
+
+function resetOdkTimer(fieldId, options = {}) {
+    if (odkTimerHandles[fieldId]) {
+        window.clearInterval(odkTimerHandles[fieldId]);
+        odkTimerHandles[fieldId] = 0;
+    }
+    odkRemainingSeconds[fieldId] = ODK_TIMER_SECONDS;
+    const countInput = getOdkCountInput(fieldId);
+    if (countInput) {
+        countInput.value = '0';
+    }
+    const rateInput = document.getElementById(fieldId);
+    if (rateInput) {
+        rateInput.value = '';
+        rateInput.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+    updateOdkDisplay(fieldId);
+    if (!options.quiet) {
+        showToast(`⏱️ ${getOdkHelperLabel(fieldId)} 10秒タイマーをリセットしました`);
+    }
+}
+
+function incrementOdkCount(fieldId) {
+    const countInput = getOdkCountInput(fieldId);
+    if (!countInput) {
+        return;
+    }
+    const current = Number.parseInt(countInput.value || '0', 10) || 0;
+    countInput.value = String(current + 1);
+    syncOdkRateFromCount(fieldId);
+}
+
+function startOdkTimer(fieldId) {
+    if (odkTimerHandles[fieldId]) {
+        return;
+    }
+    resetOdkTimer(fieldId, { quiet: true });
+    odkRemainingSeconds[fieldId] = ODK_TIMER_SECONDS;
+    updateOdkDisplay(fieldId);
+
+    odkTimerHandles[fieldId] = window.setInterval(() => {
+        odkRemainingSeconds[fieldId] -= 1;
+        updateOdkDisplay(fieldId);
+        if (odkRemainingSeconds[fieldId] <= 0) {
+            window.clearInterval(odkTimerHandles[fieldId]);
+            odkTimerHandles[fieldId] = 0;
+            showToast(`✅ ${getOdkHelperLabel(fieldId)} 10秒計測が終了しました`);
+        }
+    }, 1000);
+}
+
+function syncOdkHelperFieldsFromRates() {
+    ['pa', 'ta', 'ka'].forEach((fieldId) => {
+        odkRemainingSeconds[fieldId] = ODK_TIMER_SECONDS;
+        updateOdkDisplay(fieldId);
+        const countInput = getOdkCountInput(fieldId);
+        const rateValue = toMetricNumber(getFieldElementValue(fieldId));
+        if (countInput) {
+            countInput.value = rateValue !== null ? String(Math.round(rateValue * ODK_TIMER_SECONDS)) : '0';
+        }
+    });
+}
+
+function ensureOralReferencePanel(fieldId, config) {
+    const selectElement = document.getElementById(fieldId);
+    const group = selectElement?.closest('.form-group');
+    if (!group || !config) {
+        return;
+    }
+
+    let panel = document.getElementById(`${fieldId}ReferencePanel`);
+    if (!panel) {
+        panel = document.createElement('div');
+        panel.id = `${fieldId}ReferencePanel`;
+        panel.className = 'oral-reference-panel no-print';
+        panel.innerHTML = `
+            <div class="oral-reference-panel__header">
+                <div class="section-label" style="margin:0;">${escapeHtml(config.title || '参考画像')}</div>
+                <div class="oral-reference-panel__hint">${escapeHtml(config.note || '')}</div>
+            </div>
+            <img class="oral-reference-panel__image" src="${escapeHtml(config.src || '')}" alt="${escapeHtml(config.alt || config.title || '参考画像')}" loading="lazy">
+        `;
+        group.insertAdjacentElement('afterend', panel);
+    }
+
+    const image = panel.querySelector('img');
+    if (image && !image.dataset.boundFallback) {
+        image.addEventListener('error', () => {
+            image.remove();
+            panel.classList.add('oral-reference-panel--missing');
+            const fallback = document.createElement('div');
+            fallback.className = 'oral-reference-panel__fallback';
+            fallback.textContent = '参考画像ファイルを配置するとここに表示されます。';
+            panel.appendChild(fallback);
+        }, { once: true });
+        image.dataset.boundFallback = '1';
+    }
+}
+
+function ensureOralReferencePanels() {
+    Object.entries(ORAL_REFERENCE_IMAGE_CONFIG).forEach(([fieldId, config]) => {
+        ensureOralReferencePanel(fieldId, config);
+    });
+}
+
+function ensureOdkTimerTools() {
+    const odkGrid = document.getElementById('pa')?.closest('.form-grid');
+    if (!odkGrid || document.getElementById('odkTimerPanel')) {
+        return;
+    }
+
+    const panel = document.createElement('div');
+    panel.id = 'odkTimerPanel';
+    panel.className = 'rsst-timer-panel';
+    panel.style.marginTop = '12px';
+    panel.innerHTML = `
+        <div class="rsst-timer-panel__header">
+            <div>
+                <div class="section-label" style="margin:0 0 6px 0;">パ・タ・カ 10秒タイマー</div>
+                <div class="rsst-timer-panel__hint">開始後は各音のカウントボタンで回数を加算し、10秒後に回/秒へ換算します。</div>
+            </div>
+        </div>
+        <div class="odk-timer-grid">
+            ${['pa', 'ta', 'ka'].map((fieldId) => `
+                <div class="odk-timer-card">
+                    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+                        <strong>${getOdkHelperLabel(fieldId)}</strong>
+                        <span id="${fieldId}TimerDisplay" class="rsst-timer-panel__display" style="min-width:auto;padding:6px 10px;">10秒</span>
+                    </div>
+                    <div class="form-group" style="margin:0;">
+                        <label style="font-size:12px;">カウント</label>
+                        <input type="number" id="${fieldId}_count" data-skip-persist="1" value="0" readonly>
+                    </div>
+                    <div class="rsst-timer-panel__buttons">
+                        <button type="button" class="btn btn-primary" id="${fieldId}TimerStartButton">▶ 開始</button>
+                        <button type="button" class="btn btn-outline" id="${fieldId}TimerResetButton">↺ リセット</button>
+                    </div>
+                    <button type="button" class="btn btn-accent rsst-tap-btn" id="${fieldId}TapButton">＋ 1 回</button>
+                </div>
+            `).join('')}
+        </div>
+    `;
+    odkGrid.insertAdjacentElement('afterend', panel);
+
+    ['pa', 'ta', 'ka'].forEach((fieldId) => {
+        panel.querySelector(`#${fieldId}TimerStartButton`)?.addEventListener('click', () => startOdkTimer(fieldId));
+        panel.querySelector(`#${fieldId}TimerResetButton`)?.addEventListener('click', () => resetOdkTimer(fieldId));
+        panel.querySelector(`#${fieldId}TapButton`)?.addEventListener('click', () => incrementOdkCount(fieldId));
+    });
+    syncOdkHelperFieldsFromRates();
+}
+
+function ensureOralAssessmentEnhancements() {
+    applySelectConfig('q6', ORAL_SELECT_CONFIG.q6);
+    applySelectConfig('q7', ORAL_SELECT_CONFIG.q7);
+    applySelectConfig('q8', ORAL_SELECT_CONFIG.q8);
+    applySelectConfig('q9', ORAL_SELECT_CONFIG.q9);
+    applySelectConfig('q10', ORAL_SELECT_CONFIG.q10);
+    applySelectConfig('q11', ORAL_SELECT_CONFIG.q11);
+    applySelectConfig('a1', ORAL_SELECT_CONFIG.a1);
+    applySelectConfig('a2', ORAL_SELECT_CONFIG.a2);
+    applySelectConfig('a3', ORAL_SELECT_CONFIG.a3, { sectionLabel: true, useSectionLabelOnly: true });
+    applySelectConfig('a4', ORAL_SELECT_CONFIG.a4, { sectionLabel: true, useSectionLabelOnly: true });
+    applySelectConfig('rsst_judge', ORAL_SELECT_CONFIG.rsst_judge);
+    applySelectConfig('bukubuku', ORAL_SELECT_CONFIG.bukubuku);
+    const chewingSectionLabel = findNearestSectionLabelElement(document.getElementById('a1'));
+    if (chewingSectionLabel) {
+        chewingSectionLabel.textContent = '① 咬合の確認（収縮）';
+    }
+    ensureOralEvaluationFields();
+    ensureOralDyskinesiaInlineLayout();
+    ensureOralReferencePanels();
+    ensureOdkTimerTools();
+    syncOdkHelperFieldsFromRates();
 }
 
 function getFieldElementValue(id) {
@@ -1447,9 +2866,9 @@ function buildPrintItem(label, value, wide = false) {
     return '<div class="' + className + '"><div class="print-sheet__label">' + escapeHtml(label) + '</div><div class="print-sheet__value">' + escapeHtml(formatDisplayValue(value)) + '</div></div>';
 }
 
-function splitClinicalCommentSections(value) {
+function splitMarkedCommentSections(value, startMarker, endMarker) {
     const text = String(value || '');
-    const startIndex = text.indexOf(CLINICAL_COMMENT_START_MARKER);
+    const startIndex = text.indexOf(startMarker);
     if (startIndex < 0) {
         return {
             before: text.trim(),
@@ -1460,7 +2879,7 @@ function splitClinicalCommentSections(value) {
         };
     }
 
-    const endIndex = text.indexOf(CLINICAL_COMMENT_END_MARKER, startIndex + CLINICAL_COMMENT_START_MARKER.length);
+    const endIndex = text.indexOf(endMarker, startIndex + startMarker.length);
     if (endIndex < 0) {
         return {
             before: text.slice(0, startIndex).trim(),
@@ -1471,7 +2890,7 @@ function splitClinicalCommentSections(value) {
         };
     }
 
-    const blockEnd = endIndex + CLINICAL_COMMENT_END_MARKER.length;
+    const blockEnd = endIndex + endMarker.length;
     return {
         before: text.slice(0, startIndex).trim(),
         block: text.slice(startIndex, blockEnd).trim(),
@@ -1481,12 +2900,28 @@ function splitClinicalCommentSections(value) {
     };
 }
 
-function buildClinicalCommentBlock(lines) {
+function buildMarkedCommentBlock(lines, startMarker, endMarker) {
     const normalizedLines = (lines || []).map((line) => String(line || '').trim()).filter(Boolean);
     if (!normalizedLines.length) {
         return '';
     }
-    return [CLINICAL_COMMENT_START_MARKER, ...normalizedLines, CLINICAL_COMMENT_END_MARKER].join(String.fromCharCode(10));
+    return [startMarker, ...normalizedLines, endMarker].join(String.fromCharCode(10));
+}
+
+function splitClinicalCommentSections(value) {
+    return splitMarkedCommentSections(value, CLINICAL_COMMENT_START_MARKER, CLINICAL_COMMENT_END_MARKER);
+}
+
+function splitNutritionCommentSections(value) {
+    return splitMarkedCommentSections(value, NUTRITION_COMMENT_START_MARKER, NUTRITION_COMMENT_END_MARKER);
+}
+
+function buildClinicalCommentBlock(lines) {
+    return buildMarkedCommentBlock(lines, CLINICAL_COMMENT_START_MARKER, CLINICAL_COMMENT_END_MARKER);
+}
+
+function buildNutritionCommentBlock(lines) {
+    return buildMarkedCommentBlock(lines, NUTRITION_COMMENT_START_MARKER, NUTRITION_COMMENT_END_MARKER);
 }
 
 function parseLegacyClinicalCommentBlock(block) {
@@ -1520,14 +2955,28 @@ function parseLegacyClinicalCommentBlock(block) {
 }
 
 function getPrintFriendlyComment(value) {
-    const sections = splitClinicalCommentSections(value);
-    if (!sections.hasBlock) {
-        return sections.before;
+    const clinicalSections = splitClinicalCommentSections(value);
+    let visibleText = '';
+    if (!clinicalSections.hasBlock) {
+        visibleText = clinicalSections.before;
+    } else if (clinicalSections.isLegacyBlock) {
+        visibleText = clinicalSections.before;
+    } else {
+        visibleText = [clinicalSections.before, clinicalSections.after]
+            .filter(Boolean)
+            .join(String.fromCharCode(10) + String.fromCharCode(10));
     }
-    if (sections.isLegacyBlock) {
-        return sections.before;
+
+    const nutritionSections = splitNutritionCommentSections(visibleText);
+    if (!nutritionSections.hasBlock) {
+        return visibleText;
     }
-    return [sections.before, sections.after]
+    if (nutritionSections.isLegacyBlock) {
+        return [nutritionSections.before, stripNutritionCommentMarkers(nutritionSections.block)]
+            .filter(Boolean)
+            .join(String.fromCharCode(10) + String.fromCharCode(10));
+    }
+    return [nutritionSections.before, stripNutritionCommentMarkers(nutritionSections.block), nutritionSections.after]
         .filter(Boolean)
         .join(String.fromCharCode(10) + String.fromCharCode(10));
 }
@@ -1535,6 +2984,7 @@ function getPrintFriendlyComment(value) {
 function buildPrintReportData() {
     const name = getFieldElementValue('name').trim();
     const birthdate = getFieldElementValue('birthdate').trim();
+    const evalDate = getFieldElementValue('evalDate');
     const clinicalSupportData = buildClinicalSupportData();
 
     if (!name) {
@@ -1550,21 +3000,37 @@ function buildPrintReportData() {
         name,
         furigana: getFieldElementValue('furigana'),
         birthdate,
+        age: calculateAgeAtDate(birthdate, evalDate),
         gender: getFieldElementValue('gender'),
-        evalDate: getFieldElementValue('evalDate'),
+        evalDate,
         staff: getFieldElementValue('staff'),
+        dentistHas: getFieldElementValue('dentist_has'),
         dentist: getFieldElementValue('dentist'),
+        dentistDisplay: (() => {
+            const hasDentist = getFieldElementValue('dentist_has').trim();
+            const dentistName = getFieldElementValue('dentist').trim();
+            if (hasDentist === 'なし') {
+                return 'なし';
+            }
+            if (hasDentist === 'あり') {
+                return dentistName || '歯科名未入力';
+            }
+            return dentistName;
+        })(),
         denture: getFieldElementValue('denture'),
         weight: getFieldElementValue('weight'),
         height: getFieldElementValue('height'),
         bmi: getFieldElementValue('bmi'),
+        foodStaple: getFieldElementValue('food_staple'),
+        foodMain: getFieldElementValue('food_main'),
+        waterTexture: getFieldElementValue('water_texture'),
         oralSummary: getFieldElementValue('oral_summary_text'),
         oralContinue: getFieldElementValue('oral_eval2'),
         oralPlan: getFieldElementValue('oral_eval3'),
         mnaScore: getFieldElementValue('mna_summary_num'),
         mnaResult: getFieldElementValue('mna_summary_result'),
         comment: getPrintFriendlyComment(getFieldElementValue('summary_comment')),
-        nextMonitor: getFieldElementValue('next_monitor'),
+        nextMonitor: formatYearMonthDisplay(getFieldElementValue('next_monitor')),
         clinicalPrintLines: buildClinicalPrintLines(clinicalSupportData),
     };
 }
@@ -1586,16 +3052,20 @@ function buildPrintSheetHtml(report) {
 
     const infoGrid = [
         buildPrintItem('性別', report.gender),
+        buildPrintItem('年齢', report.age === null || report.age === undefined ? '' : `${report.age}歳`),
         buildPrintItem('担当者', report.staff),
         buildPrintItem('体重 (kg)', report.weight),
         buildPrintItem('身長 (cm)', report.height),
         buildPrintItem('BMI', report.bmi),
         buildPrintItem('義歯', report.denture),
-        buildPrintItem('歯科医', report.dentist, true),
+        buildPrintItem('かかりつけ歯科', report.dentistDisplay, true),
+        buildPrintItem('主食', report.foodStaple),
+        buildPrintItem('主菜', report.foodMain),
+        buildPrintItem('水分形態', report.waterTexture, true),
         buildPrintItem('次回モニタリング', report.nextMonitor, true),
     ].join('');
 
-    const oralLines = buildPrintMetricLines([report.oralSummary, report.oralContinue, report.oralPlan]);
+    const oralLines = buildPrintMetricLines(report.oralSummary ? [report.oralSummary] : [report.oralContinue, report.oralPlan]);
     const mnaLines = '<div class="print-sheet__metric-score">' + escapeHtml(formatDisplayValue(report.mnaScore)) + '</div>'
         + '<div class="print-sheet__metric-line">' + escapeHtml(formatDisplayValue(report.mnaResult)) + '</div>';
     const clinicalPrintLines = buildPrintMetricLines(report.clinicalPrintLines || []);
@@ -1734,6 +3204,310 @@ function ensureStage1Styles() {
             font-size: 14px;
             color: var(--text);
             word-break: break-word;
+        }
+        .summary-identity-name,
+        .summary-identity-date,
+        .summary-identity-subline,
+        #mna_summary_result,
+        .metric-chip,
+        .stage2-panel__meta,
+        .monitor-status,
+        .history-table__nowrap,
+        .history-cell--nowrap,
+        .history-table th {
+            white-space: nowrap;
+            word-break: keep-all;
+            overflow-wrap: normal;
+        }
+        .summary-identity-name {
+            margin-bottom: 2px !important;
+        }
+        .summary-identity-subline {
+            margin-bottom: 10px;
+            font-size: 13px;
+            color: var(--text-light);
+        }
+        .summary-identity-date {
+            margin-bottom: 16px !important;
+        }
+        .history-table--enhanced {
+            min-width: 720px;
+        }
+        .history-table--enhanced th,
+        .history-table--enhanced td {
+            vertical-align: top;
+        }
+        .history-table--enhanced .tag,
+        .history-table--enhanced .btn,
+        .history-table--enhanced .metric-subline {
+            white-space: nowrap;
+        }
+        .history-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin: 0 0 14px;
+        }
+        .history-toolbar__search {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1 1 320px;
+            min-width: 220px;
+        }
+        .history-toolbar__field {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: nowrap;
+        }
+        .history-toolbar__label,
+        .history-stats,
+        .history-section-hint {
+            font-size: 12px;
+            color: var(--text-light);
+        }
+        .history-toolbar__label {
+            flex: 0 0 auto;
+            white-space: nowrap;
+        }
+        .history-toolbar__input {
+            width: 100%;
+            min-width: 0;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: #fff;
+            font: inherit;
+        }
+        .history-toolbar__select {
+            flex: 1 1 auto;
+            min-width: 170px;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: #fff;
+            color: var(--text);
+            font: inherit;
+        }
+        .history-panel {
+            margin: 0 0 14px;
+            padding: 14px;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            background: linear-gradient(180deg, #f8fbfe 0%, #ffffff 100%);
+        }
+        .history-panel__summary-bar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .history-panel__controls {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            gap: 8px 10px;
+        }
+        .history-panel__header,
+        .history-section-header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        .history-section-header {
+            margin: 0 0 10px;
+        }
+        .history-panel__title,
+        .history-section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text);
+        }
+        .history-card-list {
+            display: grid;
+            gap: 12px;
+            margin-top: 12px;
+        }
+        .history-card {
+            padding: 14px;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            background: #fff;
+            box-shadow: 0 6px 18px rgba(15, 23, 42, 0.04);
+        }
+        .history-card__header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+        }
+        .history-card__lead {
+            min-width: 0;
+            flex: 1 1 260px;
+        }
+        .history-card__title-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px 10px;
+        }
+        .history-card__title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text);
+        }
+        .history-card__subline {
+            margin-top: 4px;
+            font-size: 12px;
+            color: var(--text-light);
+            word-break: break-word;
+        }
+        .history-card__date-block {
+            min-width: 140px;
+            padding: 10px 12px;
+            border: 1px solid #d9e8f4;
+            border-radius: 12px;
+            background: #f7fbff;
+        }
+        .history-card__date-label {
+            font-size: 11px;
+            color: var(--text-light);
+        }
+        .history-card__date {
+            margin-top: 4px;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        .history-card__date-pill {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: #eef4fa;
+            color: var(--primary);
+            font-size: 12px;
+            font-weight: 700;
+        }
+        .history-card__grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 10px;
+            margin-top: 12px;
+        }
+        .history-card__grid--compact {
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        }
+        .history-field {
+            min-width: 0;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: var(--section-bg);
+        }
+        .history-field__label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-light);
+        }
+        .history-field__value {
+            margin-top: 6px;
+            font-size: 13px;
+            line-height: 1.6;
+            color: var(--text);
+            white-space: normal;
+            word-break: break-word;
+        }
+        .history-field__value strong {
+            font-size: 16px;
+            color: var(--text);
+        }
+        .history-field__note {
+            margin-top: 4px;
+            font-size: 12px;
+            color: var(--text-light);
+        }
+        .history-tag-block {
+            display: grid;
+            justify-items: start;
+            gap: 4px;
+        }
+        .history-card__footer {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 12px;
+        }
+        .history-card__chips,
+        .history-card__actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .history-card__actions .btn {
+            white-space: nowrap;
+        }
+        .history-table--records {
+            min-width: 0;
+            border-collapse: separate;
+        }
+        .history-table--records thead {
+            display: none;
+        }
+        .history-table--records tbody {
+            display: block;
+        }
+        .history-table--records tr,
+        .history-table--records td {
+            display: block;
+            width: 100%;
+        }
+        .history-table--records tr + tr {
+            margin-top: 12px;
+        }
+        .history-table--records td {
+            padding: 0;
+            border: 0;
+            background: transparent;
+        }
+        .history-table--records tr:hover td {
+            background: transparent;
+        }
+        .history-records-wrapper {
+            overflow: visible;
+        }
+        .odk-inline-grid {
+            display: grid !important;
+            grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+            gap: 10px;
+            align-items: end;
+        }
+        .odk-inline-grid__item {
+            min-width: 0;
+        }
+        .odk-timer-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+        }
+        .odk-timer-card {
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 10px;
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
         }
         .metric-chip-list {
             display: flex;
@@ -1878,6 +3652,81 @@ function ensureStage1Styles() {
             color: var(--text-light);
             line-height: 1.6;
         }
+        .nutrition-cause-grid {
+            display: grid;
+            gap: 12px;
+            margin-top: 12px;
+        }
+        .nutrition-cause-card {
+            background: #fff;
+        }
+        .nutrition-cause-card__header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        .nutrition-cause-card__title {
+            font-weight: 700;
+            color: var(--text);
+        }
+        .nutrition-cause-card__mode {
+            display: inline-flex;
+        }
+        .nutrition-cause-card__subhead {
+            margin-top: 10px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-light);
+        }
+        .nutrition-action-grid {
+            display: grid;
+            gap: 10px;
+            margin-top: 12px;
+        }
+        .nutrition-action-group {
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: var(--section-bg);
+        }
+        .nutrition-action-group__title {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-light);
+            margin-bottom: 8px;
+        }
+        .nutrition-action-list {
+            display: grid;
+            gap: 8px;
+        }
+        .nutrition-action-item {
+            display: grid;
+            grid-template-columns: 18px minmax(0, 1fr);
+            gap: 8px;
+            align-items: start;
+            font-size: 13px;
+            line-height: 1.6;
+            color: var(--text);
+        }
+        .nutrition-action-item input {
+            margin-top: 3px;
+        }
+        .nutrition-preview-panel {
+            position: sticky;
+            top: 12px;
+            z-index: 2;
+            margin-top: 12px;
+            border-color: #d9e8f4;
+            box-shadow: 0 6px 18px rgba(17, 63, 102, 0.08);
+        }
+        .nutrition-preview {
+            white-space: pre-line;
+        }
+        .nutrition-empty {
+            color: var(--text-light);
+        }
         .trend-table td {
             vertical-align: top;
         }
@@ -1905,6 +3754,43 @@ function ensureStage1Styles() {
             font-size: 12px;
             color: var(--text-light);
         }
+        .oral-reference-panel {
+            margin: 10px 0 14px;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: #fff;
+        }
+        .oral-reference-panel__header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        .oral-reference-panel__hint {
+            font-size: 12px;
+            color: var(--text-light);
+        }
+        .oral-reference-panel__image {
+            display: block;
+            width: 100%;
+            max-width: 820px;
+            margin: 0 auto;
+            border: 1px solid #e5eaf1;
+            border-radius: 10px;
+            background: #fff;
+        }
+        .oral-reference-panel__fallback {
+            padding: 18px 16px;
+            border: 1px dashed var(--border);
+            border-radius: 10px;
+            background: var(--section-bg);
+            color: var(--text-light);
+            font-size: 13px;
+            text-align: center;
+        }
         .rsst-tap-btn {
             width: 100%;
             justify-content: center;
@@ -1915,15 +3801,42 @@ function ensureStage1Styles() {
         @media (max-width: 600px) {
             .draft-toolbar .btn,
             .rsst-timer-panel .btn,
-            .settings-panel__editor .btn {
+            .settings-panel__editor .btn,
+            .history-card__actions .btn {
                 flex: 1 1 140px;
                 justify-content: center;
             }
             .settings-grid {
                 grid-template-columns: 1fr;
             }
+            .history-toolbar__search,
+            .history-toolbar__field,
+            .history-card__lead,
+            .history-card__date-block,
+            .history-card__chips,
+            .history-card__actions,
+            .history-panel__controls {
+                width: 100%;
+            }
+            .history-toolbar__select {
+                min-width: 0;
+                width: auto;
+            }
+            .history-card__grid {
+                grid-template-columns: 1fr;
+            }
+            .odk-inline-grid,
+            .odk-timer-grid {
+                grid-template-columns: 1fr !important;
+            }
+            .oral-reference-panel {
+                padding: 10px;
+            }
             .rsst-tap-btn {
                 font-size: 18px;
+            }
+            .nutrition-preview-panel {
+                top: 8px;
             }
         }
     `;
@@ -2223,6 +4136,54 @@ function toggleManagedCustomInput(nodes, visible) {
     nodes.custom.style.display = visible ? 'block' : 'none';
 }
 
+function syncDentistPresenceField(options = {}) {
+    const presenceField = document.getElementById('dentist_has');
+    const dentistField = document.getElementById('dentist');
+    const selectField = document.getElementById('dentist_select');
+    const customField = document.getElementById('dentist_custom');
+    const dentistGroup = document.getElementById('dentist_name_group');
+    if (!presenceField || !dentistField || !dentistGroup) {
+        return;
+    }
+
+    const hasStoredDentist = Boolean(String(dentistField.value || '').trim());
+    if (!presenceField.value && hasStoredDentist) {
+        presenceField.value = 'あり';
+    }
+
+    const isVisible = presenceField.value === 'あり';
+    dentistGroup.style.display = isVisible ? 'block' : 'none';
+    dentistGroup.setAttribute('aria-hidden', isVisible ? 'false' : 'true');
+
+    if (!isVisible && (presenceField.value === 'なし' || !options.preserveValue)) {
+        dentistField.value = '';
+        if (selectField) {
+            selectField.value = '';
+        }
+        if (customField) {
+            customField.value = '';
+            customField.style.display = 'none';
+        }
+    }
+
+    if (isVisible && typeof renderDentistSelect === 'function') {
+        renderDentistSelect();
+    }
+}
+
+function bindDentistPresenceField() {
+    const presenceField = document.getElementById('dentist_has');
+    if (!presenceField || presenceField.dataset.boundDentistPresence === '1') {
+        return;
+    }
+
+    presenceField.addEventListener('change', () => {
+        syncDentistPresenceField();
+        scheduleAutosave();
+    });
+    presenceField.dataset.boundDentistPresence = '1';
+}
+
 function syncManagedFieldStoredValue(config, options = {}) {
     const nodes = getManagedFieldNodes(config);
     if (!nodes) {
@@ -2242,6 +4203,14 @@ function syncManagedFieldStoredValue(config, options = {}) {
         toggleManagedCustomInput(nodes, false);
     }
     nodes.field.value = storedValue;
+
+    if (config.fieldId === 'dentist') {
+        const presenceField = document.getElementById('dentist_has');
+        if (presenceField && storedValue && presenceField.value !== 'あり') {
+            presenceField.value = 'あり';
+        }
+        syncDentistPresenceField({ preserveValue: true });
+    }
 
     if (options.fromUser) {
         scheduleAutosave();
@@ -2335,6 +4304,7 @@ function renderDentistSelect() {
 
 function syncManagedPersonSelectors() {
     MANAGED_FIELD_CONFIGS.forEach((config) => renderManagedSelectField(config));
+    syncDentistPresenceField({ preserveValue: true });
 }
 
 function renderSettingsPanel(config) {
@@ -2523,7 +4493,7 @@ function ensureDataTransferControls() {
         const note = document.createElement('div');
         note.id = 'dataTransferNote';
         note.className = 'data-transfer-note no-print';
-        note.textContent = '共有記録・担当者一覧・かかりつけ医一覧はサーバーへ、下書きはこの端末へ保存されます。';
+        note.textContent = '共有記録・担当者一覧・かかりつけ歯科一覧はサーバーへ、下書きはこの端末へ保存されます。';
         summaryActionBar.insertAdjacentElement('afterend', note);
     }
 
@@ -2666,7 +4636,7 @@ async function handleImportSelection(event) {
             'OK = 置換 / キャンセル = 追加',
         ].join('\\n'));
         const replaceLocalData = window.confirm([
-            '下書き（この端末）と担当者一覧・かかりつけ医一覧（共有）を置換しますか？',
+            '下書き（この端末）と担当者一覧・かかりつけ歯科一覧（共有）を置換しますか？',
             'OK = 置換 / キャンセル = 既存へ追加',
         ].join('\\n'));
 
@@ -2820,6 +4790,9 @@ function getCurrentPatientFormState() {
         weight,
         height,
         bmi,
+        foodStaple: getFieldElementValue('food_staple').trim(),
+        foodMain: getFieldElementValue('food_main').trim(),
+        waterTexture: getFieldElementValue('water_texture').trim(),
         patientKey: buildPatientLookupKey(name, birthdate),
     };
 }
@@ -2871,15 +4844,15 @@ function ensurePatientTrendPanel() {
         </div>
         <div id="patientTrendSummary" class="metric-chip-list"></div>
         <div style="overflow-x:auto;">
-            <table class="history-table trend-table">
+            <table class="history-table history-table--enhanced trend-table">
                 <thead>
                     <tr>
-                        <th>評価日</th>
-                        <th>体重</th>
-                        <th>BMI</th>
-                        <th>体重差</th>
-                        <th>BMI差</th>
-                        <th>栄養判定</th>
+                        <th class="history-table__nowrap">評価日</th>
+                        <th class="history-table__nowrap">体重</th>
+                        <th class="history-table__nowrap">BMI</th>
+                        <th class="history-table__nowrap">体重差</th>
+                        <th class="history-table__nowrap">BMI差</th>
+                        <th class="history-table__nowrap">栄養判定</th>
                     </tr>
                 </thead>
                 <tbody id="patientTrendBody">
@@ -2956,8 +4929,501 @@ function ensureClinicalSupportPanel() {
     divider.insertAdjacentElement('beforebegin', panel);
 }
 
+function ensureNutritionAssessmentPanel() {
+    const summaryCard = document.querySelector('#tab-summary > .card');
+    const divider = summaryCard ? summaryCard.querySelector('.divider') : null;
+    const clinicalPanel = document.getElementById('clinicalSupportPanel');
+    const trendPanel = document.getElementById('patientTrendPanel');
+    if (!summaryCard || !divider || document.getElementById('nutritionAssessmentPanel')) {
+        return;
+    }
+
+    const panel = document.createElement('div');
+    panel.id = 'nutritionAssessmentPanel';
+    panel.className = 'stage2-panel stage3-panel';
+    panel.innerHTML = `
+        <div class="stage2-panel__header">
+            <div>
+                <div class="stage2-panel__title">栄養アセスメント・提案</div>
+                <div class="stage2-panel__hint">低栄養 / 過栄養を自動評価し、原因候補と対応方針をコメント欄へ反映します。</div>
+            </div>
+        </div>
+        <input type="hidden" id="${NUTRITION_SELECTION_FIELD_ID}" value="{}">
+        <div id="nutritionAssessmentChips" class="metric-chip-list"></div>
+        <div id="nutritionAssessmentSummary" class="stage2-panel__summary">BMI と MNA-SF を入力すると自動評価を表示します。</div>
+        <section class="stage3-box stage3-box--wide nutrition-preview-panel">
+            <div class="section-label">総合評価コメントへの反映プレビュー</div>
+            <div id="nutritionCommentPreview" class="stage2-panel__summary nutrition-preview">提案が選択されるとここに表示します。</div>
+            <div id="nutritionAssessmentStatus" class="stage3-note">抽出された対応方針は総合評価コメントへ自動反映します。</div>
+        </section>
+        <div id="nutritionAssessmentCards" class="nutrition-cause-grid"></div>
+    `;
+
+    if (panel.dataset.boundNutritionPanel !== '1') {
+        panel.addEventListener('change', (event) => {
+            const target = event.target;
+            if (!target || target.type !== 'checkbox') {
+                return;
+            }
+            const actionKey = String(target.getAttribute('data-nutrition-key') || '').trim();
+            if (!actionKey) {
+                return;
+            }
+            const nextState = getNutritionSelectionState();
+            nextState[actionKey] = Boolean(target.checked);
+            setNutritionSelectionState(nextState, { fromUser: true });
+            renderNutritionAssessmentPanel();
+        });
+        panel.dataset.boundNutritionPanel = '1';
+    }
+
+    if (clinicalPanel) {
+        clinicalPanel.insertAdjacentElement('beforebegin', panel);
+        return;
+    }
+    if (trendPanel) {
+        trendPanel.insertAdjacentElement('afterend', panel);
+        return;
+    }
+    divider.insertAdjacentElement('beforebegin', panel);
+}
+
 function ensureStage3Panels() {
     ensureClinicalSupportPanel();
+    ensureNutritionAssessmentPanel();
+}
+
+function getNutritionSelectionState() {
+    const field = document.getElementById(NUTRITION_SELECTION_FIELD_ID);
+    if (!field) {
+        return {};
+    }
+    try {
+        const parsed = JSON.parse(String(field.value || '{}'));
+        return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
+    } catch {
+        return {};
+    }
+}
+
+function setNutritionSelectionState(state, options = {}) {
+    const field = document.getElementById(NUTRITION_SELECTION_FIELD_ID);
+    if (!field) {
+        return;
+    }
+    const normalized = {};
+    Object.entries(state || {}).forEach(([key, value]) => {
+        const normalizedKey = String(key || '').trim();
+        if (!normalizedKey) {
+            return;
+        }
+        normalized[normalizedKey] = value !== false;
+    });
+    const nextValue = JSON.stringify(normalized);
+    if (field.value === nextValue) {
+        return;
+    }
+    field.value = nextValue;
+    if (options.fromUser) {
+        scheduleAutosave();
+    }
+}
+
+function getMnaScoreValue(key) {
+    const rawValue = mnaScores && Object.prototype.hasOwnProperty.call(mnaScores, key) ? mnaScores[key] : null;
+    if (rawValue === null || rawValue === undefined || rawValue === '') {
+        return null;
+    }
+    const numeric = Number(rawValue);
+    return Number.isFinite(numeric) ? numeric : null;
+}
+
+function buildNutritionActionKey(modeId, causeId, role, index) {
+    return [modeId, causeId, role, index].join('::');
+}
+
+function dedupeTextItems(items) {
+    return [...new Set((items || []).map((item) => String(item || '').trim()).filter(Boolean))];
+}
+
+function buildNutritionCause(modeId, causeId, reasons) {
+    const modeConfig = NUTRITION_GUIDANCE_LIBRARY[modeId];
+    const causeConfig = modeConfig && modeConfig.causes ? modeConfig.causes[causeId] : null;
+    const normalizedReasons = dedupeTextItems(reasons);
+    if (!causeConfig || !normalizedReasons.length) {
+        return null;
+    }
+    return {
+        modeId,
+        causeId,
+        icon: causeConfig.icon,
+        label: causeConfig.label,
+        reasons: normalizedReasons,
+        patientFamily: causeConfig.patientFamily || [],
+        st: causeConfig.st || [],
+        ns: causeConfig.ns || [],
+        modeLabel: modeConfig.label,
+        modeTone: modeConfig.chipTone,
+    };
+}
+
+function buildNutritionAssessmentData() {
+    const patientState = getCurrentPatientFormState();
+    const oralState = getCurrentOralAssessmentState();
+    const age = calculateAgeAtDate(patientState.birthdate, patientState.evalDate);
+    const bmiReference = getBmiReference(age);
+    const mnaState = getCurrentMnaSummaryState();
+    const history = patientState.patientKey ? (buildPatientRecordGroups(records).get(patientState.patientKey) || []) : [];
+    const comparisonRecord = getComparisonHistoryRecord(history, patientState.evalDate);
+    const previousWeight = comparisonRecord ? toMetricNumber(comparisonRecord.weight ?? comparisonRecord.fields?.weight) : null;
+    const previousBmi = comparisonRecord ? toMetricNumber(comparisonRecord.bmi ?? comparisonRecord.fields?.bmi) : null;
+    const lowOdkLabels = getLowOdkLabels(oralState);
+    const mnaA = getMnaScoreValue('a');
+    const mnaB = getMnaScoreValue('b');
+    const mnaC = getMnaScoreValue('c');
+    const mnaD = getMnaScoreValue('d');
+    const mnaE = getMnaScoreValue('e');
+    const modes = [];
+    const causes = [];
+
+    const underReasons = [];
+    if (mnaState.score !== null && mnaState.score <= 7) {
+        underReasons.push(`MNA-SF ${mnaState.score}点で低栄養が疑われます`);
+    } else if (mnaState.score !== null && mnaState.score <= 11) {
+        underReasons.push(`MNA-SF ${mnaState.score}点で低栄養リスクがあります`);
+    }
+    if (patientState.bmi !== null && bmiReference && patientState.bmi < bmiReference.low) {
+        underReasons.push(`BMI ${patientState.bmi.toFixed(1)} が ${bmiReference.label} ${bmiReference.low.toFixed(1)} 未満です`);
+    }
+    if (hasMeaningfulDrop(patientState.weight, previousWeight, 1.0)) {
+        underReasons.push(`体重が前回 ${previousWeight.toFixed(1)}kg から ${patientState.weight.toFixed(1)}kg に低下しています`);
+    }
+
+    if (underReasons.length) {
+        const weightReasons = [];
+        if (patientState.bmi !== null && bmiReference && patientState.bmi < bmiReference.low) {
+            weightReasons.push(`BMI ${patientState.bmi.toFixed(1)} が基準を下回っています`);
+        }
+        if (hasMeaningfulDrop(patientState.weight, previousWeight, 1.0)) {
+            weightReasons.push(`体重が前回より ${(previousWeight - patientState.weight).toFixed(1)}kg 低下しています`);
+        }
+        if (hasMeaningfulDrop(patientState.bmi, previousBmi, 0.5)) {
+            weightReasons.push(`BMI が前回より ${(previousBmi - patientState.bmi).toFixed(1)} 低下しています`);
+        }
+        if (mnaB !== null && mnaB <= 2) {
+            weightReasons.push('MNA-SF の体重減少項目が低下側です');
+        }
+        if (mnaState.score !== null && mnaState.score <= 11) {
+            weightReasons.push(`MNA-SF ${mnaState.score}点です`);
+        }
+
+        const dysphagiaReasons = [];
+        if (oralState.q2Code === 2) {
+            dysphagiaReasons.push('水分でのむせがあります');
+        }
+        if (oralState.q9Code !== null && oralState.q9Code >= 2) {
+            dysphagiaReasons.push('食事中や食後のむせが入力されています');
+        }
+        if (oralState.rsstCount !== null && oralState.rsstCount <= 3) {
+            dysphagiaReasons.push(`RSST ${oralState.rsstCount.toFixed(0)}回/30秒で境界域以下です`);
+        }
+        if (oralState.rsstJudgeCode === 2) {
+            dysphagiaReasons.push('RSST の専門職判断が問題ありです');
+        }
+        if (patientState.waterTexture && patientState.waterTexture !== 'とろみなし') {
+            dysphagiaReasons.push(`現在の水分形態は ${patientState.waterTexture} です`);
+        }
+
+        const anorexiaReasons = [];
+        if (mnaA !== null && mnaA <= 1) {
+            anorexiaReasons.push('MNA-SF の食欲・食事量項目が低下側です');
+        }
+        if (mnaD === 0) {
+            anorexiaReasons.push('最近の急性疾患・ストレス要因が示唆されます');
+        }
+        if (oralState.q5Code !== null && oralState.q5Code >= 4) {
+            anorexiaReasons.push('全身状態の自己評価が低下側です');
+        }
+
+        const oralReasons = [];
+        if (oralState.q3Code === 2) {
+            oralReasons.push('口腔乾燥があります');
+        }
+        if (oralState.q8Code !== null && oralState.q8Code <= 2) {
+            oralReasons.push('口腔清掃習慣が十分ではありません');
+        }
+        if (oralState.q4Code !== null && oralState.q4Code >= 2) {
+            oralReasons.push('咬合支持の低下がみられます');
+        }
+        if (oralState.q10Code !== null && oralState.q10Code >= 2) {
+            oralReasons.push('食べこぼしがみられます');
+        }
+        if ((oralState.bukubukuCode !== null && oralState.bukubukuCode >= 2)
+            || (oralState.guguguCode !== null && oralState.guguguCode >= 2)) {
+            oralReasons.push('含嗽機能の低下がみられます');
+        }
+        if (lowOdkLabels.length) {
+            oralReasons.push(`${lowOdkLabels.join('、')} で口唇・舌機能低下がみられます`);
+        }
+
+        const cognitiveReasons = [];
+        if (mnaE !== null && mnaE <= 1) {
+            cognitiveReasons.push('MNA-SF の神経心理項目が低下側です');
+        }
+        if (oralState.q11Code !== null && oralState.q11Code >= 4) {
+            cognitiveReasons.push('表情変化が少なく注意低下が疑われます');
+        }
+
+        const underCauses = [
+            buildNutritionCause('under', 'weight', weightReasons.length ? weightReasons : underReasons),
+            buildNutritionCause('under', 'dysphagia', dysphagiaReasons),
+            buildNutritionCause('under', 'anorexia', anorexiaReasons),
+            buildNutritionCause('under', 'oral', oralReasons),
+            buildNutritionCause('under', 'cognitive', cognitiveReasons),
+        ].filter(Boolean);
+
+        const underModeLabel = mnaState.score !== null && mnaState.score <= 7 ? '低栄養' : '低栄養リスク';
+        modes.push({ id: 'under', label: underModeLabel, tone: 'alert', reasons: dedupeTextItems(underReasons), causes: underCauses });
+        causes.push(...underCauses);
+    }
+
+    const overReasons = [];
+    if (patientState.bmi !== null && bmiReference && patientState.bmi > bmiReference.high) {
+        overReasons.push(`BMI ${patientState.bmi.toFixed(1)} が ${bmiReference.label} ${bmiReference.high.toFixed(1)} を上回っています`);
+    }
+    if (hasMeaningfulRise(patientState.weight, previousWeight, 1.0)) {
+        overReasons.push(`体重が前回 ${previousWeight.toFixed(1)}kg から ${patientState.weight.toFixed(1)}kg に増加しています`);
+    }
+
+    if (overReasons.length) {
+        const overeatingReasons = [];
+        if (patientState.bmi !== null && bmiReference && patientState.bmi > bmiReference.high) {
+            overeatingReasons.push(`BMI ${patientState.bmi.toFixed(1)} が基準を上回っています`);
+        }
+        if (hasMeaningfulRise(patientState.weight, previousWeight, 1.0)) {
+            overeatingReasons.push(`体重が前回より ${formatSignedDelta(patientState.weight, previousWeight, 'kg')} 増加しています`);
+        }
+        if (hasMeaningfulRise(patientState.bmi, previousBmi, 0.5)) {
+            overeatingReasons.push(`BMI が前回より ${formatSignedDelta(patientState.bmi, previousBmi, '')} 増加しています`);
+        }
+
+        const imbalanceReasons = [];
+        if (patientState.bmi !== null && patientState.bmi >= 25) {
+            imbalanceReasons.push('BMI 25 以上で、量だけでなく内容の見直しが必要です');
+        }
+        if (patientState.foodStaple || patientState.foodMain) {
+            imbalanceReasons.push(`現在の食形態は ${[patientState.foodStaple, patientState.foodMain].filter(Boolean).join(' / ')} です`);
+        }
+        if (mnaState.score !== null && mnaState.score >= 12 && patientState.bmi !== null && bmiReference && patientState.bmi > bmiReference.high) {
+            imbalanceReasons.push('MNA-SF は保たれていますが BMI 高値です');
+        }
+
+        const activityReasons = [];
+        if (mnaC !== null && mnaC <= 1) {
+            activityReasons.push('MNA-SF の移動能力項目が低下側です');
+        }
+        if (oralState.q11Code !== null && oralState.q11Code >= 4) {
+            activityReasons.push('活動性や表情の低下がみられます');
+        }
+        if (mnaD === 0) {
+            activityReasons.push('最近の急性疾患・ストレスで活動量低下が疑われます');
+        }
+
+        const hygieneReasons = [];
+        if (oralState.q7Code !== null && oralState.q7Code >= 2) {
+            hygieneReasons.push('口臭があります');
+        }
+        if (oralState.q8Code !== null && oralState.q8Code <= 2) {
+            hygieneReasons.push('口腔清掃習慣が十分ではありません');
+        }
+        if (oralState.q3Code === 2) {
+            hygieneReasons.push('口腔乾燥があります');
+        }
+
+        const overCauses = [
+            buildNutritionCause('over', 'overeating', overeatingReasons.length ? overeatingReasons : overReasons),
+            buildNutritionCause('over', 'imbalance', imbalanceReasons.length ? imbalanceReasons : overReasons),
+            buildNutritionCause('over', 'activity', activityReasons),
+            buildNutritionCause('over', 'oral_hygiene', hygieneReasons),
+        ].filter(Boolean);
+
+        modes.push({ id: 'over', label: '過栄養', tone: 'info', reasons: dedupeTextItems(overReasons), causes: overCauses });
+        causes.push(...overCauses);
+    }
+
+    const chips = [];
+    if (patientState.bmi !== null) {
+        chips.push(buildMetricChipHtml('BMI', patientState.bmi.toFixed(1), classifyBmiReference(patientState.bmi, bmiReference)));
+    }
+    if (mnaState.score !== null) {
+        chips.push(buildMetricChipHtml('MNA-SF', `${mnaState.score}点`, classifyMnaSummaryTone(mnaState.score)));
+    }
+    modes.forEach((mode) => {
+        chips.push(buildMetricChipHtml('自動評価', mode.label, mode.tone));
+    });
+    if (causes.length) {
+        chips.push(buildMetricChipHtml('原因候補', `${causes.length}件`, causes.length >= 3 ? 'alert' : 'info'));
+    }
+
+    const summaryText = !modes.length
+        ? 'BMI と MNA-SF を入力すると、低栄養・過栄養の原因候補と提案を自動表示します。'
+        : `自動評価: ${modes.map((mode) => mode.label).join(' / ')}。気になる領域: ${dedupeTextItems(causes.map((cause) => cause.label)).join('、')}。`;
+
+    return {
+        modes,
+        causes,
+        chips,
+        summaryText,
+    };
+}
+
+function buildNutritionCommentDraft(data, selectionState) {
+    if (!data || !data.causes || !data.causes.length) {
+        return '';
+    }
+
+    const modeLabels = dedupeTextItems((data.modes || []).map((mode) => mode.label));
+    const causeLabels = dedupeTextItems((data.causes || []).map((cause) => cause.label));
+    const reasonLines = dedupeTextItems((data.causes || []).flatMap((cause) => cause.reasons || []));
+    const selectedByRole = { patientFamily: [], st: [], ns: [] };
+
+    (data.causes || []).forEach((cause) => {
+        ['patientFamily', 'st', 'ns'].forEach((role) => {
+            (cause[role] || []).forEach((item, index) => {
+                const actionKey = buildNutritionActionKey(cause.modeId, cause.causeId, role, index);
+                if (selectionState[actionKey] !== false) {
+                    selectedByRole[role].push(item);
+                }
+            });
+        });
+    });
+
+    const lines = [];
+    lines.push(`自動評価: ${modeLabels.join(' / ')}。気になる領域: ${causeLabels.join('、')}。`);
+    if (reasonLines.length) {
+        lines.push(`抽出根拠: ${joinCommentItems(reasonLines, 4)}`);
+    }
+    ['patientFamily', 'st', 'ns'].forEach((role) => {
+        const items = dedupeTextItems(selectedByRole[role]).slice(0, 4);
+        if (!items.length) {
+            return;
+        }
+        lines.push(`${NUTRITION_ACTION_ROLE_LABELS[role]}: ${items.join('、')}。`);
+    });
+    return buildNutritionCommentBlock(lines);
+}
+
+function syncNutritionCommentDraft(data, selectionState) {
+    const commentField = document.getElementById('summary_comment');
+    if (!commentField) {
+        return;
+    }
+
+    const draft = normalizeCommentBlock(buildNutritionCommentDraft(data, selectionState));
+    const currentValue = String(commentField.value || '').trim();
+    const sections = splitNutritionCommentSections(currentValue);
+    const paragraphGap = String.fromCharCode(10) + String.fromCharCode(10);
+    let nextValue = currentValue;
+
+    if (!draft) {
+        if (!sections.hasBlock) {
+            return;
+        }
+        nextValue = [sections.before, sections.after].filter(Boolean).join(paragraphGap);
+    } else {
+        nextValue = [sections.before, draft, sections.after].filter(Boolean).join(paragraphGap);
+    }
+
+    if (nextValue === currentValue) {
+        return;
+    }
+
+    commentField.value = nextValue;
+    commentField.dispatchEvent(new Event('input', { bubbles: true }));
+    commentField.dispatchEvent(new Event('change', { bubbles: true }));
+}
+
+function renderNutritionAssessmentPanel() {
+    ensureNutritionAssessmentPanel();
+
+    const chips = document.getElementById('nutritionAssessmentChips');
+    const summary = document.getElementById('nutritionAssessmentSummary');
+    const cards = document.getElementById('nutritionAssessmentCards');
+    const preview = document.getElementById('nutritionCommentPreview');
+    const status = document.getElementById('nutritionAssessmentStatus');
+    if (!chips || !summary || !cards || !preview || !status) {
+        return;
+    }
+
+    const data = buildNutritionAssessmentData();
+    const selectionState = getNutritionSelectionState();
+    const totalSelectableCount = data.causes.reduce((sum, cause) => {
+        return sum + (cause.patientFamily || []).length + (cause.st || []).length + (cause.ns || []).length;
+    }, 0);
+    const selectedCount = data.causes.reduce((sum, cause) => {
+        let causeCount = 0;
+        ['patientFamily', 'st', 'ns'].forEach((role) => {
+            (cause[role] || []).forEach((item, index) => {
+                const actionKey = buildNutritionActionKey(cause.modeId, cause.causeId, role, index);
+                if (selectionState[actionKey] !== false) {
+                    causeCount += 1;
+                }
+            });
+        });
+        return sum + causeCount;
+    }, 0);
+
+    chips.innerHTML = data.chips.join('');
+    summary.textContent = data.summaryText;
+
+    if (!data.causes.length) {
+        cards.innerHTML = '<section class="stage3-box nutrition-empty">低栄養・過栄養の評価条件を満たすと、ここに原因候補と対応方針を表示します。</section>';
+        preview.textContent = '提案が選択されるとここに表示します。';
+        status.textContent = '抽出された対応方針は総合評価コメントへ自動反映します。';
+        latestNutritionAssessmentData = data;
+        syncNutritionCommentDraft(data, selectionState);
+        return;
+    }
+
+    cards.innerHTML = data.causes.map((cause) => {
+        const roleHtml = ['patientFamily', 'st', 'ns'].map((role) => {
+            const items = cause[role] || [];
+            const itemsHtml = items.map((item, index) => {
+                const actionKey = buildNutritionActionKey(cause.modeId, cause.causeId, role, index);
+                const checked = selectionState[actionKey] !== false ? 'checked' : '';
+                return `
+                    <label class="nutrition-action-item">
+                        <input type="checkbox" data-nutrition-key="${escapeHtml(actionKey)}" ${checked}>
+                        <span>${escapeHtml(item)}</span>
+                    </label>
+                `;
+            }).join('');
+            return `
+                <div class="nutrition-action-group">
+                    <div class="nutrition-action-group__title">${escapeHtml(NUTRITION_ACTION_ROLE_LABELS[role])}</div>
+                    <div class="nutrition-action-list">${itemsHtml}</div>
+                </div>
+            `;
+        }).join('');
+
+        return `
+            <section class="stage3-box nutrition-cause-card">
+                <div class="nutrition-cause-card__header">
+                    <div class="nutrition-cause-card__title">${escapeHtml(`${cause.icon} ${cause.label}`)}</div>
+                    <div class="nutrition-cause-card__mode">${buildMetricChipHtml('評価', cause.modeLabel, cause.modeTone)}</div>
+                </div>
+                <div class="nutrition-cause-card__subhead">抽出根拠</div>
+                ${buildStage3ListHtml(cause.reasons, '現入力では根拠を抽出できませんでした')}
+                <div class="nutrition-action-grid">${roleHtml}</div>
+            </section>
+        `;
+    }).join('');
+
+    const draft = buildNutritionCommentDraft(data, selectionState);
+    preview.textContent = stripNutritionCommentMarkers(draft) || '提案が選択されるとここに表示します。';
+    status.textContent = `${selectedCount} / ${totalSelectableCount} 件の対応方針を総合評価コメントへ自動反映しています。`;
+    latestNutritionAssessmentData = { ...data, commentDraft: draft };
+    syncNutritionCommentDraft(data, selectionState);
 }
 
 function stripTerminalPunctuation(value) {
@@ -3019,12 +5485,20 @@ function normalizeCommentBlock(value) {
     .join(String.fromCharCode(10));
 }
 
-function stripClinicalCommentMarkers(value) {
+function stripMarkedCommentMarkers(value, startMarker, endMarker) {
     return normalizeCommentBlock(
         String(value || '')
-            .replace(CLINICAL_COMMENT_START_MARKER, '')
-            .replace(CLINICAL_COMMENT_END_MARKER, '')
+            .replace(startMarker, '')
+            .replace(endMarker, '')
     );
+}
+
+function stripClinicalCommentMarkers(value) {
+    return stripMarkedCommentMarkers(value, CLINICAL_COMMENT_START_MARKER, CLINICAL_COMMENT_END_MARKER);
+}
+
+function stripNutritionCommentMarkers(value) {
+    return stripMarkedCommentMarkers(value, NUTRITION_COMMENT_START_MARKER, NUTRITION_COMMENT_END_MARKER);
 }
 
 function buildClinicalCommentDraft(data) {
@@ -3208,6 +5682,10 @@ function buildClinicalSupportData() {
     const hasPreviousOralData = hasOralAssessmentData(comparisonOralState);
     const previousWeight = comparisonRecord ? toMetricNumber(comparisonRecord.weight ?? comparisonRecord.fields?.weight) : null;
     const previousBmi = comparisonRecord ? toMetricNumber(comparisonRecord.bmi ?? comparisonRecord.fields?.bmi) : null;
+    const age = calculateAgeAtDate(patientState.birthdate, patientState.evalDate);
+    const bmiReference = getBmiReference(age);
+    const mnaState = getCurrentMnaSummaryState();
+    const nutritionGuidance = buildNutritionGuidance(patientState, bmiReference, mnaState);
     const findingItems = [];
     const alertItems = [];
     const recommendationItems = [];
@@ -3231,16 +5709,37 @@ function buildClinicalSupportData() {
             alertItems.push('前回保存に口腔詳細がないため、今回保存後から口腔差分が有効になります。');
         }
 
+        if (nutritionGuidance.note) {
+            alertItems.push(`MNA-SF 0〜7点のため ${nutritionGuidance.note} を確認してください。`);
+        }
+
+        const chips = history.length ? [buildMetricChipHtml('保存履歴', `${history.length}件`, history.length ? 'success' : 'info')] : [];
+        if (patientState.bmi !== null) {
+            chips.push(buildMetricChipHtml('BMI', patientState.bmi.toFixed(1), classifyBmiReference(patientState.bmi, bmiReference)));
+        }
+        if (mnaState.score !== null) {
+            chips.push(buildMetricChipHtml('MNA-SF', `${mnaState.score}点`, classifyMnaSummaryTone(mnaState.score)));
+        }
+        if (nutritionGuidance.note) {
+            chips.push(buildMetricChipHtml('栄養詳細', nutritionGuidance.note, 'alert'));
+        }
+
         return {
-            chips: history.length ? [buildMetricChipHtml('保存履歴', `${history.length}件`, history.length ? 'success' : 'info')] : [],
-            summaryText: patientState.name
-                ? '口腔タブの問診・RSST・うがい・オーラルディアドコキネシスを入力すると臨床語化を表示します。'
-                : '利用者情報と口腔項目を入力すると臨床語化を表示します。',
-            findingItems: ['口腔タブの入力後に所見候補を生成します。'],
+            chips,
+            summaryText: nutritionGuidance.issueItems.length
+                ? `${nutritionGuidance.issueItems.join(' ')}${nutritionGuidance.note ? ` ${nutritionGuidance.note}` : ''}`
+                : patientState.name
+                    ? '口腔タブの問診・RSST・うがい・オーラルディアドコキネシスを入力すると臨床語化を表示します。'
+                    : '利用者情報と口腔項目を入力すると臨床語化を表示します。',
+            findingItems: nutritionGuidance.issueItems.length ? nutritionGuidance.issueItems : ['口腔タブの入力後に所見候補を生成します。'],
             alertItems: alertItems.length ? alertItems : ['口腔項目を入力すると差分判定を表示します。'],
-            recommendationTone: 'info',
-            recommendationLabel: '入力待ち',
-            recommendationItems: ['問診・RSST・うがい・オーラルディアドコキネシスを入力すると、食形態の提案を表示します。'],
+            recommendationTone: mnaState.needsPocketNutrition ? 'alert' : 'info',
+            recommendationLabel: nutritionGuidance.actionItems.length
+                ? (mnaState.needsPocketNutrition ? '栄養評価の再確認を優先' : '栄養状態を継続観察')
+                : '入力待ち',
+            recommendationItems: nutritionGuidance.actionItems.length
+                ? nutritionGuidance.actionItems
+                : ['問診・RSST・うがい・オーラルディアドコキネシスを入力すると、食形態の提案を表示します。'],
             metaText,
             commentDraft: '',
         };
@@ -3282,11 +5781,8 @@ function buildClinicalSupportData() {
         }
     }
     if (oralState.rsstJudgeCode === 2) {
-        swallowRisk += 1;
-        findingItems.push('RSST 判定はやや不十分です。');
-    } else if (oralState.rsstJudgeCode === 3) {
         swallowRisk += 2;
-        findingItems.push('RSST 判定は不十分です。');
+        findingItems.push('RSST の専門職判断は問題ありです。');
     }
     if (oralState.q3Code === 2) {
         hygieneRisk += 2;
@@ -3294,7 +5790,10 @@ function buildClinicalSupportData() {
     }
     if (oralState.q7Code === 2) {
         hygieneRisk += 1;
-        findingItems.push('口臭があり、清掃状態や乾燥の確認が必要です。');
+        findingItems.push('軽度の口臭があり、清掃状態や乾燥の確認が必要です。');
+    } else if (oralState.q7Code === 3) {
+        hygieneRisk += 2;
+        findingItems.push('強い口臭があり、清掃状態や乾燥の確認を優先します。');
     }
     if (oralState.q8Code !== null) {
         hygieneRisk += getCleaningHabitRisk(oralState.q8Code);
@@ -3304,14 +5803,29 @@ function buildClinicalSupportData() {
             findingItems.push('口腔清掃習慣は限定的です。');
         }
     }
+    if (oralState.q10Code === 2) {
+        chewingRisk += 1;
+        findingItems.push('少量の食べこぼしがあり、食塊保持の観察が必要です。');
+    } else if (oralState.q10Code === 3) {
+        chewingRisk += 2;
+        functionRisk += 1;
+        findingItems.push('食べこぼしが目立ち、口唇・頬・舌の協調低下に留意が必要です。');
+    }
+    if (oralState.q11Code === 4) {
+        functionRisk += 1;
+        findingItems.push('表情変化が少なく、口唇・頬の活動性低下が示唆されます。');
+    } else if (oralState.q11Code === 5) {
+        functionRisk += 2;
+        findingItems.push('表情が乏しく、口唇・頬の活動性低下が強く示唆されます。');
+    }
 
     const gargleNotes = [];
     if (oralState.bukubukuCode === 2) {
         functionRisk += 1;
-        gargleNotes.push('ブクブクうがいがやや不十分');
+        gargleNotes.push('ブクブクうがいが不十分');
     } else if (oralState.bukubukuCode === 3) {
         functionRisk += 2;
-        gargleNotes.push('ブクブクうがいが不十分');
+        gargleNotes.push('ブクブクうがいができない');
     }
     if (oralState.guguguCode === 2) {
         functionRisk += 1;
@@ -3381,6 +5895,12 @@ function buildClinicalSupportData() {
             if (hasWorsenedCode(oralState.q9Code, comparisonOralState.q9Code)) {
                 alertItems.push('むせ症状が前回より増えています。');
             }
+            if (hasWorsenedCode(oralState.q10Code, comparisonOralState.q10Code)) {
+                alertItems.push('食べこぼしが前回より増えています。');
+            }
+            if (hasWorsenedCode(oralState.q11Code, comparisonOralState.q11Code) && oralState.q11Code >= 4) {
+                alertItems.push('表情の乏しさが前回より目立っています。');
+            }
             if (hasMeaningfulDrop(oralState.rsstCount, comparisonOralState.rsstCount, 1)) {
                 alertItems.push(`RSST が前回 ${comparisonOralState.rsstCount.toFixed(0)}回/30秒 から ${oralState.rsstCount.toFixed(0)}回/30秒 に低下しています。`);
             }
@@ -3445,8 +5965,29 @@ function buildClinicalSupportData() {
     if (hygieneRisk >= 2 || functionRisk >= 2) {
         recommendationItems.push('食後の口腔ケアと含嗽をセットで計画します。');
     }
+    if (nutritionGuidance.issueItems.length) {
+        findingItems.push(...nutritionGuidance.issueItems);
+        summaryParts.push(`栄養課題として ${nutritionGuidance.issueItems.join(' ')}`);
+    }
+    if (nutritionGuidance.actionItems.length) {
+        recommendationItems.push(...nutritionGuidance.actionItems);
+    }
+    if (nutritionGuidance.note) {
+        alertItems.push(`MNA-SF 0〜7点のため ${nutritionGuidance.note} を確認してください。`);
+        summaryParts.push(nutritionGuidance.note);
+    }
     if (!recommendationItems.length) {
         recommendationItems.push('現行食形態を基本に継続し、むせや食事量の変化を経過観察します。');
+    }
+
+    if (nutritionGuidance.actionItems.length && recommendationTone === 'success') {
+        recommendationTone = mnaState.needsPocketNutrition ? 'alert' : 'info';
+        recommendationLabel = mnaState.needsPocketNutrition ? '栄養評価の再確認を優先' : '栄養状態を含めて継続観察';
+    }
+    const diagnosisNoteIndex = summaryParts.findIndex((item) => item.includes('診断ではなく記録補助として利用してください。'));
+    if (diagnosisNoteIndex >= 0 && diagnosisNoteIndex !== summaryParts.length - 1) {
+        const [diagnosisNote] = summaryParts.splice(diagnosisNoteIndex, 1);
+        summaryParts.push(diagnosisNote);
     }
 
     const chips = [
@@ -3455,6 +5996,15 @@ function buildClinicalSupportData() {
         buildMetricChipHtml('衛生・乾燥', formatStage3DomainLabel(hygieneRisk), classifyStage3Risk(hygieneRisk)),
         buildMetricChipHtml('口唇・舌機能', formatStage3DomainLabel(functionRisk), classifyStage3Risk(functionRisk)),
     ];
+    if (patientState.bmi !== null) {
+        chips.push(buildMetricChipHtml('BMI', patientState.bmi.toFixed(1), classifyBmiReference(patientState.bmi, bmiReference)));
+    }
+    if (mnaState.score !== null) {
+        chips.push(buildMetricChipHtml('MNA-SF', `${mnaState.score}点`, classifyMnaSummaryTone(mnaState.score)));
+    }
+    if (nutritionGuidance.note) {
+        chips.push(buildMetricChipHtml('栄養詳細', nutritionGuidance.note, 'alert'));
+    }
     if (comparisonRecord && comparisonRecord.date) {
         chips.push(buildMetricChipHtml('比較基準', comparisonRecord.date, 'info'));
     }
@@ -3500,7 +6050,83 @@ function renderClinicalSupportPanel() {
     updateClinicalCommentActionState(data);
 }
 
-function buildNutritionSupportText(state, age, bmi, reference, mnaInfo, latestSavedRecord) {
+function parseDisplayedScore(value) {
+    const match = String(value || '').trim().match(/(\\d+(?:\\.\\d+)?)/);
+    if (!match) {
+        return null;
+    }
+    return Number.parseFloat(match[1]);
+}
+
+function classifyMnaSummaryTone(score) {
+    if (score === null) {
+        return 'info';
+    }
+    if (score <= 7) {
+        return 'alert';
+    }
+    if (score <= 11) {
+        return 'info';
+    }
+    return 'success';
+}
+
+function getCurrentMnaSummaryState() {
+    const score = parseDisplayedScore(getFieldElementValue('mna_summary_num'));
+    const rawLabel = String(getFieldElementValue('mna_summary_result') || '').replace('【ポケニュー評価へ】', '').trim();
+    const fallbackLabel = score === null ? '' : score <= 7 ? '低栄養' : score <= 11 ? 'At risk' : '良好';
+    return {
+        score,
+        label: rawLabel || fallbackLabel,
+        needsPocketNutrition: score !== null && score <= 7,
+    };
+}
+
+function buildNutritionGuidance(state, reference, mnaState) {
+    const issueItems = [];
+    const actionItems = [];
+
+    if (state.bmi !== null && reference) {
+        if (state.bmi < reference.low) {
+            issueItems.push(`BMI が ${reference.label} ${reference.low.toFixed(1)} 未満で、体重減少や摂取不足に注意が必要です。`);
+            actionItems.push('食事量・間食・補助食品の活用、体重推移の確認を行います。');
+        } else if (state.bmi > reference.high) {
+            issueItems.push(`BMI が ${reference.label} ${reference.high.toFixed(1)} を上回っています。`);
+            actionItems.push('活動量、食事量、体重推移を合わせて確認します。');
+        }
+    }
+
+    if (mnaState.score !== null) {
+        if (mnaState.score <= 7) {
+            issueItems.push(`MNA-SF ${mnaState.score}点で低栄養の可能性があります。`);
+            actionItems.push('【ポケニュー評価へ】を目安に詳細評価や多職種連携を検討します。');
+        } else if (mnaState.score <= 11) {
+            issueItems.push(`MNA-SF ${mnaState.score}点で低栄養リスクがあります。`);
+            actionItems.push('摂取量、水分量、食事形態、体重変化を定期確認します。');
+        }
+    }
+
+    const currentDiet = [state.foodStaple, state.foodMain].filter(Boolean).join(' / ');
+    const currentWater = String(state.waterTexture || '').trim();
+    if ((issueItems.length || actionItems.length) && (currentDiet || currentWater)) {
+        const dietLabel = currentDiet ? `食形態（${currentDiet}）` : '';
+        const waterLabel = currentWater ? `水分形態（${currentWater}）` : '';
+        actionItems.push(`${[dietLabel, waterLabel].filter(Boolean).join('・')}が現在の状態に合っているかを確認します。`);
+    }
+
+    if (!issueItems.length && !actionItems.length && (state.bmi !== null || mnaState.score !== null)) {
+        issueItems.push('大きな栄養リスクは現時点で強く示されていません。');
+        actionItems.push('現行の食形態・水分形態と体重推移を継続観察します。');
+    }
+
+    return {
+        issueItems: [...new Set(issueItems)],
+        actionItems: [...new Set(actionItems)],
+        note: mnaState.needsPocketNutrition ? '【ポケニュー評価へ】' : '',
+    };
+}
+
+function buildNutritionSupportText(state, age, bmi, reference, mnaInfo, latestSavedRecord, mnaState) {
     if (!state.birthdate) {
         return '生年月日を入力すると年齢帯の参考帯を表示します。';
     }
@@ -3509,6 +6135,7 @@ function buildNutritionSupportText(state, age, bmi, reference, mnaInfo, latestSa
     }
 
     const parts = [`現在の BMI は ${bmi.toFixed(1)} です。`];
+    const nutritionGuidance = buildNutritionGuidance(state, reference, mnaState);
     if (reference) {
         if (bmi < reference.low) {
             parts.push(`${reference.label} ${reference.low.toFixed(1)}〜${reference.high.toFixed(1)} を下回るため、体重減少や摂取量の変化を確認してください。`);
@@ -3520,6 +6147,18 @@ function buildNutritionSupportText(state, age, bmi, reference, mnaInfo, latestSa
     }
     if (mnaInfo) {
         parts.push(`MNA F1 では ${mnaInfo.score}点の目安です（${mnaInfo.label}）。`);
+    }
+    if (mnaState.score !== null) {
+        parts.push(`MNA-SF は ${mnaState.score}点（${mnaState.label || '判定確認中'}）です。`);
+    }
+    if (nutritionGuidance.issueItems.length) {
+        parts.push(`栄養課題: ${nutritionGuidance.issueItems.join(' ')}`);
+    }
+    if (nutritionGuidance.actionItems.length) {
+        parts.push(`対応案: ${nutritionGuidance.actionItems.join(' ')}`);
+    }
+    if (nutritionGuidance.note) {
+        parts.push(nutritionGuidance.note);
     }
     if (latestSavedRecord && latestSavedRecord.date) {
         parts.push(`保存済み最新評価日は ${latestSavedRecord.date} です。`);
@@ -3539,6 +6178,7 @@ function renderNutritionSupportPanel() {
     const age = calculateAgeAtDate(state.birthdate, state.evalDate);
     const reference = getBmiReference(age);
     const mnaInfo = getMnaF1ScoreInfo(state.bmi);
+    const mnaState = getCurrentMnaSummaryState();
     const history = state.patientKey ? (buildPatientRecordGroups(records).get(state.patientKey) || []) : [];
     const latestSavedRecord = history[0] || null;
     const latestSavedWeight = latestSavedRecord ? toMetricNumber(latestSavedRecord.weight ?? latestSavedRecord.fields?.weight) : null;
@@ -3553,8 +6193,13 @@ function renderNutritionSupportPanel() {
     if (reference) {
         chipItems.push(buildMetricChipHtml(reference.label, `${reference.low.toFixed(1)}〜${reference.high.toFixed(1)}`, 'info'));
     }
-    if (mnaInfo) {
+    if (mnaState.score !== null) {
+        chipItems.push(buildMetricChipHtml('MNA-SF', `${mnaState.score}点`, classifyMnaSummaryTone(mnaState.score)));
+    } else if (mnaInfo) {
         chipItems.push(buildMetricChipHtml('MNA F1 目安', `${mnaInfo.score}点`, mnaInfo.score <= 1 ? 'alert' : 'success'));
+    }
+    if (mnaState.needsPocketNutrition) {
+        chipItems.push(buildMetricChipHtml('栄養詳細', '【ポケニュー評価へ】', 'alert'));
     }
     if (latestSavedRecord && latestSavedRecord.date) {
         chipItems.push(buildMetricChipHtml('前回保存', latestSavedRecord.date, 'info'));
@@ -3565,7 +6210,7 @@ function renderNutritionSupportPanel() {
     }
 
     chips.innerHTML = chipItems.join('');
-    summary.textContent = buildNutritionSupportText(state, age, state.bmi, reference, mnaInfo, latestSavedRecord);
+    summary.textContent = buildNutritionSupportText(state, age, state.bmi, reference, mnaInfo, latestSavedRecord, mnaState);
 }
 
 function renderPatientTrendPanel() {
@@ -3628,12 +6273,12 @@ function renderPatientTrendPanel() {
         const scoreLabel = record.mnaScore !== null && record.mnaScore !== undefined ? `${record.mnaScore}/14` : '―';
         return `
             <tr>
-                <td><strong>${escapeHtml(record.date || '―')}</strong>${record.nextMonitor ? `<br><small class="metric-subline">次回 ${escapeHtml(record.nextMonitor)}</small>` : ''}</td>
-                <td>${escapeHtml(formatMetricValue(weight, 'kg'))}</td>
-                <td>${escapeHtml(formatMetricValue(bmi))}</td>
-                <td>${buildTrendDeltaHtml(weight, olderWeight, 'kg')}</td>
-                <td>${buildTrendDeltaHtml(bmi, olderBmi, '')}</td>
-                <td><span class="tag ${tagClass}">${escapeHtml(record.mnaLabel || '―')}</span><br><small class="metric-subline">${escapeHtml(scoreLabel)}</small></td>
+                <td class="history-cell--nowrap"><strong>${escapeHtml(record.date || '―')}</strong>${record.nextMonitor ? `<br><small class="metric-subline">次回 ${escapeHtml(record.nextMonitor)}</small>` : ''}</td>
+                <td class="history-cell--nowrap">${escapeHtml(formatMetricValue(weight, 'kg'))}</td>
+                <td class="history-cell--nowrap">${escapeHtml(formatMetricValue(bmi))}</td>
+                <td class="history-cell--nowrap">${buildTrendDeltaHtml(weight, olderWeight, 'kg')}</td>
+                <td class="history-cell--nowrap">${buildTrendDeltaHtml(bmi, olderBmi, '')}</td>
+                <td class="history-cell--nowrap"><span class="tag ${tagClass}">${escapeHtml(record.mnaLabel || '―')}</span><br><small class="metric-subline">${escapeHtml(scoreLabel)}</small></td>
             </tr>
         `;
     }).join('');
@@ -3643,6 +6288,7 @@ function updateStage2Panels() {
     renderNutritionSupportPanel();
     renderPatientTrendPanel();
     renderClinicalSupportPanel();
+    renderNutritionAssessmentPanel();
 }
 
 function scheduleStage2Update() {
@@ -3667,6 +6313,9 @@ function attachStage2InputListeners() {
         'weight',
         'height',
         'bmi',
+        'food_staple',
+        'food_main',
+        'water_texture',
         'q1',
         'q2',
         'q3',
@@ -3676,6 +6325,8 @@ function attachStage2InputListeners() {
         'q7',
         'q8',
         'q9',
+        'q10',
+        'q11',
         'rsst_count',
         'rsst_judge',
         'bukubuku',
@@ -3706,54 +6357,10 @@ function installStage2Hooks() {
         const originalLoadRecord = loadRecord;
         loadRecord = function(...args) {
             const result = originalLoadRecord.apply(this, args);
-            const recordId = Number(args[0]);
-            const loadedRecord = Array.isArray(records)
-                ? records.find((record) => Number(record.id) === recordId)
-                : null;
-            if (loadedRecord) {
-                if (typeof calcBMI === 'function') {
-                    calcBMI();
-                }
-                currentMnaFieldMode = loadedRecord.mnaFieldMode || '';
-                const restoredMnaScores = { ...buildEmptyMnaScores(), ...(loadedRecord.mnaScores || {}) };
-                if (currentMnaFieldMode === 'f1' && loadedRecord.mnaScores && loadedRecord.mnaScores.f1 != null) {
-                    restoredMnaScores.f = loadedRecord.mnaScores.f1;
-                } else if (currentMnaFieldMode === 'f2' && loadedRecord.mnaScores && loadedRecord.mnaScores.f2 != null) {
-                    restoredMnaScores.f = loadedRecord.mnaScores.f2;
-                }
-                delete restoredMnaScores.f1;
-                delete restoredMnaScores.f2;
-                mnaScores = restoredMnaScores;
-                restoreMnaSelections();
-                calcMNAScore();
-                updateSummary();
-            }
             scheduleStage2Update();
             return result;
         };
         window.loadRecord = loadRecord;
-    }
-
-    if (typeof selectMNA === 'function') {
-        const originalSelectMNA = selectMNA;
-        selectMNA = function(...args) {
-            const result = originalSelectMNA.apply(this, args);
-            const selectedKey = args[0];
-            const selectedValue = Number(args[1]);
-            if ((selectedKey === 'f1' || selectedKey === 'f2') && Number.isFinite(selectedValue)) {
-                currentMnaFieldMode = selectedKey;
-                mnaScores.f = selectedValue;
-                delete mnaScores.f1;
-                delete mnaScores.f2;
-                calcMNAScore();
-            } else {
-                currentMnaFieldMode = getSelectedMnaFieldMode() || currentMnaFieldMode || '';
-            }
-            updateSummary();
-            scheduleStage2Update();
-            return result;
-        };
-        window.selectMNA = selectMNA;
     }
 
     if (typeof renderHistory === 'function') {
@@ -3769,12 +6376,158 @@ function installStage2Hooks() {
     stage2HooksInstalled = true;
 }
 
+function setSummaryFieldText(id, text) {
+    const element = document.getElementById(id);
+    if (!element) {
+        return;
+    }
+    if ('value' in element) {
+        element.value = text;
+        return;
+    }
+    element.textContent = text;
+}
+
+function summarizeOralEval2Value(value) {
+    const text = String(value || '').trim();
+    if (!text) {
+        return '未入力';
+    }
+    if (text.startsWith('あり（継続） 口腔清掃')) {
+        return 'あり（継続） 口腔機能低下あり';
+    }
+    if (text.startsWith('あり（継続） 口腔機能向上サービス')) {
+        return 'あり（継続） 中止で著しい低下のおそれ';
+    }
+    if (text.startsWith('なし（終了）')) {
+        return 'なし（終了） 自立';
+    }
+    return text;
+}
+
+function ensureSummaryIdentitySubline() {
+    const nameElement = document.getElementById('summary_name');
+    const dateElement = document.getElementById('summary_date');
+    if (!nameElement || !dateElement || !dateElement.parentElement) {
+        return null;
+    }
+    nameElement.classList.add('summary-identity-name');
+    dateElement.classList.add('summary-identity-date');
+    let subline = document.getElementById('summaryIdentitySubline');
+    if (!subline) {
+        subline = document.createElement('div');
+        subline.id = 'summaryIdentitySubline';
+        subline.className = 'summary-identity-subline';
+        dateElement.parentElement.insertBefore(subline, dateElement);
+    }
+    return subline;
+}
+
+function updateSummaryIdentityFields() {
+    const nameText = getFieldElementValue('name').trim() || '―';
+    const furiganaText = getFieldElementValue('furigana').trim() || '―';
+    const subline = ensureSummaryIdentitySubline();
+    if (subline) {
+        subline.textContent = `氏名/ふりがな: ${nameText} / ${furiganaText}`;
+    }
+    const dateElement = document.getElementById('summary_date');
+    if (dateElement) {
+        dateElement.textContent = `評価日: ${getFieldElementValue('evalDate').trim() || '―'}`;
+    }
+}
+
+function buildEnhancedOralSummaryText() {
+    const oralEval1 = getFieldElementValue('oral_eval1').trim();
+    const oralEval2 = getFieldElementValue('oral_eval2').trim();
+    const oralEval3 = getFieldElementValue('oral_eval3').trim();
+    if (![oralEval1, oralEval2, oralEval3].some(Boolean)) {
+        return '';
+    }
+    return [
+        `① 著しい低下のおそれ: ${oralEval1 || '未入力'}`,
+        `② 継続必要性: ${summarizeOralEval2Value(oralEval2)}`,
+        `③ モニタリング後: ${oralEval3 || '未入力'}`,
+    ].join(' / ');
+}
+
+function updateEnhancedSummaryFields() {
+    updateSummaryIdentityFields();
+
+    const oralSummaryText = buildEnhancedOralSummaryText();
+    if (oralSummaryText) {
+        if (document.getElementById('oral_summary_text')) {
+            setSummaryFieldText('oral_summary_text', oralSummaryText);
+        } else {
+            setSummaryFieldText('oral_summary_box', oralSummaryText);
+        }
+    }
+
+    const mnaState = getCurrentMnaSummaryState();
+    const baseText = String(getFieldElementValue('mna_summary_result') || '').replace('【ポケニュー評価へ】', '').trim();
+    if (mnaState.score !== null || baseText) {
+        const nextText = mnaState.needsPocketNutrition
+            ? `${baseText || '低栄養の可能性があります'} 【ポケニュー評価へ】`
+            : baseText;
+        if (nextText) {
+            setSummaryFieldText('mna_summary_result', nextText);
+        }
+    }
+}
+
+function ensureSummaryFieldCompatibility() {
+    const oralSummaryBox = document.getElementById('oral_summary_box');
+    if (oralSummaryBox && !document.getElementById('oral_summary_text')) {
+        const initialText = String(oralSummaryBox.textContent || '').trim();
+        oralSummaryBox.textContent = '';
+        const valueElement = document.createElement('div');
+        valueElement.id = 'oral_summary_text';
+        valueElement.textContent = initialText || '口腔機能タブを入力してください';
+        oralSummaryBox.appendChild(valueElement);
+    }
+}
+
+function installSummaryHooks() {
+    if (summaryHooksInstalled) {
+        return;
+    }
+
+    ensureSummaryFieldCompatibility();
+
+    if (typeof updateSummary === 'function') {
+        const originalUpdateSummary = updateSummary;
+        updateSummary = function(...args) {
+            const result = originalUpdateSummary.apply(this, args);
+            updateEnhancedSummaryFields();
+            scheduleStage2Update();
+            return result;
+        };
+        window.updateSummary = updateSummary;
+    }
+
+    if (typeof calcMNAScore === 'function') {
+        const originalCalcMNAScore = calcMNAScore;
+        calcMNAScore = function(...args) {
+            const result = originalCalcMNAScore.apply(this, args);
+            updateEnhancedSummaryFields();
+            scheduleStage2Update();
+            return result;
+        };
+        window.calcMNAScore = calcMNAScore;
+    }
+
+    summaryHooksInstalled = true;
+    updateEnhancedSummaryFields();
+}
+
 window.addEventListener('afterprint', clearPrintMode);
 
 async function initializeApp() {
     ensureStage1Styles();
     await ensureLocalSettingsInitialized();
     syncManagedPersonSelectors();
+    ensurePatientFormEnhancements();
+    ensureOralAssessmentEnhancements();
+    ensureSummaryFieldCompatibility();
     ensureSettingsControls();
     ensureHistoryTools();
     ensurePrintControls();
@@ -3787,6 +6540,7 @@ async function initializeApp() {
     attachStage2InputListeners();
     installManagedFieldHooks();
     installStage2Hooks();
+    installSummaryHooks();
     try {
         records = await fetchRecords();
     } catch (error) {
@@ -3794,6 +6548,8 @@ async function initializeApp() {
         showToast(error.message || '同期に失敗しました');
     }
     renderHistory();
+    syncCustomDateSelectors();
+    syncOdkHelperFieldsFromRates();
     updateDraftStatusDisplays();
     updateStage2Panels();
 }
@@ -3919,6 +6675,12 @@ class AuthConfig:
     trust_proxy: bool
 
 
+@dataclass(slots=True)
+class ClientTemplateState:
+    templates: dict[str, str]
+    source_mtime_ns: int | None
+
+
 def replace_once(text: str, old: str, new: str) -> str:
     if old not in text:
         raise RuntimeError(f"Expected snippet not found: {old[:60]}")
@@ -4025,15 +6787,6 @@ def transform_client_html(
   if (r.mnaScores) {""",
     )
 
-    html = replace_once(
-        html,
-        "  mnaScores[key === 'f2' ? 'f' : key] = value;\n",
-        """  mnaScores[(key === 'f1' || key === 'f2') ? 'f' : key] = value;
-    if (key === 'f1' || key === 'f2') {
-        currentMnaFieldMode = key;
-    }
-""",
-    )
     html, count = MNA_RESTORE_PATTERN.subn(
         """
     restoreMnaSelections();
@@ -4114,6 +6867,44 @@ def prepare_client_templates() -> dict[str, str]:
         "public": build_client_template(auth_enabled=False),
         "auth": build_client_template(auth_enabled=True),
     }
+
+
+def get_source_artifact_mtime_ns() -> int | None:
+    try:
+        return SOURCE_ARTIFACT_PATH.stat().st_mtime_ns
+    except OSError:
+        return None
+
+
+def build_client_template_state() -> ClientTemplateState:
+    return ClientTemplateState(
+        templates=prepare_client_templates(),
+        source_mtime_ns=get_source_artifact_mtime_ns(),
+    )
+
+
+def get_live_client_templates(server: ThreadingHTTPServer) -> dict[str, str]:
+    with server.client_templates_lock:  # type: ignore[attr-defined]
+        state = server.client_template_state  # type: ignore[attr-defined]
+        current_mtime_ns = get_source_artifact_mtime_ns()
+        if current_mtime_ns == state.source_mtime_ns and state.templates:
+            return state.templates
+
+        try:
+            templates = prepare_client_templates()
+        except Exception as error:
+            if state.templates:
+                print(f"Client template reload skipped: {error}")
+                return state.templates
+            raise
+
+        server.client_template_state = ClientTemplateState(  # type: ignore[attr-defined]
+            templates=templates,
+            source_mtime_ns=get_source_artifact_mtime_ns(),
+        )
+        if state.source_mtime_ns is not None:
+            print(f"Reloaded client templates from {SOURCE_ARTIFACT_PATH.name}")
+        return templates
 
 
 def build_client_html(
@@ -4613,6 +7404,29 @@ def open_connection(db_path: Path) -> sqlite3.Connection:
     return connection
 
 
+def resolve_asset_path(request_path: str) -> Path | None:
+    if not request_path.startswith("/assets/"):
+        return None
+
+    parts = request_path.lstrip("/").split("/")
+    if not parts or any(part in {"", ".", ".."} for part in parts):
+        return None
+
+    candidate = (BASE_DIR / Path(*parts)).resolve()
+    try:
+        candidate.relative_to(ASSETS_DIR_RESOLVED)
+    except ValueError:
+        return None
+
+    if not candidate.exists() or not candidate.is_file():
+        return None
+    return candidate
+
+
+def guess_asset_content_type(file_path: Path) -> str:
+    return ASSET_CONTENT_TYPES.get(file_path.suffix.lower(), "application/octet-stream")
+
+
 def list_records(db_path: Path) -> list[dict]:
     with open_connection(db_path) as connection:
         rows = connection.execute(
@@ -4755,7 +7569,7 @@ class KoukuKinouHandler(BaseHTTPRequestHandler):
 
     @property
     def client_templates(self) -> dict[str, str]:
-        return self.server.client_templates  # type: ignore[attr-defined]
+        return get_live_client_templates(self.server)
 
     def allows_tailscale_auth(self) -> bool:
         return self.auth_config.enabled and self.auth_config.mode in {"tailscale", "tailscale-or-password"}
@@ -4856,11 +7670,18 @@ class KoukuKinouHandler(BaseHTTPRequestHandler):
             )
             return
 
-        static_asset = resolve_help_static_asset(parsed.path)
+        static_asset = HELP_STATIC_ROUTES.get(parsed.path)
         if static_asset:
             if not self.ensure_authenticated(api=False):
                 return
             self.respond_file(static_asset[0], static_asset[1])
+            return
+
+        asset_path = resolve_asset_path(parsed.path)
+        if asset_path:
+            if not self.ensure_authenticated(api=False):
+                return
+            self.respond_file(asset_path, guess_asset_content_type(asset_path))
             return
 
         if parsed.path in {"/", "/index.html"}:
@@ -5216,12 +8037,13 @@ def main() -> None:
     args = parse_args()
     auth_config = build_auth_config(args)
     ensure_database(args.db)
-    client_templates = prepare_client_templates()
+    client_template_state = build_client_template_state()
     server = ThreadingHTTPServer((args.host, args.port), KoukuKinouHandler)
     server.daemon_threads = True
     server.db_path = args.db  # type: ignore[attr-defined]
     server.auth_config = auth_config  # type: ignore[attr-defined]
-    server.client_templates = client_templates  # type: ignore[attr-defined]
+    server.client_template_state = client_template_state  # type: ignore[attr-defined]
+    server.client_templates_lock = threading.Lock()  # type: ignore[attr-defined]
     server.sessions = {}  # type: ignore[attr-defined]
     server.session_lock = threading.Lock()  # type: ignore[attr-defined]
     print(f"Serving on http://{args.host}:{args.port}")
