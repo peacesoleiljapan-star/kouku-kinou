@@ -7,6 +7,7 @@
 ## 関連資料
 
 - Synology + Tailscale 配置手順: [DEPLOY_SYNOLOGY_JA.md](DEPLOY_SYNOLOGY_JA.md)
+- 非エンジニア向け index.html 更新手順: [GITHUB_BROWSER_UPDATE_GUIDE_JA.md](GITHUB_BROWSER_UPDATE_GUIDE_JA.md)
 - GitHub Actions 自動反映手順: [AUTO_DEPLOY_GITHUB_ACTIONS_JA.md](AUTO_DEPLOY_GITHUB_ACTIONS_JA.md)
 - Windows 利用者向け Tailscale 接続ガイド: [TAILSCALE_CLIENT_GUIDE_JA.md](TAILSCALE_CLIENT_GUIDE_JA.md)
 - タブレット利用者向け Tailscale 接続ガイド: [TAILSCALE_TABLET_GUIDE_JA.md](TAILSCALE_TABLET_GUIDE_JA.md)
@@ -104,7 +105,7 @@ docker compose ps
 
 現在の公開 URL は `https://diskstation.tail632bc4.ts.net/` です。
 
-GitHub のブラウザから `index.html` を上書きして本番へ自動反映したい場合は、[AUTO_DEPLOY_GITHUB_ACTIONS_JA.md](AUTO_DEPLOY_GITHUB_ACTIONS_JA.md) の GitHub Actions + Tailscale + Synology SSH 構成を使ってください。
+担当者が GitHub のブラウザから `index.html` を上書きして本番へ反映する手順は、[GITHUB_BROWSER_UPDATE_GUIDE_JA.md](GITHUB_BROWSER_UPDATE_GUIDE_JA.md) を参照してください。構成の技術詳細は [AUTO_DEPLOY_GITHUB_ACTIONS_JA.md](AUTO_DEPLOY_GITHUB_ACTIONS_JA.md) にあります。
 
 Synology 側の SSH 鍵設定をやり直す必要があるときは、Windows から [setup_synology_actions_ssh.cmd](setup_synology_actions_ssh.cmd) を再実行してください。
 
