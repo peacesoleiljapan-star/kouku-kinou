@@ -174,6 +174,11 @@ elif ! container_running; then
 fi
 
 if [ "$needs_rebuild" -eq 1 ]; then
+    if docker_cmd container inspect "$DEPLOY_SERVICE_NAME" >/dev/null 2>&1; then
+        echo "Stopping existing container before rebuild"
+        compose down --remove-orphans >/dev/null 2>&1 || true
+        docker_cmd rm -f "$DEPLOY_SERVICE_NAME" >/dev/null 2>&1 || true
+    fi
     echo "Running docker compose up --build -d"
     compose up --build -d
 else
