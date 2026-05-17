@@ -10,14 +10,33 @@ DEPLOY_SERVICE_NAME="${DEPLOY_SERVICE_NAME:-kouku-kinou}"
 DEPLOY_HEALTH_URL="${DEPLOY_HEALTH_URL:-http://127.0.0.1:8010/api/health}"
 DEPLOY_FORCE_REBUILD="${DEPLOY_FORCE_REBUILD:-0}"
 
+find_executable() {
+    for candidate in "$@"; do
+        if [ -n "$candidate" ] && [ -x "$candidate" ]; then
+            printf '%s\n' "$candidate"
+            return 0
+        fi
+    done
+
+    return 1
+}
+
+DOCKER_BIN="$(find_executable "$(command -v docker 2>/dev/null || true)" /usr/local/bin/docker /usr/bin/docker /var/packages/ContainerManager/target/usr/bin/docker /var/packages/Docker/target/usr/bin/docker || true)"
+DOCKER_COMPOSE_BIN="$(find_executable "$(command -v docker-compose 2>/dev/null || true)" /usr/local/bin/docker-compose /usr/bin/docker-compose /var/packages/ContainerManager/target/usr/bin/docker-compose /var/packages/Docker/target/usr/bin/docker-compose || true)"
+
 docker_cmd() {
+    if [ -z "$DOCKER_BIN" ]; then
+        echo "docker command not found" >&2
+        exit 1
+    fi
+
     if [ "$(id -u)" -eq 0 ]; then
-        docker "$@"
+        "$DOCKER_BIN" "$@"
         return
     fi
 
     if command -v sudo >/dev/null 2>&1; then
-        sudo -n docker "$@"
+        sudo -n "$DOCKER_BIN" "$@"
         return
     fi
 
@@ -26,19 +45,19 @@ docker_cmd() {
 }
 
 compose() {
-    if docker_cmd compose version >/dev/null 2>&1; then
+    if [ -n "$DOCKER_BIN" ] && docker_cmd compose version >/dev/null 2>&1; then
         docker_cmd compose "$@"
         return
     fi
 
-    if command -v docker-compose >/dev/null 2>&1; then
+    if [ -n "$DOCKER_COMPOSE_BIN" ]; then
         if [ "$(id -u)" -eq 0 ]; then
-            docker-compose "$@"
+            "$DOCKER_COMPOSE_BIN" "$@"
             return
         fi
 
         if command -v sudo >/dev/null 2>&1; then
-            sudo -n docker-compose "$@"
+            sudo -n "$DOCKER_COMPOSE_BIN" "$@"
             return
         fi
 
