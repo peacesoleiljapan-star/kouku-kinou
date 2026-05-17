@@ -35,10 +35,6 @@ def load_dotenv_file(dotenv_path: Path) -> None:
         key, value = line.split("=", 1)
         key = key.strip()
         value = value.strip()
-        if not key:
-            continue
-        os.environ.setdefault(key, value)
-
 
 load_dotenv_file(DOTENV_PATH)
 
@@ -83,10 +79,7 @@ ASSET_CONTENT_TYPES = {
     ".svg": "image/svg+xml; charset=utf-8",
     ".webp": "image/webp",
 }
-
-HELP_STATIC_ROUTES: dict[str, tuple[Path, str]] = {
-    "/readme.html": (README_HTML_PATH, "text/html; charset=utf-8"),
-    "/README.html": (README_HTML_PATH, "text/html; charset=utf-8"),
+HELP_STATIC_ROUTES = {
     "/README.md": (BASE_DIR / "README.md", "text/markdown; charset=utf-8"),
     "/DEPLOY_SYNOLOGY_JA.md": (BASE_DIR / "DEPLOY_SYNOLOGY_JA.md", "text/markdown; charset=utf-8"),
     "/OPERATIONS_MANUAL_JA.md": (BASE_DIR / "OPERATIONS_MANUAL_JA.md", "text/markdown; charset=utf-8"),
@@ -99,7 +92,6 @@ HELP_STATIC_ROUTES: dict[str, tuple[Path, str]] = {
     "/TailscaleClientLauncher.settings.json": (BASE_DIR / "TailscaleClientLauncher.settings.json", "application/json; charset=utf-8"),
     "/.env.example": (BASE_DIR / ".env.example", "text/plain; charset=utf-8"),
 }
-
 STATE_LINE = "let records = JSON.parse(localStorage.getItem('oralNutritionRecords') || '[]');"
 SAVE_DEF = "function saveRecord() {"
 SAVE_BLOCK = """records.unshift(record);\n  localStorage.setItem('oralNutritionRecords', JSON.stringify(records));\n  renderHistory();"""
@@ -121,10 +113,6 @@ RESPONSIVE_REPLACEMENT = """/* RESPONSIVE */
         .header-top h1 { width: 100%; }
         .form-grid, .form-grid-3 { grid-template-columns: 1fr; }
         .action-bar { flex-direction: column; }
-        .action-bar .btn {
-            width: 100%;
-            justify-content: center;
-        }
     }
 
     @media (max-width: 600px) {
@@ -137,8 +125,6 @@ RESPONSIVE_REPLACEMENT = """/* RESPONSIVE */
         .toast {
             width: calc(100% - 24px);
             white-space: normal;
-            border-radius: 16px;
-            padding: 12px 16px;
         }
     }
 
@@ -169,10 +155,6 @@ PATIENT_STAFF_FIELD_NEW = '''<div class="form-group full">
                 <input type="text" id="staff_custom" data-skip-persist="1" placeholder="担当者名を入力" style="display:none;margin-top:8px">
             </div>'''
 SETTINGS_TAB_HTML = '''<!-- ==================== TAB 6: 設定 ==================== -->
-<div id="tab-settings" class="tab-content">
-    <div class="card">
-        <div class="card-header">
-            <div class="icon" style="background:#fff5e8">⚙️</div>
             <div><h2>設定</h2><div class="subtitle">担当者・かかりつけ歯科の候補管理</div></div>
         </div>
         <div class="info-box">このサーバーで共有する候補一覧を編集します。追加・削除すると利用者情報タブのプルダウンへ即時反映されます。</div>
@@ -2893,8 +2875,6 @@ function ensureOralAssessmentEnhancements() {
     ensureOralEvaluationFields();
     ensureOralDyskinesiaInlineLayout();
     ensureOralReferencePanels();
-    ensureOdkTimerTools();
-    syncOdkHelperFieldsFromRates();
 }
 
 function getFieldElementValue(id) {
@@ -3146,7 +3126,7 @@ function buildPrintSheetHtml(report) {
         + '<div class="print-sheet__metrics">'
         + '<div class="print-sheet__metric-card"><div class="print-sheet__metric-title">口腔機能評価</div>' + (oralLines || '<div class="print-sheet__metric-line">未入力</div>') + '</div>'
         + '<div class="print-sheet__metric-card"><div class="print-sheet__metric-title">MNA-SF</div>' + mnaLines + '</div>'
-        + '<div class="print-sheet__metric-card print-sheet__metric-card--wide"><div class="print-sheet__metric-title">臨床語化・差分要点</div>' + (clinicalPrintLines || '<div class="print-sheet__metric-line">口腔タブ未入力のため、印刷用の臨床要点は未作成です。</div>') + '</div>'
+        + '<div class="print-sheet__metric-card print-sheet__metric-card--wide"><div class="print-sheet__metric-title">差分アシスト</div>' + (clinicalPrintLines || '<div class="print-sheet__metric-line">差分アラートはまだありません。</div>') + '</div>'
         + '</div>'
         + '<div class="print-sheet__section">'
         + '<div class="print-sheet__section-title">コメント・支援方針</div>'
@@ -4952,44 +4932,17 @@ function ensureClinicalSupportPanel() {
     panel.innerHTML = `
         <div class="stage2-panel__header">
             <div>
-                <div class="stage2-panel__title">臨床語化・差分アシスト</div>
-                <div class="stage2-panel__hint">現在の入力から所見候補と食形態の提案を整理します。</div>
+                <div class="stage2-panel__title">差分アシスト</div>
+                <div class="stage2-panel__hint">前回保存との差分から要確認点を自動で整理し、コメント欄へ反映します。</div>
             </div>
             <div id="clinicalSupportMeta" class="stage2-panel__meta"></div>
         </div>
-        <div id="clinicalSupportChips" class="metric-chip-list"></div>
-        <div id="clinicalSupportSummary" class="stage2-panel__summary">口腔タブを入力すると臨床語化を表示します。</div>
-        <div class="stage3-action-bar">
-            <button type="button" class="btn btn-outline" id="applyClinicalCommentButton">📝 コメント欄へ追記</button>
-            <button type="button" class="btn btn-outline" id="convertLegacyClinicalCommentButton">🔁 旧形式メモを変換</button>
-            <div id="clinicalCommentActionStatus" class="stage3-action-status">既存コメントは残したまま末尾へ追記します。</div>
-        </div>
-        <div class="stage3-grid">
-            <section class="stage3-box">
-                <div class="section-label">所見候補</div>
-                <div id="clinicalFindingList"></div>
-            </section>
-            <section class="stage3-box">
-                <div class="section-label">差分アラート</div>
-                <div id="clinicalAlertList"></div>
-            </section>
-            <section class="stage3-box stage3-box--wide">
-                <div class="section-label">食形態提案</div>
-                <div id="foodRecommendationLabel" class="stage3-recommendation"></div>
-                <div id="foodRecommendationList"></div>
-                <div class="stage3-note">提案は記録補助です。最終判断は主治医・歯科医師・ST等と確認してください。</div>
-            </section>
-        </div>
+        <div id="clinicalSupportSummary" class="stage2-panel__summary">利用者情報と口腔項目を入力すると差分アラートを表示します。</div>
+        <section class="stage3-box stage3-box--wide" style="margin-top:12px;">
+            <div class="section-label">差分アラート</div>
+            <div id="clinicalAlertList"></div>
+        </section>
     `;
-
-    const applyButton = panel.querySelector('#applyClinicalCommentButton');
-    if (applyButton) {
-        applyButton.addEventListener('click', applyClinicalCommentDraft);
-    }
-    const convertButton = panel.querySelector('#convertLegacyClinicalCommentButton');
-    if (convertButton) {
-        convertButton.addEventListener('click', convertLegacyClinicalCommentBlock);
-    }
 
     if (trendPanel) {
         trendPanel.insertAdjacentElement('afterend', panel);
@@ -5588,68 +5541,79 @@ function stripNutritionCommentMarkers(value) {
 }
 
 function buildClinicalCommentDraft(data) {
-    if (!data || data.recommendationLabel === '入力待ち') {
+    if (!data) {
         return '';
     }
 
-    const summaryLine = ensureSentenceText(
-        String(data.summaryText || '')
-            .split('。')
-            .map((item) => item.trim())
-            .filter((item) => item && !item.includes('診断ではなく') && !item.includes('保存記録を基準に表示'))
-            .join('。')
-    );
-    const findingText = joinCommentItems((data.findingItems || []).filter((item) => isActionableStage3Message(item)), 3);
-    const alertText = joinCommentItems((data.alertItems || []).filter((item) => isActionableStage3Message(item)), 2);
-    const recommendationText = joinCommentItems((data.recommendationItems || []).filter((item) => isActionableStage3Message(item)), 2);
-
-    const lines = [];
-    if (summaryLine) {
-        lines.push(summaryLine);
-    }
-    if (findingText) {
-        lines.push(`所見候補: ${findingText}`);
-    }
-    if (alertText) {
-        lines.push(`変化: ${alertText}`);
-    }
-    if (recommendationText) {
-        lines.push(`支援方針（${data.recommendationLabel}）: ${recommendationText}`);
+    const alertItems = dedupeTextItems(data.alertItems || []);
+    if (!alertItems.length) {
+        return '';
     }
 
-    return buildClinicalCommentBlock(lines);
+    return buildClinicalCommentBlock([
+        `差分アラート: ${joinCommentItems(alertItems, 3)}`,
+    ]);
 }
 
 function buildClinicalPrintLines(data) {
-    if (!data || data.recommendationLabel === '入力待ち') {
-        return ['所見: 口腔タブ未入力のため、臨床語化・差分要点は未作成です。'];
+    if (!data) {
+        return ['差分アラート: 比較に必要な入力が不足しています。'];
     }
 
-    const findingText = joinCommentItems((data.findingItems || []).filter((item) => isActionableStage3Message(item)), 2);
-    const actionableAlerts = (data.alertItems || []).filter((item) => isActionableStage3Message(item));
-    const safeAlert = (data.alertItems || []).find((item) => {
-        return item.includes('前回保存に口腔詳細がない')
-            || item.includes('保存済み履歴がない')
-            || item.includes('氏名と生年月日を入力すると');
-    });
-    let alertText = '';
-    if (actionableAlerts.length) {
-        alertText = joinCommentItems(actionableAlerts, safeAlert ? 1 : 2);
-        if (safeAlert) {
-            alertText = `${alertText} ${ensureSentenceText(stripTerminalPunctuation(safeAlert))}`.trim();
+    const alertItems = dedupeTextItems(data.alertItems || []);
+    if (!alertItems.length) {
+        return ['差分アラート: 前回比較の準備が整うとここに表示します。'];
+    }
+
+    return [`差分アラート: ${joinCommentItems(alertItems, 3)}`];
+}
+
+function buildClinicalAlertSummary(alertItems) {
+    const items = dedupeTextItems(alertItems || []);
+    if (!items.length) {
+        return '前回比較の準備が整うと差分アラートを表示します。';
+    }
+    if (items.length === 1) {
+        return ensureSentenceText(stripTerminalPunctuation(items[0]));
+    }
+    return `前回保存との差分から ${items.length} 件の要確認を抽出しました。`;
+}
+
+function syncClinicalCommentDraft(data) {
+    const commentField = document.getElementById('summary_comment');
+    if (!commentField) {
+        return;
+    }
+
+    const draft = normalizeCommentBlock(buildClinicalCommentDraft(data));
+    const currentValue = String(commentField.value || '').trim();
+    const sections = splitClinicalCommentSections(currentValue);
+    const paragraphGap = String.fromCharCode(10) + String.fromCharCode(10);
+    let before = sections.before;
+    let after = sections.after;
+
+    if (sections.hasBlock && sections.isLegacyBlock) {
+        const legacy = parseLegacyClinicalCommentBlock(sections.block);
+        after = [legacy.trailingText, sections.after].filter(Boolean).join(paragraphGap);
+    }
+
+    let nextValue = currentValue;
+    if (!draft) {
+        if (!sections.hasBlock) {
+            return;
         }
-    } else if (safeAlert) {
-        alertText = ensureSentenceText(stripTerminalPunctuation(safeAlert));
+        nextValue = [before, after].filter(Boolean).join(paragraphGap);
+    } else {
+        nextValue = [before, draft, after].filter(Boolean).join(paragraphGap);
     }
 
-    const recommendationText = joinCommentItems((data.recommendationItems || []).filter((item) => isActionableStage3Message(item)), 1);
-    const lines = [];
-    lines.push(findingText ? `所見: ${findingText}` : '所見: 顕著な口腔所見候補は少なく、経過観察中心です。');
-    if (alertText) {
-        lines.push(`変化: ${alertText}`);
+    if (nextValue === currentValue) {
+        return;
     }
-    lines.push(recommendationText ? `食形態: ${data.recommendationLabel}。${recommendationText}` : `食形態: ${data.recommendationLabel}。`);
-    return lines.slice(0, 3);
+
+    commentField.value = nextValue;
+    commentField.dispatchEvent(new Event('input', { bubbles: true }));
+    commentField.dispatchEvent(new Event('change', { bubbles: true }));
 }
 
 function updateClinicalCommentActionState(data) {
@@ -5812,11 +5776,7 @@ function buildClinicalSupportData() {
 
         return {
             chips,
-            summaryText: nutritionGuidance.issueItems.length
-                ? `${nutritionGuidance.issueItems.join(' ')}${nutritionGuidance.note ? ` ${nutritionGuidance.note}` : ''}`
-                : patientState.name
-                    ? '口腔タブの問診・RSST・うがい・オーラルディアドコキネシスを入力すると臨床語化を表示します。'
-                    : '利用者情報と口腔項目を入力すると臨床語化を表示します。',
+            summaryText: buildClinicalAlertSummary(alertItems.length ? alertItems : ['口腔項目を入力すると差分判定を表示します。']),
             findingItems: nutritionGuidance.issueItems.length ? nutritionGuidance.issueItems : ['口腔タブの入力後に所見候補を生成します。'],
             alertItems: alertItems.length ? alertItems : ['口腔項目を入力すると差分判定を表示します。'],
             recommendationTone: mnaState.needsPocketNutrition ? 'alert' : 'info',
@@ -6100,7 +6060,7 @@ function buildClinicalSupportData() {
 
     const data = {
         chips,
-        summaryText: summaryParts.join(' '),
+        summaryText: buildClinicalAlertSummary(alertItems),
         findingItems,
         alertItems,
         recommendationTone,
@@ -6113,27 +6073,19 @@ function buildClinicalSupportData() {
 }
 
 function renderClinicalSupportPanel() {
-    const chips = document.getElementById('clinicalSupportChips');
     const summary = document.getElementById('clinicalSupportSummary');
-    const findings = document.getElementById('clinicalFindingList');
     const alerts = document.getElementById('clinicalAlertList');
-    const recommendationLabel = document.getElementById('foodRecommendationLabel');
-    const recommendationList = document.getElementById('foodRecommendationList');
     const meta = document.getElementById('clinicalSupportMeta');
-    if (!chips || !summary || !findings || !alerts || !recommendationLabel || !recommendationList || !meta) {
+    if (!summary || !alerts || !meta) {
         return;
     }
 
     const data = buildClinicalSupportData();
     latestClinicalSupportData = data;
-    chips.innerHTML = data.chips.join('');
     summary.textContent = data.summaryText;
-    findings.innerHTML = buildStage3ListHtml(data.findingItems, '入力後に所見候補を表示します。');
     alerts.innerHTML = buildStage3ListHtml(data.alertItems, '前回比較の準備が整うと差分を表示します。');
-    recommendationLabel.innerHTML = buildMetricChipHtml('提案レベル', data.recommendationLabel, data.recommendationTone);
-    recommendationList.innerHTML = buildStage3ListHtml(data.recommendationItems, '入力後に食形態提案を表示します。');
     meta.textContent = data.metaText;
-    updateClinicalCommentActionState(data);
+    syncClinicalCommentDraft(data);
 }
 
 function parseDisplayedScore(value) {
@@ -6619,7 +6571,6 @@ async function initializeApp() {
     ensurePrintControls();
     ensureDraftControls();
     ensureDataTransferControls();
-    ensureRsstTimerTools();
     ensureStage2Panels();
     ensureStage3Panels();
     attachDraftAutosave();
@@ -6635,7 +6586,6 @@ async function initializeApp() {
     }
     renderHistory();
     syncCustomDateSelectors();
-    syncOdkHelperFieldsFromRates();
     updateDraftStatusDisplays();
     updateStage2Panels();
 }
