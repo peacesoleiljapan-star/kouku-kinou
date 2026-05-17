@@ -49,6 +49,9 @@ jobs:
       TS_USER: ${{ vars.TS_NAS_SSH_USER }}
       TS_PORT: ${{ vars.TS_NAS_SSH_PORT }}
       TS_REPO_DIR: ${{ vars.TS_REPO_DIR }}
+      TS_OAUTH_CLIENT_ID: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+      TS_AUDIENCE: ${{ secrets.TS_AUDIENCE }}
+      TAILSCALE_AUTHKEY: ${{ secrets.TAILSCALE_AUTHKEY }}
       FORCE_REBUILD: ${{ inputs.force_rebuild && '1' || '0' }}
     steps:
       - name: Validate workflow variables
@@ -61,20 +64,20 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Connect Tailscale with workload identity
-        if: ${{ secrets.TS_OAUTH_CLIENT_ID != '' && secrets.TS_AUDIENCE != '' }}
+        if: ${{ env.TS_OAUTH_CLIENT_ID != '' && env.TS_AUDIENCE != '' }}
         uses: tailscale/github-action@v4
         with:
-          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
-          audience: ${{ secrets.TS_AUDIENCE }}
+          oauth-client-id: ${{ env.TS_OAUTH_CLIENT_ID }}
+          audience: ${{ env.TS_AUDIENCE }}
           tags: ${{ env.TS_TAGS }}
           version: latest
           ping: ${{ env.TS_HOST }}
 
       - name: Connect Tailscale with auth key fallback
-        if: ${{ !(secrets.TS_OAUTH_CLIENT_ID != '' && secrets.TS_AUDIENCE != '') }}
+        if: ${{ !(env.TS_OAUTH_CLIENT_ID != '' && env.TS_AUDIENCE != '') }}
         uses: tailscale/github-action@v4
         with:
-          authkey: ${{ secrets.TAILSCALE_AUTHKEY }}
+          authkey: ${{ env.TAILSCALE_AUTHKEY }}
           version: latest
           ping: ${{ env.TS_HOST }}
 
