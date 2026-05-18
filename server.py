@@ -155,6 +155,8 @@ PATIENT_STAFF_FIELD_NEW = '''<div class="form-group full">
                 <input type="text" id="staff_custom" data-skip-persist="1" placeholder="担当者名を入力" style="display:none;margin-top:8px">
             </div>'''
 SETTINGS_TAB_HTML = '''<!-- ==================== TAB 6: 設定 ==================== -->
+<div class="tab-content" id="tab-settings">
+    <div class="card">
             <div><h2>設定</h2><div class="subtitle">担当者・かかりつけ歯科の候補管理</div></div>
         </div>
         <div class="info-box">このサーバーで共有する候補一覧を編集します。追加・削除すると利用者情報タブのプルダウンへ即時反映されます。</div>
