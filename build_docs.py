@@ -29,6 +29,7 @@ DOCS = (
     DocSpec("README.md", "README.pdf", "口腔機能・栄養評価", "Overview", "配布・運用の全体像", "README.html"),
     DocSpec("DEPLOY_SYNOLOGY_JA.md", "DEPLOY_SYNOLOGY_JA.pdf", "Synology + Tailscale 配置手順", "Admin", "管理者向け配置手順", "DEPLOY_SYNOLOGY_JA.html"),
     DocSpec("OPERATIONS_MANUAL_JA.md", "OPERATIONS_MANUAL_JA.pdf", "初心者向け操作マニュアル", "Manual", "現場利用者向けの操作手順", "OPERATIONS_MANUAL_PDF_JA.html"),
+    DocSpec("ST_CLAUDE_UPDATE_GUIDE_JA.md", "ST_CLAUDE_UPDATE_GUIDE_JA.pdf", "言語聴覚士向け Claude 画面修正手順", "ST", "言語聴覚士が Claude で index.html を作って管理者へ渡すまでの手順", "ST_CLAUDE_UPDATE_GUIDE_JA.html"),
     DocSpec("TAILSCALE_CLIENT_GUIDE_JA.md", "TAILSCALE_CLIENT_GUIDE_JA.pdf", "Windows 利用者向け Tailscale 接続ガイド", "Windows", "Windows 利用者向け配布資料", "TAILSCALE_CLIENT_GUIDE_JA.html"),
     DocSpec("TAILSCALE_TABLET_GUIDE_JA.md", "TAILSCALE_TABLET_GUIDE_JA.pdf", "タブレット利用者向け Tailscale 接続ガイド", "Tablet", "iPad / Android 利用者向け配布資料", "TAILSCALE_TABLET_GUIDE_JA.html"),
     DocSpec("TAILSCALE_TABLET_MESSAGE_TEMPLATE_JA.md", "TAILSCALE_TABLET_MESSAGE_TEMPLATE_JA.pdf", "タブレット利用者向け案内文テンプレート", "Template", "管理者向け配布文テンプレート", "TAILSCALE_TABLET_MESSAGE_TEMPLATE_JA.html"),

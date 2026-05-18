@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>言語聴覚士向け Claude 画面修正手順</title>
+    <style>
+        :root {
+            --ink: #1f2937;
+            --muted: #5b6472;
+            --line: #d6dbe4;
+            --accent: #0f766e;
+            --accent-soft: #ecfdf5;
+            --paper: #ffffff;
+            --page: #eef3f9;
+            --shadow: rgba(15, 23, 42, 0.08);
+            --code: #0f172a;
+            --code-bg: #f8fafc;
+        }
+        * { box-sizing: border-box; }
+        html { background: var(--page); }
+        body { margin: 0; background: var(--page); color: var(--ink); font-family: "BIZ UDPGothic", "Yu Gothic UI", Meiryo, sans-serif; line-height: 1.78; }
+        .toolbar { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 24px; border-bottom: 1px solid var(--line); background: rgba(255,255,255,0.94); backdrop-filter: blur(8px); }
+        .toolbar__title { font-size: 15px; font-weight: 700; letter-spacing: .02em; }
+        .toolbar__meta { color: var(--muted); font-size: 12px; }
+        .toolbar__actions { display: flex; gap: 10px; }
+        .button { appearance: none; border: 1px solid var(--accent); background: var(--accent); color: #fff; border-radius: 999px; padding: 10px 16px; font-size: 13px; font-weight: 700; cursor: pointer; }
+        .button--ghost { background: transparent; color: var(--accent); }
+        .page { width: min(100%, 980px); margin: 28px auto 56px; padding: 0 16px; }
+        .sheet { background: var(--paper); border-radius: 20px; box-shadow: 0 12px 32px var(--shadow); padding: 34px 42px 44px; }
+        .cover { margin-bottom: 28px; padding-bottom: 20px; border-bottom: 2px solid var(--line); }
+        .cover__badge { display: inline-block; margin-bottom: 12px; padding: 6px 12px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-size: 12px; font-weight: 700; letter-spacing: .02em; }
+        .cover h1 { margin: 0 0 10px; font-size: 32px; line-height: 1.3; color: #0f172a; }
+        .cover__subtitle { margin: 0 0 8px; color: var(--muted); font-size: 15px; }
+        .cover__meta { margin: 0; color: var(--muted); font-size: 12px; }
+        .print-tip { margin: 0 0 24px; padding: 12px 14px; border: 1px solid #b7d7d1; border-radius: 14px; background: #f0fdfa; color: #115e59; font-size: 13px; }
+        h2, h3, figure, pre { break-inside: avoid; page-break-inside: avoid; }
+        h2 { margin: 28px 0 14px; padding: 12px 16px; border-left: 6px solid var(--accent); background: var(--accent-soft); color: #0f172a; font-size: 24px; line-height: 1.45; break-after: avoid-page; page-break-after: avoid; }
+        h3 { margin: 26px 0 10px; color: #0f172a; font-size: 20px; line-height: 1.45; break-after: avoid-page; page-break-after: avoid; }
+        p { margin: 0 0 12px; font-size: 15px; }
+        ol, ul { margin: 0 0 16px 1.5em; padding: 0; }
+        li { margin-bottom: 6px; padding-left: 4px; }
+        p, li { orphans: 2; widows: 2; }
+        code { padding: 0.08em 0.35em; border-radius: 6px; background: #eef2ff; color: #1d4ed8; font-family: Consolas, "Cascadia Code", monospace; font-size: 0.95em; }
+        pre { margin: 0 0 18px; padding: 16px 18px; overflow: auto; border: 1px solid var(--line); border-radius: 14px; background: var(--code-bg); }
+        pre code { padding: 0; background: transparent; color: var(--code); font-size: 13px; white-space: pre-wrap; }
+        a { color: #0b57d0; text-decoration: none; }
+        strong { color: #0f172a; }
+        figure { margin: 18px 0 14px; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; background: #fff; }
+        figure img { display: block; width: 100%; height: auto; background: #f8fafc; }
+        .figure--screenshot { max-width: 820px; margin-left: auto; margin-right: auto; }
+        .figure--screenshot img { max-height: 72vh; object-fit: contain; }
+        .figure--qr { max-width: 420px; margin-left: auto; margin-right: auto; }
+        .figure--qr img { padding: 18px; object-fit: contain; }
+        figcaption { padding: 10px 14px; border-top: 1px solid var(--line); background: #f8fafc; color: var(--muted); font-size: 13px; }
+        .footer-note { margin-top: 28px; padding-top: 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; }
+        @page { size: A4; margin: 10mm 11mm 12mm; }
+        @media print {
+            html, body { background: #fff; }
+            .toolbar { display: none; }
+            .page { width: auto; margin: 0; padding: 0; }
+            .sheet { box-shadow: none; border-radius: 0; padding: 0; }
+            figure { margin: 10px 0 12px; }
+            .figure--screenshot { max-width: 168mm; }
+            .figure--screenshot img { max-height: 170mm; }
+            .figure--qr { max-width: 74mm; }
+            .figure--qr img { max-height: 74mm; padding: 10px; }
+            a { color: inherit; text-decoration: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="toolbar">
+        <div>
+            <div class="toolbar__title">資料ビュー</div>
+            <div class="toolbar__meta">言語聴覚士向け Claude 画面修正手順 / Generated from ST_CLAUDE_UPDATE_GUIDE_JA.md / 2026-05-19 00:50</div>
+        </div>
+        <div class="toolbar__actions">
+            <button class="button button--ghost" type="button" onclick="window.print()">印刷</button>
+            <button class="button" type="button" onclick="window.scrollTo({ top: 0, behavior: 'smooth' })">先頭へ</button>
+        </div>
+    </div>
+    <div class="page">
+        <article class="sheet">
+            <header class="cover">
+                <div class="cover__badge">ST</div>
+                <h1>言語聴覚士向け Claude 画面修正手順</h1>
+                <p class="cover__subtitle">言語聴覚士が Claude で index.html を作って管理者へ渡すまでの手順</p>
+                <p class="cover__meta">Generated from ST_CLAUDE_UPDATE_GUIDE_JA.md / 2026-05-19 00:50</p>
+            </header>
+            <div class="print-tip">PDF 化するときは A4 でそのまま印刷できます。見出し、図、コードブロックが崩れにくく、改ページの空きが大きくなりすぎないように調整しています。</div>
+            <p>この資料は、言語聴覚士が Claude を使って新しい <code>index.html</code> を作り、管理者へ渡すまでの手順です。</p>
+<p>この手順では、GitHub、PowerShell、<code>server.py</code> の編集はしません。そこは管理者が担当します。</p>
+<h2>最初に覚えること</h2>
+<ol><li>触るのは <code>index.html</code> だけです。</li><li><code>server.py</code>、<code>compose.yaml</code>、<code>Dockerfile</code> などは触りません。</li><li>Claude には、部分的な修正ではなく、完成した <code>index.html</code> 全体を出してもらいます。</li><li>本番へ反映するかどうかの確認は、必ず管理者が行います。</li></ol>
+<h2>この手順でやること</h2>
+<ol><li>今の <code>index.html</code> を Claude に渡す</li><li>直したい内容を文章で伝える</li><li>Claude から新しい <code>index.html</code> 全体を受け取る</li><li>ファイルとして保存する</li><li>変更内容のメモと一緒に管理者へ渡す</li></ol>
+<h2>事前に準備するもの</h2>
+<ol><li>現在使っている <code>index.html</code></li><li>直したい内容のメモ</li><li>Claude を開ける PC</li></ol>
+<p>直したい内容のメモは、次のように短く箇条書きで十分です。</p>
+<ul><li>利用者情報タブで年齢をもっと見やすくしたい</li><li>総合評価のコメント欄を広くしたい</li><li>印刷時の見出しを分かりやすくしたい</li></ul>
+<h2>Claude への依頼手順</h2>
+<ol><li>Claude を開きます。</li><li>今使っている <code>index.html</code> を添付します。</li><li>下の依頼文をそのまま貼ります。</li><li>「直したい内容」の部分だけ、自分の修正内容に置き換えます。</li></ol>
+<pre><code class="language-text">添付した index.html を元に、次の修正を入れた完成版の index.html を全文で返してください。
+
+条件:
+- 返答は index.html 全体だけにしてください
+- 省略せず、途中を ... にしないでください
+- 既存機能は消さないでください
+- tab-patient、tab-oral、tab-mna、tab-summary、tab-history は残してください
+- showTab(id)、selectMNA()、saveRecord()、deleteRecord(id)、initializeApp() は残してください
+- const API_ROOT = &#x27;/api/records&#x27;; と const SETTINGS_API_ROOT = &#x27;/api/settings&#x27;; は残してください
+- index.html 以外のファイル案は不要です
+
+直したい内容:
+- ここに修正したい内容を書く</code></pre>
+<h2>Claude の返答を確認するときのポイント</h2>
+<p>次の 4 つだけ見れば大丈夫です。</p>
+<ol><li><code>index.html</code> 全体が返ってきている</li><li>途中が省略されていない</li><li>自分が頼んだ修正が入っている</li><li><code>server.py</code> など別ファイルの変更提案になっていない</li></ol>
+<p>次のような返答は、そのまま使わないでください。</p>
+<ul><li>差分だけ</li><li>一部分だけ</li><li>「続きは省略します」と書かれているもの</li><li><code>index.html</code> 以外のファイルを直す前提のもの</li></ul>
+<p>その場合は Claude に、次の一文を追加で送ってください。</p>
+<pre><code class="language-text">省略せず、index.html 全体を最初から最後までそのまま出してください。</code></pre>
+<h2>ファイルの保存方法</h2>
+<ol><li>Claude の返答を全文コピーします。</li><li>メモ帳、VS Code、または使いやすいテキストエディタを開きます。</li><li>新しいファイルに全文を貼ります。</li><li>文字コードは通常の UTF-8 のままで保存します。</li><li>ファイル名は、たとえば次のようにして保存します。</li></ol>
+<pre><code class="language-text">index_2026-05-19.html</code></pre>
+<p>重要:</p>
+<ul><li>いきなり元の <code>index.html</code> を上書きしなくて大丈夫です。</li><li>まずは別名で保存して、管理者へ渡してください。</li></ul>
+<h2>管理者へ渡すときに一緒に伝えること</h2>
+<p>管理者には、ファイルだけでなく、次の 2 つも一緒に渡してください。</p>
+<ol><li>何を直したかったか</li><li>Claude が直した内容の要約</li></ol>
+<p>例:</p>
+<ul><li>利用者情報の見やすさを改善</li><li>総合評価のコメント欄を広げた</li><li>印刷時のタイトルを調整した</li></ul>
+<h2>やってはいけないこと</h2>
+<ol><li><code>index.html</code> の一部分だけを管理者へ渡す</li><li>自分で GitHub の本番ファイルを直接上書きする</li><li><code>server.py</code> を自分で直そうとする</li><li>Claude の説明文だけを渡して、HTML ファイル本体を渡さない</li></ol>
+<h2>うまくいかないとき</h2>
+<h3>Claude が一部分しか返さない</h3>
+<p>次の一文を追加で送ってください。</p>
+<pre><code class="language-text">差分ではなく、完成した index.html 全体を省略なしで返してください。</code></pre>
+<h3>Claude が別ファイルの修正を提案する</h3>
+<p>次の一文を追加で送ってください。</p>
+<pre><code class="language-text">今回は index.html だけを修正対象にしてください。ほかのファイル案は不要です。</code></pre>
+<h3>自分で正しいか判断できない</h3>
+<p>無理に直さず、そのまま管理者へ渡してください。最終確認は管理者が行います。</p>
+<h2>このあと管理者がやること</h2>
+<p>この資料のここまでできたら、あなたの作業は終わりです。</p>
+<p>このあと管理者が次を行います。</p>
+<ol><li>PowerShell で検証する</li><li>問題なければリポジトリの <code>index.html</code> と差し替える</li><li>GitHub へ反映する</li><li>本番画面で確認する</li></ol>
+<p>ここだけ覚えれば大丈夫: あなたは Claude で完成した <code>index.html</code> を作り、別名で保存して、修正内容のメモと一緒に管理者へ渡せば完了です。</p>
+            <div class="footer-note">Source: ST_CLAUDE_UPDATE_GUIDE_JA.md / Generated by build_docs.py</div>
+        </article>
+    </div>
+</body>
+</html>

@@ -8,6 +8,7 @@
 
 - Synology + Tailscale 配置手順: [DEPLOY_SYNOLOGY_JA.md](DEPLOY_SYNOLOGY_JA.md)
 - 非エンジニア向け index.html 更新手順: [GITHUB_BROWSER_UPDATE_GUIDE_JA.md](GITHUB_BROWSER_UPDATE_GUIDE_JA.md)
+- 言語聴覚士向け Claude 画面修正手順: [ST_CLAUDE_UPDATE_GUIDE_JA.md](ST_CLAUDE_UPDATE_GUIDE_JA.md)
 - GitHub Actions 自動反映手順: [AUTO_DEPLOY_GITHUB_ACTIONS_JA.md](AUTO_DEPLOY_GITHUB_ACTIONS_JA.md)
 - Windows 利用者向け Tailscale 接続ガイド: [TAILSCALE_CLIENT_GUIDE_JA.md](TAILSCALE_CLIENT_GUIDE_JA.md)
 - タブレット利用者向け Tailscale 接続ガイド: [TAILSCALE_TABLET_GUIDE_JA.md](TAILSCALE_TABLET_GUIDE_JA.md)
@@ -80,6 +81,44 @@ python seed_sample_records.py
 ```
 
 既存データを消して入れ直す場合は `python seed_sample_records.py --replace` を使います。
+
+## Claude 生成 index.html を受け取ったときに管理者がやること
+
+今後は、言語聴覚士が Claude で新しい `index.html` を作り、管理者が検証して本番へ入れる運用を前提にします。
+
+管理者は次の順番だけ守ってください。
+
+1. 受け取った HTML は、いきなりリポジトリ直下の `index.html` に上書きしない
+2. まず別名のファイルとして保存する
+3. PowerShell で検証コマンドを実行する
+4. `OK (managed)` または `OK (legacy-source)` が出たときだけ、本番用の `index.html` と差し替える
+5. GitHub へ反映し、Actions と本番画面を確認する
+
+PowerShell 例:
+
+```powershell
+& "C:\Users\user\AppData\Local\Microsoft\WindowsApps\python.exe" .\server.py --validate-client-html "C:\path\to\index_new.html"
+```
+
+判定ルール:
+
+- `Client HTML validation: OK (managed)`: Claude 生成済みの完成版 HTML として受け入れてよい
+- `Client HTML validation: OK (legacy-source)`: 旧来の変換前 HTML として受け入れてよい
+- `Client HTML validation failed: ...`: その HTML は置き換えない。作成者へ差し戻す
+
+受け入れてはいけないもの:
+
+- `index.html` の一部分だけ
+- 途中が省略された HTML
+- `server.py` も直す前提の提案
+- 検証コマンドで失敗した HTML
+
+本番反映までの最後の流れ:
+
+1. 検証に通ったファイルでリポジトリ直下の `index.html` を置き換える
+2. `main` に commit するか Pull Request を `main` へ merge する
+3. GitHub Actions の `Deploy to Synology` 成功を確認する
+4. 本番 URL を開き、ログイン、保存、記録一覧の表示を確認する
 
 ## Docker / Synology
 

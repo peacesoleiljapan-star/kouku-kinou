@@ -74,7 +74,7 @@
     <div class="toolbar">
         <div>
             <div class="toolbar__title">資料ビュー</div>
-            <div class="toolbar__meta">口腔機能・栄養評価 / Generated from README.md / 2026-05-04 22:12</div>
+            <div class="toolbar__meta">口腔機能・栄養評価 / Generated from README.md / 2026-05-19 00:49</div>
         </div>
         <div class="toolbar__actions">
             <button class="button button--ghost" type="button" onclick="window.print()">印刷</button>
@@ -87,41 +87,13 @@
                 <div class="cover__badge">Overview</div>
                 <h1>口腔機能・栄養評価</h1>
                 <p class="cover__subtitle">配布・運用の全体像</p>
-                <p class="cover__meta">Generated from README.md / 2026-05-04 22:12</p>
+                <p class="cover__meta">Generated from README.md / 2026-05-19 00:49</p>
             </header>
             <div class="print-tip">PDF 化するときは A4 でそのまま印刷できます。見出し、図、コードブロックが崩れにくく、改ページの空きが大きくなりすぎないように調整しています。</div>
             <p>口腔機能・栄養評価システムを Synology NAS / Docker で自己ホストし、Tailscale Serve で HTTPS 終端するための構成です。</p>
 <p>このフォルダの <code>index.html</code> は Claude artifact の wrapper ですが、<code>server.py</code> がその中に埋め込まれた本体 HTML を抽出し、保存処理だけを SQLite API に差し替えて配信します。これにより、既存レイアウトをほぼそのまま維持しつつ、複数端末で記録を共有できます。</p>
 <h2>関連資料</h2>
-<ul><li>Synology + Tailscale 配置手順: <a href="DEPLOY_SYNOLOGY_JA.html">DEPLOY_SYNOLOGY_JA.html</a> / <a href="DEPLOY_SYNOLOGY_JA.pdf">DEPLOY_SYNOLOGY_JA.pdf</a></li><li>Windows 利用者向け Tailscale 接続ガイド: <a href="TAILSCALE_CLIENT_GUIDE_JA.html">TAILSCALE_CLIENT_GUIDE_JA.html</a> / <a href="TAILSCALE_CLIENT_GUIDE_JA.pdf">TAILSCALE_CLIENT_GUIDE_JA.pdf</a></li><li>タブレット利用者向け Tailscale 接続ガイド: <a href="TAILSCALE_TABLET_GUIDE_JA.html">TAILSCALE_TABLET_GUIDE_JA.html</a> / <a href="TAILSCALE_TABLET_GUIDE_JA.pdf">TAILSCALE_TABLET_GUIDE_JA.pdf</a></li><li>タブレット利用者向け案内文テンプレート: <a href="TAILSCALE_TABLET_MESSAGE_TEMPLATE_JA.html">TAILSCALE_TABLET_MESSAGE_TEMPLATE_JA.html</a> / <a href="TAILSCALE_TABLET_MESSAGE_TEMPLATE_JA.pdf">TAILSCALE_TABLET_MESSAGE_TEMPLATE_JA.pdf</a></li><li>タブレット利用者向け QR 案内シート: <a href="TAILSCALE_TABLET_QR_SHEET_JA.html">TAILSCALE_TABLET_QR_SHEET_JA.html</a> / <a href="TAILSCALE_TABLET_QR_SHEET_JA.pdf">TAILSCALE_TABLET_QR_SHEET_JA.pdf</a></li><li>初心者向け運用マニュアル: <a href="OPERATIONS_MANUAL_PDF_JA.html">OPERATIONS_MANUAL_PDF_JA.html</a> / <a href="OPERATIONS_MANUAL_JA.pdf">OPERATIONS_MANUAL_JA.pdf</a></li><li>Windows 用かんたん起動: <a href="TailscaleClientLauncher.cmd">TailscaleClientLauncher.cmd</a></li><li>起動ツール設定: <a href="TailscaleClientLauncher.settings.json">TailscaleClientLauncher.settings.json</a></li><li>実運用設定のひな形: <a href=".env.example">.env.example</a></li><li>現在の実運用設定: Git 管理対象外の .env を各環境で配置して使います。</li></ul>
-<p>アプリ画面右上の <code>?</code> ヘルプから開く <a href="README.html">README.html</a> では、配布向けの HTML / PDF 資料も直接開けます。</p>
-<h2>配布パッケージの作り方</h2>
-<p>配布用の PDF 再生成と package フォルダ作成は、<code>build_package.cmd</code> または <code>build_package.ps1</code> でまとめて実行できます。</p>
-<ol><li><code>build_package.cmd</code> をダブルクリックする</li><li>または PowerShell で <code>./build_package.ps1</code> を実行する</li><li>完了後に <code>package/</code> 配下へ管理者向け、Windows 利用者向け、タブレット配布向けのフォルダと ZIP が作成される</li></ol>
-<p>この処理では Markdown から <code>README.html</code> と各 HTML / PDF を作り直すため、README や配布資料を更新した後は再実行してください。</p>
-<h2>共有開発の運用ルール</h2>
-<p>今後の役割は次で固定します。</p>
-<ol><li>開発フォルダ: <code>\\192.168.11.200\全社共有\IT\アプリ開発\神谷\kouku-kinou</code></li><li>運用フォルダ: <code>\\192.168.11.200\docker\kouku-kinou</code></li><li>GitHub: <code>https://github.com/peacesoleiljapan-star/kouku-kinou.git</code></li></ol>
-<p>考え方:</p>
-<ol><li>コード、文書、配布資料の更新は開発フォルダだけで行います。</li><li>運用フォルダは Container Manager に読ませる配備先です。原則として <code>.env</code> と <code>data/</code> 以外を直接編集しません。</li><li>GitHub は履歴管理と復旧元です。開発フォルダで変更したものを commit / push して残します。</li></ol>
-<p>各 PC の Python 環境:</p>
-<ol><li><code>.venv</code> を共有フォルダの中に置かないでください。</li><li>各 PC ごとにローカルの Python / venv を使います。</li><li><code>build_package.ps1</code> は環境変数 <code>KOUKU_KINOU_PYTHON</code> があれば、その <code>python.exe</code> を優先して使います。</li><li>この PC では <code>KOUKU_KINOU_PYTHON=C:\Users\user\Documents\vscrepo\.venv\Scripts\python.exe</code> を設定済みです。</li><li>別の PC では、共有開発フォルダ直下の <code>setup_shared_dev_pc.cmd</code> を 1 回実行すれば、<code>git safe.directory</code> と <code>KOUKU_KINOU_PYTHON</code> の設定を入れられます。必要なら <code>setup_shared_dev_pc.ps1 -PythonPath C:\path\to\python.exe</code> を使います。</li></ol>
-<h2>GitHub への反映</h2>
-<p>このフォルダはすでに GitHub の <code>peacesoleiljapan-star/kouku-kinou</code> と接続済みです。今後は次の 2 通りで反映できます。</p>
-<ol><li>すぐ反映したいときは <code>sync_to_github_now.cmd</code> をダブルクリックする</li><li>自動反映したいときは <code>setup_github_auto_sync.cmd</code> を 1 回だけ実行する</li></ol>
-<p><code>setup_github_auto_sync.cmd</code> を実行すると、Windows のスタートアップへ自動起動を登録し、次を有効にします。</p>
-<ol><li>Windows のスタートアップへ自動起動ランチャーを登録する</li><li>ログオン中はこのフォルダの保存済み変更を監視し、しばらく更新が止まったら自動で commit / push する</li><li>変更がなくても定期的に同期処理を実行する</li></ol>
-<p>初期設定では 60 秒ほど更新が止まると自動反映し、15 分ごとにも定期同期します。未保存の編集内容は GitHub へ送られないため、保存後に反映されます。</p>
-<p>最小の作業手順:</p>
-<ol><li>開発フォルダで <code>git pull</code></li><li>ファイルを編集する</li><li><code>build_package.ps1</code> で package を作る</li><li>必要な配布物を運用フォルダへ反映する</li><li>動作確認後に <code>git add -A</code> → <code>git commit -m &quot;変更内容&quot;</code> → <code>git push</code></li></ol>
-<p>GitHub の最低限のコマンド:</p>
-<pre><code class="language-powershell">git pull
-git status
-git add -A
-git commit -m &quot;変更内容&quot;
-git push</code></pre>
-<h2>配布前チェック</h2>
-<ol><li>配布先に <code>.env</code> がなければ、<code>.env.example</code> をコピーして <code>.env</code> を作成します。</li><li><code>KOUKU_KINOU_PASSWORD</code> を本番用の強い値へ変更します。</li><li><code>TailscaleClientLauncher.settings.json</code> の <code>organizationName</code>、<code>appUrl</code>、<code>supportText</code>、<code>supportContact</code> を配布先に合わせて更新します。</li><li>Windows 利用者へは launcher 3 ファイルと <code>TAILSCALE_CLIENT_GUIDE_JA.pdf</code>、タブレット利用者へは URL と <code>TAILSCALE_TABLET_GUIDE_JA.pdf</code> / <code>TAILSCALE_TABLET_QR_SHEET_JA.pdf</code> を渡します。</li><li>配布前に <code>/api/health</code>、保存、検索、設定画面、アプリ内ヘルプの HTML / PDF / 画像表示を確認します。</li></ol>
+<ul><li>Synology + Tailscale 配置手順: <a href="DEPLOY_SYNOLOGY_JA.md">DEPLOY_SYNOLOGY_JA.md</a></li><li>非エンジニア向け index.html 更新手順: <a href="GITHUB_BROWSER_UPDATE_GUIDE_JA.md">GITHUB_BROWSER_UPDATE_GUIDE_JA.md</a></li><li>言語聴覚士向け Claude 画面修正手順: <a href="ST_CLAUDE_UPDATE_GUIDE_JA.md">ST_CLAUDE_UPDATE_GUIDE_JA.md</a></li><li>GitHub Actions 自動反映手順: <a href="AUTO_DEPLOY_GITHUB_ACTIONS_JA.md">AUTO_DEPLOY_GITHUB_ACTIONS_JA.md</a></li><li>Windows 利用者向け Tailscale 接続ガイド: <a href="TAILSCALE_CLIENT_GUIDE_JA.md">TAILSCALE_CLIENT_GUIDE_JA.md</a></li><li>タブレット利用者向け Tailscale 接続ガイド: <a href="TAILSCALE_TABLET_GUIDE_JA.md">TAILSCALE_TABLET_GUIDE_JA.md</a></li><li>タブレット利用者向け案内文テンプレート: <a href="TAILSCALE_TABLET_MESSAGE_TEMPLATE_JA.md">TAILSCALE_TABLET_MESSAGE_TEMPLATE_JA.md</a></li><li>タブレット利用者向け QR 案内シート: <a href="TAILSCALE_TABLET_QR_SHEET_JA.md">TAILSCALE_TABLET_QR_SHEET_JA.md</a></li><li>初心者向け運用マニュアル: <a href="OPERATIONS_MANUAL_JA.md">OPERATIONS_MANUAL_JA.md</a></li><li>Windows 用かんたん起動: <a href="TailscaleClientLauncher.cmd">TailscaleClientLauncher.cmd</a></li><li>起動ツール設定: <a href="TailscaleClientLauncher.settings.json">TailscaleClientLauncher.settings.json</a></li><li>実運用設定のひな形: <a href=".env.example">.env.example</a></li><li>現在の実運用設定: Git 管理対象外の .env を各環境で配置して使います。</li></ul>
 <h2>想定構成</h2>
 <ol><li>アプリ本体は Synology Container Manager 上の Docker コンテナで動かします。</li><li><code>compose.yaml</code> はホストの <code>127.0.0.1:8010</code> にだけ公開し、LAN から直接見えないようにします。</li><li>Synology 上の Tailscale Serve が <code>https://diskstation.tail632bc4.ts.net/</code> を終端し、ローカルの <code>http://127.0.0.1:8010</code> へ流します。</li><li>利用者は Tailscale に接続したうえで、その HTTPS URL からアクセスします。</li></ol>
 <p>DSM のリバースプロキシや独自ドメイン、ポート開放は前提にしていません。</p>
@@ -137,30 +109,42 @@ git push</code></pre>
 <p>認証を切って画面確認だけしたい場合は以下です。</p>
 <pre><code class="language-powershell">python server.py --no-auth --host 127.0.0.1 --port 8010</code></pre>
 <p>起動後に以下へアクセスします。</p>
-<ul><li><code>http://localhost:8010/</code></li><li>ヘルプ: <code>http://localhost:8010/readme.html</code></li><li>ヘルスチェック: <code>http://localhost:8010/api/health</code></li></ul>
+<ul><li><code>http://localhost:8010/</code></li><li>ヘルスチェック: <code>http://localhost:8010/api/health</code></li></ul>
 <p>SQLite の保存先は既定で <code>data/records.db</code> です。環境変数 <code>KOUKU_KINOU_DB</code> で変更できます。</p>
 <p>保存ルール:</p>
 <ul><li>利用者は <code>氏名 + 生年月日</code> で識別します</li><li>同じ利用者の同じ評価日は新規追加ではなく上書き更新します</li><li>同じ利用者でも評価日が違えば履歴として別記録を残します</li><li>記録一覧では氏名、ふりがな、生年月日、評価日で検索できます</li></ul>
 <p>確認用サンプル投入:</p>
 <pre><code class="language-powershell">python seed_sample_records.py</code></pre>
 <p>既存データを消して入れ直す場合は <code>python seed_sample_records.py --replace</code> を使います。</p>
+<h2>Claude 生成 index.html を受け取ったときに管理者がやること</h2>
+<p>今後は、言語聴覚士が Claude で新しい <code>index.html</code> を作り、管理者が検証して本番へ入れる運用を前提にします。</p>
+<p>管理者は次の順番だけ守ってください。</p>
+<ol><li>受け取った HTML は、いきなりリポジトリ直下の <code>index.html</code> に上書きしない</li><li>まず別名のファイルとして保存する</li><li>PowerShell で検証コマンドを実行する</li><li><code>OK (managed)</code> または <code>OK (legacy-source)</code> が出たときだけ、本番用の <code>index.html</code> と差し替える</li><li>GitHub へ反映し、Actions と本番画面を確認する</li></ol>
+<p>PowerShell 例:</p>
+<pre><code class="language-powershell">&amp; &quot;C:\Users\user\AppData\Local\Microsoft\WindowsApps\python.exe&quot; .\server.py --validate-client-html &quot;C:\path\to\index_new.html&quot;</code></pre>
+<p>判定ルール:</p>
+<ul><li><code>Client HTML validation: OK (managed)</code>: Claude 生成済みの完成版 HTML として受け入れてよい</li><li><code>Client HTML validation: OK (legacy-source)</code>: 旧来の変換前 HTML として受け入れてよい</li><li><code>Client HTML validation failed: ...</code>: その HTML は置き換えない。作成者へ差し戻す</li></ul>
+<p>受け入れてはいけないもの:</p>
+<ul><li><code>index.html</code> の一部分だけ</li><li>途中が省略された HTML</li><li><code>server.py</code> も直す前提の提案</li><li>検証コマンドで失敗した HTML</li></ul>
+<p>本番反映までの最後の流れ:</p>
+<ol><li>検証に通ったファイルでリポジトリ直下の <code>index.html</code> を置き換える</li><li><code>main</code> に commit するか Pull Request を <code>main</code> へ merge する</li><li>GitHub Actions の <code>Deploy to Synology</code> 成功を確認する</li><li>本番 URL を開き、ログイン、保存、記録一覧の表示を確認する</li></ol>
 <h2>Docker / Synology</h2>
-<p>配布先に <code>.env</code> がなければ <code>.env.example</code> をコピーして <code>.env</code> を作成します。すでに <code>.env</code> がある場合も、まず中身を確認し、必要なら管理者用パスワードを変更してください。</p>
+<p><code>.env</code> は作成済みです。まず中身を確認し、必要なら管理者用パスワードを変更してください。</p>
 <pre><code class="language-dotenv">KOUKU_KINOU_AUTH_MODE=tailscale-or-password
 KOUKU_KINOU_PASSWORD=change-this-admin-password
 KOUKU_KINOU_SESSION_TTL_MINUTES=480
 KOUKU_KINOU_SECURE_COOKIE=1
-KOUKU_KINOU_DATA_DIR=./data
 KOUKU_KINOU_ALLOWED_NETWORKS=
 KOUKU_KINOU_TRUST_PROXY=0</code></pre>
-<p>Synology で <code>unable to open database file</code> が出る場合は、<code>KOUKU_KINOU_DATA_DIR</code> を <code>./data</code> から NAS 上の実フォルダへ明示してください。例: <code>/volume1/docker/kouku-kinou/data</code></p>
 <p>コンテナ起動:</p>
 <pre><code class="language-powershell">docker compose up --build -d
 docker compose ps</code></pre>
 <p><code>docker compose ps</code> の <code>STATUS</code> で <code>healthy</code> になれば、<code>/api/health</code> まで含めて通っています。</p>
-<p><code>/api/health</code> が <code>{&quot;status&quot;: &quot;error&quot;, &quot;error&quot;: &quot;unable to open database file&quot;}</code> を返す場合は次を順に確認します。</p>
-<ol><li><code>.env</code> の <code>KOUKU_KINOU_DATA_DIR</code> が意図したフォルダを指している</li><li>そのフォルダが Synology 上に実在する</li><li>Container Manager でそのフォルダを読書きできる</li><li>再ビルド後に <code>records.db</code>、<code>records.db-wal</code>、<code>records.db-shm</code> が作成される</li></ol>
 <p>現在の公開 URL は <code>https://diskstation.tail632bc4.ts.net/</code> です。</p>
+<p>担当者が GitHub のブラウザから <code>index.html</code> を上書きして本番へ反映する手順は、<a href="GITHUB_BROWSER_UPDATE_GUIDE_JA.md">GITHUB_BROWSER_UPDATE_GUIDE_JA.md</a> を参照してください。構成の技術詳細は <a href="AUTO_DEPLOY_GITHUB_ACTIONS_JA.md">AUTO_DEPLOY_GITHUB_ACTIONS_JA.md</a> にあります。</p>
+<p>Synology 側の SSH 鍵設定をやり直す必要があるときは、Windows から <a href="setup_synology_actions_ssh.cmd">setup_synology_actions_ssh.cmd</a> を再実行してください。</p>
+<p>GitHub Actions の Variables / SSH secrets を再登録したいときは、Windows から <a href="setup_github_actions_deploy.cmd">setup_github_actions_deploy.cmd</a> を実行してください。</p>
+<p>Synology で Docker 実行に root 権限が必要な場合は、先に <a href="setup_synology_actions_ssh.cmd">setup_synology_actions_ssh.cmd</a> を <code>-RegisterRootKey</code> 付きで実行し、その後 <a href="setup_github_actions_deploy.cmd">setup_github_actions_deploy.cmd</a> を <code>-User root</code> 付きで実行してください。</p>
 <p>Synology では DSM で SSH を有効にしたうえで NAS に入り、root 権限で Tailscale Serve を設定します。</p>
 <p>Tailscale Serve 設定:</p>
 <pre><code class="language-powershell">tailscale serve --bg 8010
@@ -173,14 +157,11 @@ tailscale serve status</code></pre>
 <p>Windows 利用者には、次の 3 ファイルをまとめて配布できます。</p>
 <ol><li><code>TailscaleClientLauncher.cmd</code></li><li><code>TailscaleClientLauncher.ps1</code></li><li><code>TailscaleClientLauncher.settings.json</code></li></ol>
 <p>配布用の <code>TailscaleClientLauncher.settings.json</code> には <code>https://diskstation.tail632bc4.ts.net/</code> を設定済みです。利用者はコマンド入力なしで Tailscale 導入とアプリ起動を進められます。</p>
-<p>配布前に <code>organizationName</code>、<code>appUrl</code>、<code>supportText</code>、<code>supportContact</code> を現場向けに更新してください。特に <code>supportContact</code> は利用者が困ったときの連絡先になるため、空欄のまま配らないほうが安全です。</p>
-<p>Windows 利用者へ操作手順も渡す場合は <a href="TAILSCALE_CLIENT_GUIDE_JA.pdf">TAILSCALE_CLIENT_GUIDE_JA.pdf</a> を同梱すると、そのまま案内に使えます。</p>
 <p>タブレット利用者には、ファイル配布より次の 2 つだけを案内するほうが簡単です。</p>
 <ol><li>Tailscale の導入とサインイン方法</li><li>アプリ URL <code>https://diskstation.tail632bc4.ts.net/</code></li></ol>
-<p>タブレット向けの詳しい案内は <a href="TAILSCALE_TABLET_GUIDE_JA.html">TAILSCALE_TABLET_GUIDE_JA.html</a> にまとめています。 配布時にそのまま使う文面は <a href="TAILSCALE_TABLET_MESSAGE_TEMPLATE_JA.html">TAILSCALE_TABLET_MESSAGE_TEMPLATE_JA.html</a>、紙配布用の QR 案内は <a href="TAILSCALE_TABLET_QR_SHEET_JA.html">TAILSCALE_TABLET_QR_SHEET_JA.html</a> を使えます。</p>
-<p>配布用の見やすい版としては <a href="TAILSCALE_TABLET_GUIDE_JA.pdf">TAILSCALE_TABLET_GUIDE_JA.pdf</a>、<a href="TAILSCALE_TABLET_MESSAGE_TEMPLATE_JA.pdf">TAILSCALE_TABLET_MESSAGE_TEMPLATE_JA.pdf</a>、<a href="TAILSCALE_TABLET_QR_SHEET_JA.pdf">TAILSCALE_TABLET_QR_SHEET_JA.pdf</a> も同梱しています。</p>
+<p>タブレット向けの詳しい案内は <a href="TAILSCALE_TABLET_GUIDE_JA.md">TAILSCALE_TABLET_GUIDE_JA.md</a> にまとめています。 配布時にそのまま使う文面は <a href="TAILSCALE_TABLET_MESSAGE_TEMPLATE_JA.md">TAILSCALE_TABLET_MESSAGE_TEMPLATE_JA.md</a>、紙配布用の QR 案内は <a href="TAILSCALE_TABLET_QR_SHEET_JA.md">TAILSCALE_TABLET_QR_SHEET_JA.md</a> を使えます。</p>
 <h2>実装メモ</h2>
-<ul><li>画面配信時に <code>localStorage</code> を使う元コードを API 呼び出しへ変換しています。</li><li>記録は SQLite に JSON として保存されます。</li><li>利用者識別は <code>氏名 + 生年月日</code>、評価識別は <code>氏名 + 生年月日 + 評価日</code> です。</li><li>同一利用者・同一評価日の保存は上書き、別日の評価は履歴追加です。</li><li>記録一覧には検索欄があり、氏名、ふりがな、生年月日、評価日で絞り込みできます。</li><li>共有対象は同じ NAS 上の単一 DB なので、PC とタブレットで同じ記録一覧を参照できます。</li><li><code>compose.yaml</code> は loopback のみに bind するため、Tailscale Serve を通らない直接アクセスを減らせます。</li><li><code>compose.yaml</code> の healthcheck は <code>/api/health</code> で DB と画面テンプレートの準備完了を確認します。</li><li><code>tailscale</code> または <code>tailscale-or-password</code> では、Tailscale identity header を使った認証に対応しています。</li><li><code>README.html</code> から PDF 資料と <code>assets/</code> 配下の画像付きマニュアルを開けるようにしているため、配布後もブラウザーだけで資料確認を完結できます。</li><li><code>index.html</code> 自体は元 artifact のソースとして残しています。</li></ul>
+<ul><li>画面配信時に <code>localStorage</code> を使う元コードを API 呼び出しへ変換しています。</li><li>記録は SQLite に JSON として保存されます。</li><li>利用者識別は <code>氏名 + 生年月日</code>、評価識別は <code>氏名 + 生年月日 + 評価日</code> です。</li><li>同一利用者・同一評価日の保存は上書き、別日の評価は履歴追加です。</li><li>記録一覧には検索欄があり、氏名、ふりがな、生年月日、評価日で絞り込みできます。</li><li>共有対象は同じ NAS 上の単一 DB なので、PC とタブレットで同じ記録一覧を参照できます。</li><li><code>compose.yaml</code> は loopback のみに bind するため、Tailscale Serve を通らない直接アクセスを減らせます。</li><li><code>compose.yaml</code> の healthcheck は <code>/api/health</code> で DB と画面テンプレートの準備完了を確認します。</li><li><code>tailscale</code> または <code>tailscale-or-password</code> では、Tailscale identity header を使った認証に対応しています。</li><li><code>index.html</code> 自体は元 artifact のソースとして残しています。</li></ul>
             <div class="footer-note">Source: README.md / Generated by build_docs.py</div>
         </article>
     </div>

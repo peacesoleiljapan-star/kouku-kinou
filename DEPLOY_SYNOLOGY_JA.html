@@ -74,7 +74,7 @@
     <div class="toolbar">
         <div>
             <div class="toolbar__title">資料ビュー</div>
-            <div class="toolbar__meta">Synology + Tailscale 配置手順 / Generated from DEPLOY_SYNOLOGY_JA.md / 2026-05-04 22:12</div>
+            <div class="toolbar__meta">Synology + Tailscale 配置手順 / Generated from DEPLOY_SYNOLOGY_JA.md / 2026-05-19 00:49</div>
         </div>
         <div class="toolbar__actions">
             <button class="button button--ghost" type="button" onclick="window.print()">印刷</button>
@@ -87,7 +87,7 @@
                 <div class="cover__badge">Admin</div>
                 <h1>Synology + Tailscale 配置手順</h1>
                 <p class="cover__subtitle">管理者向け配置手順</p>
-                <p class="cover__meta">Generated from DEPLOY_SYNOLOGY_JA.md / 2026-05-04 22:12</p>
+                <p class="cover__meta">Generated from DEPLOY_SYNOLOGY_JA.md / 2026-05-19 00:49</p>
             </header>
             <div class="print-tip">PDF 化するときは A4 でそのまま印刷できます。見出し、図、コードブロックが崩れにくく、改ページの空きが大きくなりすぎないように調整しています。</div>
             <p>この手順書は、Synology NAS 上で 口腔機能・栄養評価システム を動かし、Tailscale Serve で HTTPS 終端したい管理者向けです。DSM の独自ドメイン運用やリバースプロキシ設定は使いません。</p>
@@ -95,29 +95,25 @@
 <ol><li>Synology Container Manager でアプリを起動する</li><li>アプリのポートを NAS 自身の <code>127.0.0.1:8010</code> だけに公開する</li><li>Synology 上の Tailscale Serve で <code>https://diskstation.tail632bc4.ts.net/</code> を有効にする</li><li>利用者には Tailscale 接続後の HTTPS URL だけを案内する</li></ol>
 <h2>現在の tailnet 情報</h2>
 <ol><li>device 名: <code>diskstation</code></li><li>tailnet 名: <code>tail632bc4</code></li><li>現在のアプリ URL: <code>https://diskstation.tail632bc4.ts.net/</code></li></ol>
+<p>GitHub の <code>index.html</code> 更新をそのまま本番へ自動反映したい場合は、<a href="AUTO_DEPLOY_GITHUB_ACTIONS_JA.md">AUTO_DEPLOY_GITHUB_ACTIONS_JA.md</a> を併用してください。</p>
 <h2>この構成でやらないこと</h2>
 <ol><li>Synology 独自ドメインの取得</li><li>DSM リバースプロキシ設定</li><li>ルーターでのポート開放</li><li>Tailscale Funnel によるインターネット公開</li></ol>
 <p>Tailscale Serve は tailnet 内限定です。公開 URL を全世界へ出したい用途には向きません。</p>
 <h2>このアプリの置き場所</h2>
 <p>Synology に置く主なものは次のとおりです。</p>
-<ol><li><code>compose.yaml</code>: アプリ全体を起動する設定</li><li><code>.env</code>: 認証モードや管理者パスワード</li><li><code>Dockerfile</code>: Container Manager で build するときに使う定義</li><li><code>assets/</code>: HTML 資料と画面内参照で使う画像類</li><li><code>server.py</code>: アプリ本体を配信するサーバー</li><li><code>index.html</code>: 元の画面ソース</li><li><code>README.html</code> などの配布資料: ヘルプと配布物で使う HTML / PDF</li><li><code>data/records.db</code>: 記録データと共有設定。最重要ファイル</li></ol>
+<ol><li><code>compose.yaml</code>: アプリ全体を起動する設定</li><li><code>.env</code>: 認証モードや管理者パスワード</li><li><code>server.py</code>: アプリ本体を配信するサーバー</li><li><code>index.html</code>: 元の画面ソース</li><li><code>data/records.db</code>: 記録データと共有設定。最重要ファイル</li></ol>
 <h2>事前準備</h2>
 <p>Synology 側で次を確認します。</p>
 <ol><li>Container Manager が入っている</li><li>Tailscale が Synology に導入済みで、tailnet へ参加できている</li><li>保存用フォルダを作れる</li><li>管理者が 1 回だけ Tailscale CLI を実行できる</li></ol>
 <p>作るフォルダ例:</p>
 <ol><li><code>docker/kouku-kinou</code></li><li><code>docker/kouku-kinou/data</code></li></ol>
-<p>いちばん確実なのは、配布物の <code>package/kouku-kinou-admin-deploy</code> の中身をそのまま <code>docker/kouku-kinou</code> へコピーする方法です。</p>
-<p>最低限でも、<code>docker/kouku-kinou</code> 直下に次を置きます。</p>
-<ol><li><code>compose.yaml</code></li><li><code>.env</code></li><li><code>Dockerfile</code></li><li><code>server.py</code></li><li><code>index.html</code></li><li><code>assets</code> フォルダ</li><li><code>README.html</code> などの HTML / PDF 資料一式</li><li><code>data</code> フォルダ</li></ol>
-<p><code>data</code> フォルダの中には、少なくとも次を置きます。</p>
-<ol><li><code>records.db</code></li><li>必要に応じて <code>records.backup-*.db</code></li></ol>
+<p>このフォルダに以下を置きます。</p>
+<ol><li><code>compose.yaml</code></li><li><code>.env</code></li><li><code>server.py</code></li><li><code>index.html</code></li></ol>
 <h2>.env の確認</h2>
 <p>実運用前に次を確認してください。</p>
-<ol><li><code>KOUKU_KINOU_AUTH_MODE=tailscale-or-password</code></li><li><code>KOUKU_KINOU_PASSWORD</code>: 管理者用の強いパスワードへ変更</li><li><code>KOUKU_KINOU_SECURE_COOKIE=1</code>: このままでよい</li><li><code>KOUKU_KINOU_DATA_DIR=./data</code>: Synology で迷う場合は <code>/volume1/docker/kouku-kinou/data</code> のような絶対パスへ変更</li><li><code>KOUKU_KINOU_ALLOWED_NETWORKS=</code>: 通常は空欄のままでよい</li><li><code>KOUKU_KINOU_TRUST_PROXY=0</code>: 通常はこのままでよい</li></ol>
+<ol><li><code>KOUKU_KINOU_AUTH_MODE=tailscale-or-password</code></li><li><code>KOUKU_KINOU_PASSWORD</code>: 管理者用の強いパスワードへ変更</li><li><code>KOUKU_KINOU_SECURE_COOKIE=1</code>: このままでよい</li><li><code>KOUKU_KINOU_ALLOWED_NETWORKS=</code>: 通常は空欄のままでよい</li><li><code>KOUKU_KINOU_TRUST_PROXY=0</code>: 通常はこのままでよい</li></ol>
 <p><code>tailscale-or-password</code> の意味:</p>
 <ol><li>利用者が Tailscale の HTTPS URL から入れば自動認証される</li><li>うまくヘッダーが届かない時だけ、管理者用パスワードでも入れる</li></ol>
-<p><code>KOUKU_KINOU_DATA_DIR</code> の考え方:</p>
-<ol><li>既定値の <code>./data</code> は <code>compose.yaml</code> と同じフォルダの <code>data</code> を使います</li><li>Synology で場所を明示したい場合は <code>/volume1/docker/kouku-kinou/data</code> のような共有フォルダ配下を指定します</li><li><code>unable to open database file</code> が出たときは、まずこの値と実フォルダの存在を見直します</li></ol>
 <h2>Container Manager で起動する手順</h2>
 <ol><li>DSM にログインします。</li><li>Container Manager を開きます。</li><li>「プロジェクト」を開きます。</li><li>「作成」を押します。</li><li>プロジェクト名を <code>kouku-kinou</code> にします。</li><li>フォルダに <code>docker/kouku-kinou</code> を指定します。</li><li><code>compose.yaml</code> を読み込ませます。</li><li>起動します。</li></ol>
 <p>起動後に確認すること:</p>
@@ -149,21 +145,16 @@ tailscale serve --bg 8010</code></pre>
 <h2>公開確認</h2>
 <p>次の順で確認します。</p>
 <ol><li><code>tailscale serve status</code> に <code>proxy http://127.0.0.1:8010</code> が出る</li><li><code>https://diskstation.tail632bc4.ts.net/api/health</code> が開ける</li><li>Tailscale 接続済みの PC からトップ画面が開ける</li><li>同一利用者を保存するとき、生年月日未入力では保存できない</li><li>同一利用者・同一評価日の再保存が上書き更新になる</li><li>記録一覧の検索が使える</li><li>別の端末で同じ記録が見える</li></ol>
-<p>もし <code>https://diskstation.tail632bc4.ts.net/api/health</code> が <code>{&quot;status&quot;: &quot;error&quot;, &quot;error&quot;: &quot;unable to open database file&quot;}</code> を返した場合は次です。</p>
-<ol><li><code>data</code> フォルダを Synology 上で作成済みか確認する</li><li><code>.env</code> の <code>KOUKU_KINOU_DATA_DIR</code> を絶対パスへ変更する</li><li>Container Manager でプロジェクトを再ビルドする</li><li><code>data/records.db</code>、<code>data/records.db-wal</code>、<code>data/records.db-shm</code> が作成されるか確認する</li><li>それでも直らない場合はコンテナログで <code>/data</code> まわりの権限エラーを確認する</li></ol>
 <h2>利用者への配布</h2>
 <p>利用者には次の 2 つを渡します。</p>
 <ol><li>Tailscale の接続方法</li><li>アプリ URL または <code>TailscaleClientLauncher.cmd</code> 一式</li></ol>
 <p>Windows 利用者向けの簡易起動ツールは次の 3 ファイルです。</p>
 <ol><li><code>TailscaleClientLauncher.cmd</code></li><li><code>TailscaleClientLauncher.ps1</code></li><li><code>TailscaleClientLauncher.settings.json</code></li></ol>
 <p><code>TailscaleClientLauncher.settings.json</code> の <code>appUrl</code> は <code>https://diskstation.tail632bc4.ts.net/</code> に設定済みです。URL を変更した時だけ、このファイルも合わせて更新してください。</p>
-<p>配布前に <code>organizationName</code>、<code>appUrl</code>、<code>supportText</code>、<code>supportContact</code> を現場向けに更新してください。特に <code>supportContact</code> は、利用者が困ったときの連絡先になるため、空欄のまま配らないほうが安全です。</p>
-<p>操作手順も一緒に渡すなら、<code>TAILSCALE_CLIENT_GUIDE_JA.pdf</code> を同梱するとそのまま案内に使えます。</p>
 <p>タブレット利用者にはファイル一式を配るより、次の案内だけを渡すほうが簡単です。</p>
 <ol><li>App Store / Google Play で Tailscale を入れること</li><li>管理者が指定した方法で Tailscale にサインインすること</li><li><code>https://diskstation.tail632bc4.ts.net/</code> をブラウザーで開くこと</li></ol>
-<p>利用者向けの説明文は <a href="TAILSCALE_TABLET_GUIDE_JA.html">TAILSCALE_TABLET_GUIDE_JA.html</a> をそのまま使えます。</p>
-<p>短い配布メッセージは <a href="TAILSCALE_TABLET_MESSAGE_TEMPLATE_JA.html">TAILSCALE_TABLET_MESSAGE_TEMPLATE_JA.html</a>、紙で渡す案内は <a href="TAILSCALE_TABLET_QR_SHEET_JA.html">TAILSCALE_TABLET_QR_SHEET_JA.html</a> を使えます。</p>
-<p>配布用の見やすい版としては <code>TAILSCALE_TABLET_GUIDE_JA.pdf</code>、<code>TAILSCALE_TABLET_MESSAGE_TEMPLATE_JA.pdf</code>、<code>TAILSCALE_TABLET_QR_SHEET_JA.pdf</code> も使えます。</p>
+<p>利用者向けの説明文は <a href="TAILSCALE_TABLET_GUIDE_JA.md">TAILSCALE_TABLET_GUIDE_JA.md</a> をそのまま使えます。</p>
+<p>短い配布メッセージは <a href="TAILSCALE_TABLET_MESSAGE_TEMPLATE_JA.md">TAILSCALE_TABLET_MESSAGE_TEMPLATE_JA.md</a>、紙で渡す案内は <a href="TAILSCALE_TABLET_QR_SHEET_JA.md">TAILSCALE_TABLET_QR_SHEET_JA.md</a> を使えます。</p>
 <h2>バックアップ</h2>
 <p>最重要なのは <code>data/records.db</code> です。記録本体と共有設定がここに入ります。</p>
 <p>おすすめ:</p>
