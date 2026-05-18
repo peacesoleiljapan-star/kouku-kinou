@@ -52,6 +52,8 @@ AUTH_STATUS_PLACEHOLDER = "__AUTH_STATUS_HTML__"
 HELP_ROUTE_PATH = "/readme.html"
 DB_TIMEOUT_SECONDS = 30.0
 DB_WRITE_LOCK = threading.Lock()
+CLIENT_HTML_MODE_LEGACY_SOURCE = "legacy-source"
+CLIENT_HTML_MODE_MANAGED = "managed"
 DEFAULT_SHARED_SETTINGS = {
     "staffList": [
         "本澤　真奈美",
@@ -101,6 +103,19 @@ LOAD_FIELDS_BLOCK = """  document.getElementById('next_monitor').value = r.nextM
 INIT_BLOCK = """document.getElementById('evalDate').value = new Date().toISOString().split('T')[0];\nrenderHistory();"""
 HEADER_TOP_BLOCK = '<div class="header-top">'
 AUTH_HEADER_REPLACEMENT = '<div class="header-top" style="justify-content:space-between;gap:12px">'
+LOGOUT_BADGE_HTML = '<a href="/logout" class="badge" style="text-decoration:none;background:#fff1ea;color:#8a3b21">ログアウト</a>'
+HEADER_STATUS_BLOCK_PATTERN = re.compile(
+    r'(<div class="header-top"[^>]*>\s*<h1>.*?</h1>\s*)(<div style="display:flex;align-items:center;gap:8px">.*?</div>)(\s*</div>)',
+    re.DOTALL,
+)
+MANAGED_CLIENT_MARKERS = (
+    "let records = [];",
+    "const API_ROOT = '/api/records';",
+    "const SETTINGS_API_ROOT = '/api/settings';",
+    "async function fetchRecords() {",
+    "async function persistRecord(record) {",
+    "initializeApp();",
+)
 RESPONSIVE_REPLACEMENT = """/* RESPONSIVE */
     @media (max-width: 900px) {
         .tab-content { padding: 14px; }
@@ -6740,9 +6755,7 @@ def build_status_badges_html(*, include_logout: bool = False) -> str:
         ),
     ]
     if include_logout:
-        controls.append(
-            '<a href="/logout" class="badge" style="text-decoration:none;background:#fff1ea;color:#8a3b21">ログアウト</a>'
-        )
+        controls.append(LOGOUT_BADGE_HTML)
     return '<div style="display:flex;align-items:center;gap:8px">' + ''.join(controls) + '</div>'
 
 
@@ -6763,6 +6776,37 @@ def extract_embedded_html(wrapper_html: str) -> str:
 
     raw = wrapper_html[start:end]
     return json.loads(f'"{raw}"')
+
+
+def detect_client_html_mode(html: str) -> str:
+    if STATE_LINE in html:
+        return CLIENT_HTML_MODE_LEGACY_SOURCE
+
+    if all(marker in html for marker in MANAGED_CLIENT_MARKERS):
+        return CLIENT_HTML_MODE_MANAGED
+
+    raise RuntimeError(
+        "Unsupported client HTML format. Expected either the legacy source artifact or a managed Claude-generated client HTML with API integration."
+    )
+
+
+def extract_client_html_and_mode(wrapper_html: str) -> tuple[str, str]:
+    embedded_html = extract_embedded_html(wrapper_html)
+    return embedded_html, detect_client_html_mode(embedded_html)
+
+
+def build_client_template_from_wrapper_html(
+    wrapper_html: str,
+    auth_enabled: bool = False,
+) -> str:
+    embedded_html, mode = extract_client_html_and_mode(wrapper_html)
+    if mode == CLIENT_HTML_MODE_MANAGED:
+        return embedded_html
+    return transform_client_html(
+        embedded_html,
+        auth_enabled=auth_enabled,
+        auth_status_html=AUTH_STATUS_PLACEHOLDER if auth_enabled else None,
+    )
 
 
 def transform_client_html(
@@ -6886,16 +6930,18 @@ initializeApp();""")
 
 def build_client_template(auth_enabled: bool = False) -> str:
     wrapper_html = SOURCE_ARTIFACT_PATH.read_text(encoding="utf-8")
-    embedded_html = extract_embedded_html(wrapper_html)
-    return transform_client_html(
-        embedded_html,
-        auth_enabled=auth_enabled,
-        auth_status_html=AUTH_STATUS_PLACEHOLDER if auth_enabled else None,
-    )
+    return build_client_template_from_wrapper_html(wrapper_html, auth_enabled=auth_enabled)
 
 
 def render_client_html(client_template: str, auth_status_html: str | None = None) -> str:
     if AUTH_STATUS_PLACEHOLDER not in client_template:
+        if auth_status_html and "ログアウト" in auth_status_html and "ログアウト" not in client_template:
+            match = HEADER_STATUS_BLOCK_PATTERN.search(client_template)
+            if match:
+                status_block = match.group(2)
+                if status_block.endswith("</div>"):
+                    status_block = status_block[:-6] + LOGOUT_BADGE_HTML + "</div>"
+                    return client_template[:match.start(2)] + status_block + client_template[match.end(2):]
         return client_template
     return client_template.replace(AUTH_STATUS_PLACEHOLDER, auth_status_html or build_status_badges_html())
 
@@ -6951,6 +6997,29 @@ def build_client_html(
 ) -> str:
     template = build_client_template(auth_enabled=auth_enabled)
     return render_client_html(template, auth_status_html=auth_status_html)
+
+
+def validate_client_source_file(source_path: Path) -> str:
+    wrapper_html = source_path.read_text(encoding="utf-8")
+    _, mode = extract_client_html_and_mode(wrapper_html)
+    public_template = build_client_template_from_wrapper_html(wrapper_html, auth_enabled=False)
+    auth_template = render_client_html(
+        build_client_template_from_wrapper_html(wrapper_html, auth_enabled=True),
+        auth_status_html=build_status_badges_html(include_logout=True),
+    )
+
+    checks = {
+        "利用者情報タブ": 'id="tab-patient"' in public_template,
+        "記録 API": "const API_ROOT = '/api/records';" in public_template,
+        "設定 API": "const SETTINGS_API_ROOT = '/api/settings';" in public_template,
+        "初期化処理": "initializeApp();" in public_template,
+        "認証バッジ注入": "ログアウト" in auth_template,
+    }
+    missing_items = [label for label, ok in checks.items() if not ok]
+    if missing_items:
+        raise RuntimeError("Validation checks failed: " + ", ".join(missing_items))
+
+    return mode
 
 
 def build_login_html(
@@ -8061,6 +8130,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--host", default="0.0.0.0")
     parser.add_argument("--port", type=int, default=8010)
     parser.add_argument("--db", type=Path, default=DEFAULT_DB_PATH)
+    parser.add_argument("--validate-client-html", nargs="?", const=SOURCE_ARTIFACT_PATH, type=Path)
     parser.add_argument("--auth-mode", default=DEFAULT_AUTH_MODE)
     parser.add_argument("--password", default=os.environ.get("KOUKU_KINOU_PASSWORD"))
     parser.add_argument("--no-auth", action="store_true", default=os.environ.get("KOUKU_KINOU_NO_AUTH") == "1")
@@ -8073,6 +8143,15 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     args = parse_args()
+    if args.validate_client_html is not None:
+        try:
+            mode = validate_client_source_file(args.validate_client_html)
+        except Exception as error:
+            raise SystemExit(f"Client HTML validation failed: {error}") from error
+        print(f"Client HTML validation: OK ({mode})")
+        print(f"Source: {args.validate_client_html}")
+        return
+
     auth_config = build_auth_config(args)
     ensure_database(args.db)
     client_template_state = build_client_template_state()
