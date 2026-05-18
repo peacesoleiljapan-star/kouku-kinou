@@ -7010,8 +7010,16 @@ def validate_client_source_file(source_path: Path) -> str:
 
     checks = {
         "利用者情報タブ": 'id="tab-patient"' in public_template,
+        "口腔機能タブ": 'id="tab-oral"' in public_template,
+        "MNAタブ": 'id="tab-mna"' in public_template,
+        "総合評価タブ": 'id="tab-summary"' in public_template,
+        "履歴タブ": 'id="tab-history"' in public_template,
         "記録 API": "const API_ROOT = '/api/records';" in public_template,
         "設定 API": "const SETTINGS_API_ROOT = '/api/settings';" in public_template,
+        "タブ切替関数": "function showTab(id)" in public_template,
+        "MNA選択関数": "function selectMNA(" in public_template,
+        "保存関数": "function saveRecord()" in public_template or "async function saveRecord()" in public_template,
+        "削除関数": "function deleteRecord(id)" in public_template or "async function deleteRecord(id)" in public_template,
         "初期化処理": "initializeApp();" in public_template,
         "認証バッジ注入": "ログアウト" in auth_template,
     }
