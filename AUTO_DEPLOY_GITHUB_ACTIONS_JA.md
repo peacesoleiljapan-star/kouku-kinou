@@ -228,6 +228,8 @@ GitHub Actions の workflow_dispatch から手動実行できます。force_rebu
 
 NAS 側の作業ツリーで、git 管理対象ファイルを手で直しています。自動化を壊す原因になるため、NAS 側の tracked file 直接編集はやめて GitHub を正本にしてください。
 
+現在の deploy script は、tracked file の差分を見つけた場合はその差分を表示したうえで、Synology 側の tracked file を GitHub 側の対象 commit へ自動で戻してから続行します。`.env` や `data` などの Git 管理対象外ファイルはそのまま残ります。
+
 ### 反映されない
 
 1. 変更が main に commit または merge されているか確認

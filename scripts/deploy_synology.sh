@@ -142,19 +142,20 @@ if [ -n "$DEPLOY_REPO_URL" ]; then
     fi
 fi
 
-tracked_changes="$(git status --porcelain --untracked-files=no)"
-if [ -n "$tracked_changes" ]; then
-    echo "Tracked local changes exist on Synology. Deployment aborted." >&2
-    echo "$tracked_changes" >&2
-    exit 1
-fi
-
 git fetch "$DEPLOY_REMOTE" "$DEPLOY_BRANCH" --prune
 
 target_ref="$DEPLOY_REMOTE/$DEPLOY_BRANCH"
 current_head="$(git rev-parse HEAD)"
 target_head="$(git rev-parse "$target_ref")"
 changed_files=""
+
+tracked_changes="$(git status --porcelain --untracked-files=no)"
+if [ -n "$tracked_changes" ]; then
+    echo "Tracked local changes exist on Synology. Resetting tracked files to $target_ref."
+    echo "$tracked_changes"
+    git reset --hard "$target_ref" >/dev/null 2>&1
+    current_head="$target_head"
+fi
 
 if [ "$current_head" != "$target_head" ]; then
     changed_files="$(git diff --name-only "$current_head" "$target_head")"
