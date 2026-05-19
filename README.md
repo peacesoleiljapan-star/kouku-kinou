@@ -6,17 +6,17 @@
 
 ## 関連資料
 
-- Synology + Tailscale 配置手順: [DEPLOY_SYNOLOGY_JA.md](DEPLOY_SYNOLOGY_JA.md)
-- 非エンジニア向け index.html 更新手順: [GITHUB_BROWSER_UPDATE_GUIDE_JA.md](GITHUB_BROWSER_UPDATE_GUIDE_JA.md)
-- 言語聴覚士向け Claude 画面修正手順: [ST_CLAUDE_UPDATE_GUIDE_JA.md](ST_CLAUDE_UPDATE_GUIDE_JA.md)
-- GitHub Actions 自動反映手順: [AUTO_DEPLOY_GITHUB_ACTIONS_JA.md](AUTO_DEPLOY_GITHUB_ACTIONS_JA.md)
+- Synology + Tailscale 初期配置と更新確認の手順: [DEPLOY_SYNOLOGY_JA.md](DEPLOY_SYNOLOGY_JA.md)
+- 非エンジニア向け index.html 安全更新手順: [GITHUB_BROWSER_UPDATE_GUIDE_JA.md](GITHUB_BROWSER_UPDATE_GUIDE_JA.md)
+- 言語聴覚士向け Claude 画面修正・受け渡し手順: [ST_CLAUDE_UPDATE_GUIDE_JA.md](ST_CLAUDE_UPDATE_GUIDE_JA.md)
+- GitHub Actions で Synology へ自動反映する手順: [AUTO_DEPLOY_GITHUB_ACTIONS_JA.md](AUTO_DEPLOY_GITHUB_ACTIONS_JA.md)
 - Windows 利用者向け Tailscale 接続ガイド: [TAILSCALE_CLIENT_GUIDE_JA.md](TAILSCALE_CLIENT_GUIDE_JA.md)
 - タブレット利用者向け Tailscale 接続ガイド: [TAILSCALE_TABLET_GUIDE_JA.md](TAILSCALE_TABLET_GUIDE_JA.md)
 - タブレット利用者向け案内文テンプレート: [TAILSCALE_TABLET_MESSAGE_TEMPLATE_JA.md](TAILSCALE_TABLET_MESSAGE_TEMPLATE_JA.md)
 - タブレット利用者向け QR 案内シート: [TAILSCALE_TABLET_QR_SHEET_JA.md](TAILSCALE_TABLET_QR_SHEET_JA.md)
-- 初心者向け運用マニュアル: [OPERATIONS_MANUAL_JA.md](OPERATIONS_MANUAL_JA.md)
-- Windows 用かんたん起動: [TailscaleClientLauncher.cmd](TailscaleClientLauncher.cmd)
-- 起動ツール設定: [TailscaleClientLauncher.settings.json](TailscaleClientLauncher.settings.json)
+- 初心者向け操作マニュアル: [OPERATIONS_MANUAL_JA.md](OPERATIONS_MANUAL_JA.md)
+- Windows 用 Tailscale 起動ツール: [TailscaleClientLauncher.cmd](TailscaleClientLauncher.cmd)
+- 起動ツール設定ファイル: [TailscaleClientLauncher.settings.json](TailscaleClientLauncher.settings.json)
 - 実運用設定のひな形: [.env.example](.env.example)
 - 現在の実運用設定: Git 管理対象外の .env を各環境で配置して使います。
 

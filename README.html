@@ -74,7 +74,7 @@
     <div class="toolbar">
         <div>
             <div class="toolbar__title">資料ビュー</div>
-            <div class="toolbar__meta">口腔機能・栄養評価 / Generated from README.md / 2026-05-20 02:13</div>
+            <div class="toolbar__meta">口腔機能・栄養評価 / Generated from README.md / 2026-05-20 05:25</div>
         </div>
         <div class="toolbar__actions">
             <button class="button button--ghost" type="button" onclick="window.print()">印刷</button>
@@ -87,13 +87,13 @@
                 <div class="cover__badge">Overview</div>
                 <h1>口腔機能・栄養評価</h1>
                 <p class="cover__subtitle">配布・運用の全体像</p>
-                <p class="cover__meta">Generated from README.md / 2026-05-20 02:13</p>
+                <p class="cover__meta">Generated from README.md / 2026-05-20 05:25</p>
             </header>
             <div class="print-tip">PDF 化するときは A4 でそのまま印刷できます。見出し、図、コードブロックが崩れにくく、改ページの空きが大きくなりすぎないように調整しています。</div>
             <p>口腔機能・栄養評価システムを Synology NAS / Docker で自己ホストし、Tailscale Serve で HTTPS 終端するための構成です。</p>
 <p>このフォルダの <code>index.html</code> は Claude artifact の wrapper ですが、<code>server.py</code> がその中に埋め込まれた本体 HTML を抽出し、保存処理だけを SQLite API に差し替えて配信します。これにより、既存レイアウトをほぼそのまま維持しつつ、複数端末で記録を共有できます。</p>
 <h2>関連資料</h2>
-<ul><li>Synology + Tailscale 配置手順: <a href="DEPLOY_SYNOLOGY_JA.md">DEPLOY_SYNOLOGY_JA.md</a></li><li>非エンジニア向け index.html 更新手順: <a href="GITHUB_BROWSER_UPDATE_GUIDE_JA.md">GITHUB_BROWSER_UPDATE_GUIDE_JA.md</a></li><li>言語聴覚士向け Claude 画面修正手順: <a href="ST_CLAUDE_UPDATE_GUIDE_JA.md">ST_CLAUDE_UPDATE_GUIDE_JA.md</a></li><li>GitHub Actions 自動反映手順: <a href="AUTO_DEPLOY_GITHUB_ACTIONS_JA.md">AUTO_DEPLOY_GITHUB_ACTIONS_JA.md</a></li><li>Windows 利用者向け Tailscale 接続ガイド: <a href="TAILSCALE_CLIENT_GUIDE_JA.md">TAILSCALE_CLIENT_GUIDE_JA.md</a></li><li>タブレット利用者向け Tailscale 接続ガイド: <a href="TAILSCALE_TABLET_GUIDE_JA.md">TAILSCALE_TABLET_GUIDE_JA.md</a></li><li>タブレット利用者向け案内文テンプレート: <a href="TAILSCALE_TABLET_MESSAGE_TEMPLATE_JA.md">TAILSCALE_TABLET_MESSAGE_TEMPLATE_JA.md</a></li><li>タブレット利用者向け QR 案内シート: <a href="TAILSCALE_TABLET_QR_SHEET_JA.md">TAILSCALE_TABLET_QR_SHEET_JA.md</a></li><li>初心者向け運用マニュアル: <a href="OPERATIONS_MANUAL_JA.md">OPERATIONS_MANUAL_JA.md</a></li><li>Windows 用かんたん起動: <a href="TailscaleClientLauncher.cmd">TailscaleClientLauncher.cmd</a></li><li>起動ツール設定: <a href="TailscaleClientLauncher.settings.json">TailscaleClientLauncher.settings.json</a></li><li>実運用設定のひな形: <a href=".env.example">.env.example</a></li><li>現在の実運用設定: Git 管理対象外の .env を各環境で配置して使います。</li></ul>
+<ul><li>Synology + Tailscale 初期配置と更新確認の手順: <a href="DEPLOY_SYNOLOGY_JA.md">DEPLOY_SYNOLOGY_JA.md</a></li><li>非エンジニア向け index.html 安全更新手順: <a href="GITHUB_BROWSER_UPDATE_GUIDE_JA.md">GITHUB_BROWSER_UPDATE_GUIDE_JA.md</a></li><li>言語聴覚士向け Claude 画面修正・受け渡し手順: <a href="ST_CLAUDE_UPDATE_GUIDE_JA.md">ST_CLAUDE_UPDATE_GUIDE_JA.md</a></li><li>GitHub Actions で Synology へ自動反映する手順: <a href="AUTO_DEPLOY_GITHUB_ACTIONS_JA.md">AUTO_DEPLOY_GITHUB_ACTIONS_JA.md</a></li><li>Windows 利用者向け Tailscale 接続ガイド: <a href="TAILSCALE_CLIENT_GUIDE_JA.md">TAILSCALE_CLIENT_GUIDE_JA.md</a></li><li>タブレット利用者向け Tailscale 接続ガイド: <a href="TAILSCALE_TABLET_GUIDE_JA.md">TAILSCALE_TABLET_GUIDE_JA.md</a></li><li>タブレット利用者向け案内文テンプレート: <a href="TAILSCALE_TABLET_MESSAGE_TEMPLATE_JA.md">TAILSCALE_TABLET_MESSAGE_TEMPLATE_JA.md</a></li><li>タブレット利用者向け QR 案内シート: <a href="TAILSCALE_TABLET_QR_SHEET_JA.md">TAILSCALE_TABLET_QR_SHEET_JA.md</a></li><li>初心者向け操作マニュアル: <a href="OPERATIONS_MANUAL_JA.md">OPERATIONS_MANUAL_JA.md</a></li><li>Windows 用 Tailscale 起動ツール: <a href="TailscaleClientLauncher.cmd">TailscaleClientLauncher.cmd</a></li><li>起動ツール設定ファイル: <a href="TailscaleClientLauncher.settings.json">TailscaleClientLauncher.settings.json</a></li><li>実運用設定のひな形: <a href=".env.example">.env.example</a></li><li>現在の実運用設定: Git 管理対象外の .env を各環境で配置して使います。</li></ul>
 <h2>想定構成</h2>
 <ol><li>アプリ本体は Synology Container Manager 上の Docker コンテナで動かします。</li><li><code>compose.yaml</code> はホストの <code>127.0.0.1:8010</code> にだけ公開し、LAN から直接見えないようにします。</li><li>Synology 上の Tailscale Serve が <code>https://diskstation.tail632bc4.ts.net/</code> を終端し、ローカルの <code>http://127.0.0.1:8010</code> へ流します。</li><li>利用者は Tailscale に接続したうえで、その HTTPS URL からアクセスします。</li></ol>
 <p>DSM のリバースプロキシや独自ドメイン、ポート開放は前提にしていません。</p>
