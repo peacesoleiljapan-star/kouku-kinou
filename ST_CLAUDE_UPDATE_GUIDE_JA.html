@@ -74,7 +74,7 @@
     <div class="toolbar">
         <div>
             <div class="toolbar__title">資料ビュー</div>
-            <div class="toolbar__meta">言語聴覚士向け Claude 画面修正手順 / Generated from ST_CLAUDE_UPDATE_GUIDE_JA.md / 2026-05-19 00:50</div>
+            <div class="toolbar__meta">言語聴覚士向け Claude 画面修正手順 / Generated from ST_CLAUDE_UPDATE_GUIDE_JA.md / 2026-05-20 02:13</div>
         </div>
         <div class="toolbar__actions">
             <button class="button button--ghost" type="button" onclick="window.print()">印刷</button>
@@ -87,19 +87,19 @@
                 <div class="cover__badge">ST</div>
                 <h1>言語聴覚士向け Claude 画面修正手順</h1>
                 <p class="cover__subtitle">言語聴覚士が Claude で index.html を作って管理者へ渡すまでの手順</p>
-                <p class="cover__meta">Generated from ST_CLAUDE_UPDATE_GUIDE_JA.md / 2026-05-19 00:50</p>
+                <p class="cover__meta">Generated from ST_CLAUDE_UPDATE_GUIDE_JA.md / 2026-05-20 02:13</p>
             </header>
             <div class="print-tip">PDF 化するときは A4 でそのまま印刷できます。見出し、図、コードブロックが崩れにくく、改ページの空きが大きくなりすぎないように調整しています。</div>
             <p>この資料は、言語聴覚士が Claude を使って新しい <code>index.html</code> を作り、管理者へ渡すまでの手順です。</p>
 <p>この手順では、GitHub、PowerShell、<code>server.py</code> の編集はしません。そこは管理者が担当します。</p>
 <h2>最初に覚えること</h2>
-<ol><li>触るのは <code>index.html</code> だけです。</li><li><code>server.py</code>、<code>compose.yaml</code>、<code>Dockerfile</code> などは触りません。</li><li>Claude には、部分的な修正ではなく、完成した <code>index.html</code> 全体を出してもらいます。</li><li>本番へ反映するかどうかの確認は、必ず管理者が行います。</li></ol>
+<ol><li>触るのは <code>index.html</code> だけです。</li><li><code>server.py</code>、<code>compose.yaml</code>、<code>Dockerfile</code> などは触りません。</li><li>Claude には、差分ではなく完成した <code>index.html</code> 全体を出してもらいます。</li><li>本番へ反映するかどうかの判断は、管理者の検証結果で決まります。</li></ol>
 <h2>この手順でやること</h2>
-<ol><li>今の <code>index.html</code> を Claude に渡す</li><li>直したい内容を文章で伝える</li><li>Claude から新しい <code>index.html</code> 全体を受け取る</li><li>ファイルとして保存する</li><li>変更内容のメモと一緒に管理者へ渡す</li></ol>
+<ol><li>今の <code>index.html</code> を Claude に渡します。</li><li>直したい内容を文章で伝えます。</li><li>Claude から新しい <code>index.html</code> 全体を受け取ります。</li><li>別名ファイルとして保存します。</li><li>修正内容のメモと一緒に管理者へ渡します。</li></ol>
 <h2>事前に準備するもの</h2>
 <ol><li>現在使っている <code>index.html</code></li><li>直したい内容のメモ</li><li>Claude を開ける PC</li></ol>
 <p>直したい内容のメモは、次のように短く箇条書きで十分です。</p>
-<ul><li>利用者情報タブで年齢をもっと見やすくしたい</li><li>総合評価のコメント欄を広くしたい</li><li>印刷時の見出しを分かりやすくしたい</li></ul>
+<ol><li>利用者情報タブで年齢をもっと見やすくしたい</li><li>総合評価のコメント欄を広くしたい</li><li>印刷時の見出しを分かりやすくしたい</li></ol>
 <h2>Claude への依頼手順</h2>
 <ol><li>Claude を開きます。</li><li>今使っている <code>index.html</code> を添付します。</li><li>下の依頼文をそのまま貼ります。</li><li>「直したい内容」の部分だけ、自分の修正内容に置き換えます。</li></ol>
 <pre><code class="language-text">添付した index.html を元に、次の修正を入れた完成版の index.html を全文で返してください。
@@ -112,32 +112,41 @@
 - showTab(id)、selectMNA()、saveRecord()、deleteRecord(id)、initializeApp() は残してください
 - const API_ROOT = &#x27;/api/records&#x27;; と const SETTINGS_API_ROOT = &#x27;/api/settings&#x27;; は残してください
 - index.html 以外のファイル案は不要です
+- ログイン画面だけではなく、評価画面まで含む完成版を返してください
 
 直したい内容:
 - ここに修正したい内容を書く</code></pre>
+<h2>管理者が受け入れる条件</h2>
+<p>管理者は、受け取った HTML を次のコマンドで検証します。</p>
+<pre><code class="language-powershell">&amp; &quot;C:\Users\user\AppData\Local\Microsoft\WindowsApps\python.exe&quot; .\server.py --validate-client-html &quot;C:\path\to\index_new.html&quot;</code></pre>
+<p>管理者が受け入れるのは次のどちらかが出たときだけです。</p>
+<ol><li><code>Client HTML validation: OK (managed)</code></li><li><code>Client HTML validation: OK (legacy-source)</code></li></ol>
+<p>次のものは受け入れられません。</p>
+<ol><li><code>index.html</code> の一部分だけ</li><li>途中が省略された HTML</li><li><code>server.py</code> も直す前提の提案</li><li><code>Client HTML validation failed: ...</code> になった HTML</li></ol>
+<p>この条件を知っておくと、Claude への依頼文をやり直すときに迷いにくくなります。</p>
 <h2>Claude の返答を確認するときのポイント</h2>
 <p>次の 4 つだけ見れば大丈夫です。</p>
 <ol><li><code>index.html</code> 全体が返ってきている</li><li>途中が省略されていない</li><li>自分が頼んだ修正が入っている</li><li><code>server.py</code> など別ファイルの変更提案になっていない</li></ol>
-<p>次のような返答は、そのまま使わないでください。</p>
-<ul><li>差分だけ</li><li>一部分だけ</li><li>「続きは省略します」と書かれているもの</li><li><code>index.html</code> 以外のファイルを直す前提のもの</li></ul>
+<p>次のような返答は、そのまま使いません。</p>
+<ol><li>差分だけ</li><li>一部分だけ</li><li>「続きは省略します」と書かれているもの</li><li><code>index.html</code> 以外のファイルを直す前提のもの</li></ol>
 <p>その場合は Claude に、次の一文を追加で送ってください。</p>
-<pre><code class="language-text">省略せず、index.html 全体を最初から最後までそのまま出してください。</code></pre>
+<pre><code class="language-text">差分ではなく、完成した index.html 全体を省略なしで返してください。</code></pre>
 <h2>ファイルの保存方法</h2>
 <ol><li>Claude の返答を全文コピーします。</li><li>メモ帳、VS Code、または使いやすいテキストエディタを開きます。</li><li>新しいファイルに全文を貼ります。</li><li>文字コードは通常の UTF-8 のままで保存します。</li><li>ファイル名は、たとえば次のようにして保存します。</li></ol>
-<pre><code class="language-text">index_2026-05-19.html</code></pre>
+<pre><code class="language-text">index_2026-05-20.html</code></pre>
 <p>重要:</p>
-<ul><li>いきなり元の <code>index.html</code> を上書きしなくて大丈夫です。</li><li>まずは別名で保存して、管理者へ渡してください。</li></ul>
+<ol><li>いきなり元の <code>index.html</code> を上書きしません。</li><li>まずは別名で保存して、管理者へ渡します。</li></ol>
 <h2>管理者へ渡すときに一緒に伝えること</h2>
-<p>管理者には、ファイルだけでなく、次の 2 つも一緒に渡してください。</p>
+<p>管理者には、ファイルだけでなく、次の 2 つも一緒に渡します。</p>
 <ol><li>何を直したかったか</li><li>Claude が直した内容の要約</li></ol>
 <p>例:</p>
-<ul><li>利用者情報の見やすさを改善</li><li>総合評価のコメント欄を広げた</li><li>印刷時のタイトルを調整した</li></ul>
+<ol><li>利用者情報の見やすさを改善</li><li>総合評価のコメント欄を広げた</li><li>印刷時のタイトルを調整した</li></ol>
 <h2>やってはいけないこと</h2>
 <ol><li><code>index.html</code> の一部分だけを管理者へ渡す</li><li>自分で GitHub の本番ファイルを直接上書きする</li><li><code>server.py</code> を自分で直そうとする</li><li>Claude の説明文だけを渡して、HTML ファイル本体を渡さない</li></ol>
 <h2>うまくいかないとき</h2>
 <h3>Claude が一部分しか返さない</h3>
 <p>次の一文を追加で送ってください。</p>
-<pre><code class="language-text">差分ではなく、完成した index.html 全体を省略なしで返してください。</code></pre>
+<pre><code class="language-text">省略せず、index.html 全体を最初から最後までそのまま出してください。</code></pre>
 <h3>Claude が別ファイルの修正を提案する</h3>
 <p>次の一文を追加で送ってください。</p>
 <pre><code class="language-text">今回は index.html だけを修正対象にしてください。ほかのファイル案は不要です。</code></pre>
@@ -146,7 +155,7 @@
 <h2>このあと管理者がやること</h2>
 <p>この資料のここまでできたら、あなたの作業は終わりです。</p>
 <p>このあと管理者が次を行います。</p>
-<ol><li>PowerShell で検証する</li><li>問題なければリポジトリの <code>index.html</code> と差し替える</li><li>GitHub へ反映する</li><li>本番画面で確認する</li></ol>
+<ol><li>PowerShell で検証する</li><li>問題なければリポジトリの <code>index.html</code> と差し替える</li><li>GitHub へ反映する</li><li>GitHub Actions と本番画面で確認する</li></ol>
 <p>ここだけ覚えれば大丈夫: あなたは Claude で完成した <code>index.html</code> を作り、別名で保存して、修正内容のメモと一緒に管理者へ渡せば完了です。</p>
             <div class="footer-note">Source: ST_CLAUDE_UPDATE_GUIDE_JA.md / Generated by build_docs.py</div>
         </article>

@@ -9,6 +9,8 @@
 3. 保存する
 4. あとで記録一覧から検索して読み込む
 
+このアプリは、同じ NAS 上の記録を PC とタブレットで共有して使います。いつも同じ正式 URL を開いてください。
+
 このマニュアルでは、実際の操作画面を使って、どこを押すか、何を入れるか、何に気をつけるかを順番に説明します。
 
 Windows で Tailscale のつなぎ方が分からないときは [TAILSCALE_CLIENT_GUIDE_JA.html](TAILSCALE_CLIENT_GUIDE_JA.html)、タブレットで使うときは [TAILSCALE_TABLET_GUIDE_JA.html](TAILSCALE_TABLET_GUIDE_JA.html) を見てください。
@@ -20,6 +22,7 @@ Windows で Tailscale のつなぎ方が分からないときは [TAILSCALE_CLIE
 1. このアプリは、先に Tailscale をつないでから開きます。
 2. 利用者は「氏名 + 生年月日」で見分けます。
 3. 同じ利用者の同じ評価日は、新しく増えるのではなく上書き更新になります。
+4. 記録一覧では、氏名、ふりがな、生年月日、評価日で検索できます。
 
 現在の正式 URL は、管理者から案内された URL を使ってください。今の運用では、通常は https://diskstation.tail632bc4.ts.net/ を開きます。
 

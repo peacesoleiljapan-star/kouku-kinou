@@ -16,6 +16,17 @@ LINE やチャットで短く送る場合の例です。
 ```text
 タブレットで使う方へ
 
+1. Tailscale をインストールしてください
+2. 管理者が案内した方法でサインインしてください
+3. 接続後に次の URL を開いてください
+https://diskstation.tail632bc4.ts.net/
+```
+
+もう少し説明を足したい場合は、次の版を使います。
+
+```text
+タブレットで使う方へ
+
 1. App Store または Google Play で Tailscale をインストールしてください
 2. Tailscale を開いて、管理者から案内した方法でサインインしてください
 3. 接続後に次の URL を開いてください
@@ -52,3 +63,4 @@ https://diskstation.tail632bc4.ts.net/
 1. タブレット利用者には `TailscaleClientLauncher.cmd` 一式は不要です。
 2. 初心者向けには、URL だけでなく [TAILSCALE_TABLET_QR_SHEET_JA.html](TAILSCALE_TABLET_QR_SHEET_JA.html) を紙で配るほうが伝わりやすくなります。
 3. パスワード運用を残している場合は、その案内文だけ別で追記してください。
+4. URL が変わった場合は、このテンプレート内の URL をまとめて差し替えてから送ってください。

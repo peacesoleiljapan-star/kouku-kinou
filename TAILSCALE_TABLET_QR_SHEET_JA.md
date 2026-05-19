@@ -25,6 +25,8 @@ URL: https://tailscale.com/download
 
 Tailscale 接続後に、下の QR か URL からアプリを開きます。
 
+先に Tailscale が接続済みになってから、下の QR を読んでください。
+
 ![口腔機能・栄養評価システム QR](assets/qr/kouku-kinou-app-qr.svg)
 
 URL: https://diskstation.tail632bc4.ts.net/
@@ -34,6 +36,7 @@ URL: https://diskstation.tail632bc4.ts.net/
 1. 先に Tailscale が接続済みか確認します。
 2. 接続できていない場合は、Tailscale アプリを開き直します。
 3. パスワード画面が出た場合は、管理者へ連絡します。
+4. 共用端末では、作業後にブラウザーを閉じます。
 
 ## 管理者向けメモ
 
