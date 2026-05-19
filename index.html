@@ -69,7 +69,7 @@
     font-weight: 700;
   }
 
-  /* TABS — workflow steps + management group */
+  /* TABS — five equal-width tabs */
   .tab-bar {
     display: flex;
     align-items: stretch;
@@ -77,14 +77,15 @@
   }
   .tab-group-workflow {
     display: flex;
-    flex: 1;
+    flex: 4 1 0;
   }
   .tab-group-manage {
     display: flex;
-    border-left: 1px solid rgba(255,255,255,0.18);
+    flex: 1 1 0;
   }
   .tab-btn {
-    flex: 1;
+    flex: 1 1 0;
+    min-width: 0;
     min-height: 52px;
     padding: 8px 6px;
     border: none;
@@ -108,7 +109,7 @@
     border-bottom-color: var(--accent);
     background: rgba(255,255,255,0.10);
   }
-  /* step number chip on workflow tabs */
+  /* step number chip */
   .tab-step-num {
     width: 20px; height: 20px;
     border-radius: 50%;
@@ -130,10 +131,7 @@
     color: white;
   }
   .tab-btn.manage {
-    flex: 0 0 auto;
-    min-width: 56px;
-    font-size: 12px;
-    color: rgba(255,255,255,0.5);
+    color: rgba(255,255,255,0.55);
   }
   .tab-label-text { line-height: 1.2; }
 
@@ -444,7 +442,6 @@
         .card { padding: 14px; }
         .tab-btn { font-size: 12px; padding: 6px 4px; gap: 4px; }
         .tab-label-text { font-size: 11px; }
-        .tab-btn.manage { min-width: 48px; }
         .tab-step-num { width: 18px; height: 18px; font-size: 10px; }
         .score-bar__item { padding: 7px 10px; }
         .score-bar__value { font-size: 13.5px; }
@@ -501,8 +498,6 @@
                 body.print-all-mode .score-bar,
                 body.print-all-mode .action-bar,
                 body.print-all-mode .no-print,
-                body.print-all-mode .guid-hint,
-                body.print-all-mode .guid-empty,
                 body.print-all-mode #tab-history,
                 body.print-all-mode #tab-settings {
                         display: none !important;
@@ -684,6 +679,31 @@
     margin-bottom: 12px;
   }
 
+  /* AUTO-JUDGE BADGE (e.g. RSST result from count) */
+  .auto-judge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 14px;
+    border-radius: 9px;
+    border: 1.5px solid var(--border);
+    background: #fafcff;
+    font-size: 15px;
+    font-weight: 700;
+    min-height: 46px;
+  }
+  .auto-judge--empty { color: var(--text-light); font-weight: 500; }
+  .auto-judge--ok {
+    background: #e8f5f0;
+    border-color: var(--success);
+    color: var(--success);
+  }
+  .auto-judge--ng {
+    background: #fdf0ee;
+    border-color: var(--danger);
+    color: var(--danger);
+  }
+
   /* ── SUMMARY GUIDANCE UI ── */
   .summ-identity {
     display: flex; align-items: center; gap: 14px;
@@ -712,127 +732,6 @@
   .summ-score-card.bad .summ-score-card__value,
   .summ-score-card.bad .summ-score-card__result { color: var(--danger); }
 
-  .guid-step-label {
-    font-size: 11px; font-weight: 700; color: #64748b;
-    letter-spacing: 0.06em; margin-bottom: 8px; margin-top: 4px;
-  }
-  .guid-mode-row { display: flex; gap: 10px; margin-bottom: 14px; }
-  .guid-mode-btn {
-    flex: 1; padding: 12px 10px; border-radius: 12px;
-    border: 2px solid var(--border); background: white;
-    color: var(--text-light); font-size: 14px; font-weight: 700;
-    cursor: pointer; transition: all .2s;
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-    box-shadow: 0 1px 4px rgba(0,0,0,.06);
-  }
-  .guid-mode-btn.active-low  { border-color:#0d7377; background:#0d7377; color:white; box-shadow:0 4px 16px #0d737740; }
-  .guid-mode-btn.active-high { border-color:#b45309; background:#b45309; color:white; box-shadow:0 4px 16px #b4530940; }
-
-  .guid-cat-list { display: flex; flex-direction: column; gap: 7px; margin-bottom: 14px; }
-  .guid-cat-btn {
-    padding: 10px 12px; border-radius: 10px;
-    border: 1.5px solid var(--border); background: white;
-    display: flex; align-items: center; gap: 10px;
-    cursor: pointer; text-align: left; transition: all .15s;
-    box-shadow: 0 1px 3px rgba(0,0,0,.05); width: 100%;
-  }
-  .guid-cat-btn.sel-low  { border-color:#0d7377; background:#e6f7f7; }
-  .guid-cat-btn.sel-high { border-color:#b45309; background:#fef3c7; }
-  .guid-checkbox {
-    width: 20px; height: 20px; border-radius: 6px;
-    border: 2px solid #cbd5e1; background: transparent;
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0; font-size: 11px; color: white; font-weight: 700;
-  }
-  .guid-checkbox.chk-low  { border-color:#0d7377; background:#0d7377; }
-  .guid-checkbox.chk-high { border-color:#b45309; background:#b45309; }
-  .guid-cat-icon { font-size: 16px; }
-  .guid-cat-text { font-size: 13px; font-weight: 600; color: #374151; }
-  .guid-cat-text.lbl-low  { color: #0d7377; }
-  .guid-cat-text.lbl-high { color: #b45309; }
-
-  .guid-tab-bar { display: flex; gap: 6px; margin-bottom: 12px; overflow-x: auto; padding-bottom: 2px; }
-  .guid-tab-btn {
-    flex-shrink: 0; padding: 7px 11px; border-radius: 20px;
-    border: 1.5px solid var(--border); background: white;
-    color: #94a3b8; font-size: 11.5px; font-weight: 700;
-    cursor: pointer; white-space: nowrap; transition: all .15s;
-  }
-  .guid-tab-btn.t-obs  { border-color:#0ea5e9; background:#f0f9ff; color:#0369a1; }
-  .guid-tab-btn.t-fam  { border-color:#16a34a; background:#f0fdf4; color:#15803d; }
-  .guid-tab-btn.t-reh  { border-color:#7c3aed; background:#f5f3ff; color:#5b21b6; }
-  .guid-tab-btn.t-ns   { border-color:#c2410c; background:#fff7ed; color:#9a3412; }
-
-  .guid-rehab-sub-bar {
-    display: flex; gap: 5px; margin-bottom: 10px;
-    background: #f5f3ff; border-radius: 10px; padding: 4px;
-  }
-  .guid-rehab-sub-btn {
-    flex: 1; padding: 6px 4px; border-radius: 8px;
-    border: none; background: transparent;
-    font-size: 12px; font-weight: 700; color: #7c3aed;
-    cursor: pointer; transition: all .15s; text-align: center; opacity: 0.5;
-  }
-  .guid-rehab-sub-btn.active-sub { background: white; opacity: 1; box-shadow: 0 1px 6px rgba(124,58,237,0.18); }
-
-  .guid-card-list { display: flex; flex-direction: column; gap: 10px; }
-  .guid-card {
-    border-radius: 12px; border: 1px solid #e2e8f0;
-    background: white; overflow: hidden;
-    box-shadow: 0 2px 10px rgba(0,0,0,.05);
-  }
-  .guid-card-header {
-    width: 100%; padding: 12px 14px;
-    background: white; border: none; cursor: pointer;
-    display: flex; align-items: center; justify-content: space-between;
-  }
-  .guid-card-header.open-obs { background:#f0f9ff; border-bottom:1px solid #0ea5e930; }
-  .guid-card-header.open-fam { background:#f0fdf4; border-bottom:1px solid #16a34a30; }
-  .guid-card-header.open-reh { background:#f5f3ff; border-bottom:1px solid #7c3aed30; }
-  .guid-card-header.open-ns  { background:#fff7ed; border-bottom:1px solid #c2410c30; }
-  .guid-card-title { display:flex; align-items:center; gap:8px; }
-  .guid-card-dot   { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
-  .dot-low  { background:#0d7377; }
-  .dot-high { background:#b45309; }
-  .guid-card-name  { font-size:13.5px; font-weight:700; color:#1e293b; }
-  .guid-card-arrow { font-size:18px; color:#94a3b8; transition:transform .2s; display:inline-block; }
-  .guid-card-arrow.open { transform: rotate(90deg); }
-  .guid-card-body { padding:12px 14px 14px; display:none; }
-  .guid-card-body.visible { display:block; }
-  .guid-role-badge {
-    display: inline-flex; align-items: center; gap: 5px;
-    padding: 4px 11px 4px 8px; border-radius: 20px;
-    font-size: 11px; font-weight: 800; margin-bottom: 10px;
-  }
-  .guid-role-st  { background:#ede9fe; color:#5b21b6; }
-  .guid-role-pt  { background:#fce7f3; color:#9d174d; }
-  .guid-role-ot  { background:#fff3cd; color:#92400e; }
-  .guid-item-row {
-    display:flex; gap:10px; padding:7px 0;
-    border-bottom:1px dashed #f1f5f9;
-  }
-  .guid-item-row:last-child { border-bottom:none; }
-  .guid-item-num {
-    width:22px; height:22px; border-radius:6px;
-    display:flex; align-items:center; justify-content:center;
-    flex-shrink:0; margin-top:1px; font-size:9px; font-weight:700;
-  }
-  .num-obs { background:#f0f9ff; border:1px solid #0ea5e940; color:#0369a1; }
-  .num-fam { background:#f0fdf4; border:1px solid #16a34a40; color:#15803d; }
-  .num-reh { background:#f5f3ff; border:1px solid #7c3aed40; color:#5b21b6; }
-  .num-ns  { background:#fff7ed; border:1px solid #c2410c40; color:#9a3412; }
-  .guid-item-text { font-size:13px; color:#374151; line-height:1.65; }
-  .guid-hint {
-    margin-top:14px; padding:10px 12px;
-    background:#f8fafc; border-radius:10px; border:1px solid #e2e8f0;
-    font-size:11px; color:#64748b; line-height:1.65;
-  }
-  .guid-empty {
-    text-align:center; padding:32px 20px; color:#94a3b8;
-    font-size: 13px;
-  }
-  .guid-empty-icon { font-size: 40px; margin-bottom: 10px; }
-  .guid-divider { height: 1px; background: var(--border); margin: 20px 0; }
 </style>
 </head>
 <body>
@@ -1062,17 +961,18 @@
     <p class="section-label">④ RSST（反復唾液嚥下テスト）</p>
     <div class="form-grid">
       <div class="form-group">
-        <label>構築時間（秒）</label>
-        <input type="number" id="rsst_time" placeholder="30">
+        <label>測定時間（秒）</label>
+        <input type="number" id="rsst_time" value="30" readonly aria-readonly="true" style="background:#f0f4f8;font-weight:700;" title="RSSTは30秒固定です">
       </div>
       <div class="form-group">
         <label>回数</label>
-        <input type="number" id="rsst_count" placeholder="回">
+        <input type="number" id="rsst_count" placeholder="回" min="0" oninput="updateRsstJudge()">
       </div>
     </div>
     <div class="form-group" style="margin-top:8px">
-      <label>専門職の判断（RSST）</label>
-      <select id="rsst_judge"><option value="">選択</option><option>1できる</option><option>2やや不十分</option><option>3不十分</option></select>
+      <label>専門職の判断（RSST）<span style="font-weight:500;text-transform:none;letter-spacing:normal;color:var(--text-light)">／ 回数から自動判定</span></label>
+      <div id="rsst_judge_auto" class="auto-judge auto-judge--empty">回数を入力すると自動判定されます</div>
+      <input type="hidden" id="rsst_judge" value="">
     </div>
 
         <p class="section-label" style="margin-top:14px">⑤ ブクブクうがい</p>
@@ -1317,42 +1217,6 @@
     <div class="divider"></div>
   </div>
 
-  <!-- ② 対応ガイダンス -->
-  <div class="card">
-    <div class="card-header">
-      <div class="icon" style="background:#e8f0f8">🗺️</div>
-      <div><h2>対応ガイダンス</h2><div class="subtitle">評価結果に応じた対応方針</div></div>
-    </div>
-
-    <!-- STEP 1 -->
-    <div class="guid-step-label">STEP 1｜評価結果を選択</div>
-    <div class="guid-mode-row">
-      <button class="guid-mode-btn" id="guid-btn-low"  onclick="guidSetMode('低栄養')">📉 低栄養</button>
-      <button class="guid-mode-btn" id="guid-btn-high" onclick="guidSetMode('過栄養')">📈 過栄養</button>
-    </div>
-
-    <!-- STEP 2 -->
-    <div id="guid-step2" style="display:none">
-      <div class="guid-step-label">STEP 2｜気になる領域を選択（複数可）</div>
-      <div class="guid-cat-list" id="guid-cat-list"></div>
-    </div>
-
-    <!-- STEP 3 -->
-    <div id="guid-step3" style="display:none">
-      <div class="guid-step-label">STEP 3｜対応方針を確認</div>
-      <div class="guid-tab-bar" id="guid-tab-bar"></div>
-      <div id="guid-rehab-sub" style="display:none"></div>
-      <div class="guid-card-list" id="guid-card-list"></div>
-      <div class="guid-hint">💡 各カードをタップすると詳細が展開されます。「リハビリ対応」ではST・PT・OTをそれぞれ切り替えて確認できます。</div>
-    </div>
-
-    <div class="guid-empty" id="guid-empty-msg">
-      <div class="guid-empty-icon">🍽️</div>
-      <div style="font-weight:600">評価結果を選択してください</div>
-      <div style="margin-top:4px;font-size:12px">低栄養・過栄養に応じた対応方針が表示されます</div>
-    </div>
-  </div>
-
   <!-- ③ コメント・記録 -->
   <div class="card">
     <div class="card-header">
@@ -1361,7 +1225,7 @@
     </div>
     <div class="form-group" style="margin-bottom:12px">
       <label>支援の方向性・コメント</label>
-      <textarea id="summary_comment" placeholder="例：口腔清掃状態良好。MNAスコアにより低栄養のリスクあり。栄養士への連携を検討。" style="min-height:100px"></textarea>
+      <textarea id="summary_comment" class="autogrow" placeholder="例：口腔清掃状態良好。MNAスコアにより低栄養のリスクあり。栄養士への連携を検討。" style="min-height:120px;overflow:hidden;resize:vertical"></textarea>
     </div>
     <div class="form-group">
       <label>次回モニタリング予定日</label>
@@ -1447,6 +1311,24 @@
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
+<!-- 栄養アセスメント 項目編集モーダル -->
+<div class="nedit-overlay" id="nutritionEditOverlay">
+  <div class="nedit-modal" role="dialog" aria-modal="true" aria-labelledby="nutritionEditTitle">
+    <div class="nedit-modal__header">
+      <div class="nedit-modal__title" id="nutritionEditTitle">項目の編集</div>
+      <div class="nedit-modal__sub" id="nutritionEditSub"></div>
+    </div>
+    <div class="nedit-modal__body" id="nutritionEditBody"></div>
+    <div class="nedit-modal__footer">
+      <button type="button" class="btn btn-outline" id="nutritionEditResetButton">初期内容に戻す</button>
+      <div class="nedit-footer-right">
+        <button type="button" class="btn btn-outline" id="nutritionEditCancelButton">キャンセル</button>
+        <button type="button" class="btn btn-success" id="nutritionEditSaveButton">保存</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 // ==================== STATE ====================
 let mnaScores = { a: null, b: null, c: null, d: null, e: null, f: null };
@@ -1470,6 +1352,7 @@ const CLINICAL_COMMENT_END_MARKER = '【口腔機能メモここまで】';
 const NUTRITION_COMMENT_START_MARKER = '【栄養アセスメント】';
 const NUTRITION_COMMENT_END_MARKER = '【栄養アセスメントここまで】';
 const NUTRITION_SELECTION_FIELD_ID = 'nutrition_selection_state';
+const NUTRITION_OVERRIDE_FIELD_ID = 'nutrition_action_overrides';
 const MANAGED_SELECT_CUSTOM_VALUE = '__custom__';
 const DEFAULT_STAFF_OPTIONS = ['本澤　真奈美', '兵働　めぐみ', '川原　奈緒美', '水野　永子', '宇井　くるみ', '近藤　祥子', '加治木　綾華', '伊藤　言美', '間島　大心', '村松　由姫香', '権田　万智子', '多和　佑恭'];
 const MANAGED_FIELD_CONFIGS = [
@@ -2076,6 +1959,12 @@ function restoreFieldValues(fields) {
     }
     if (typeof syncOdkHelperFieldsFromRates === 'function') {
         syncOdkHelperFieldsFromRates();
+    }
+    if (typeof updateRsstJudge === 'function') {
+        updateRsstJudge();
+    }
+    if (typeof refreshAutogrowTextareas === 'function') {
+        refreshAutogrowTextareas();
     }
 }
 
@@ -3884,7 +3773,6 @@ function ensureOralAssessmentEnhancements() {
     applySelectConfig('a2', ORAL_SELECT_CONFIG.a2);
     applySelectConfig('a3', ORAL_SELECT_CONFIG.a3, { sectionLabel: true, useSectionLabelOnly: true });
     applySelectConfig('a4', ORAL_SELECT_CONFIG.a4, { sectionLabel: true, useSectionLabelOnly: true });
-    applySelectConfig('rsst_judge', ORAL_SELECT_CONFIG.rsst_judge);
     applySelectConfig('bukubuku', ORAL_SELECT_CONFIG.bukubuku);
     const chewingSectionLabel = findNearestSectionLabelElement(document.getElementById('a1'));
     if (chewingSectionLabel) {
@@ -4757,6 +4645,11 @@ function ensureStage1Styles() {
             font-weight: 700;
             color: var(--text-light);
             margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            min-height: 24px;
         }
         .nutrition-action-subgrid {
             display: grid;
@@ -4774,6 +4667,30 @@ function ensureStage1Styles() {
             font-size: 12px;
             font-weight: 700;
             color: #2f5675;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            min-height: 24px;
+        }
+        /* edit button on each role/sub-role group */
+        .nutrition-edit-btn {
+            flex-shrink: 0;
+            border: 1px solid var(--primary-light);
+            background: #fff;
+            color: var(--primary);
+            font-family: 'Noto Sans JP', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 9px;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: background 0.15s, color 0.15s;
+            white-space: nowrap;
+        }
+        .nutrition-edit-btn:hover {
+            background: var(--primary);
+            color: #fff;
         }
         .nutrition-action-list {
             display: grid;
@@ -4792,6 +4709,104 @@ function ensureStage1Styles() {
             margin-top: 3px;
         }
         .nutrition-empty {
+            color: var(--text-light);
+        }
+
+        /* ── Nutrition action edit modal ── */
+        .nedit-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 33, 48, 0.55);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+        .nedit-overlay.open { display: flex; }
+        .nedit-modal {
+            background: #fff;
+            border-radius: 14px;
+            width: 100%;
+            max-width: 560px;
+            max-height: 88vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 18px 50px rgba(0,0,0,0.35);
+            overflow: hidden;
+        }
+        .nedit-modal__header {
+            padding: 16px 20px;
+            background: var(--primary);
+            color: #fff;
+        }
+        .nedit-modal__title {
+            font-size: 15px;
+            font-weight: 700;
+        }
+        .nedit-modal__sub {
+            font-size: 12px;
+            opacity: 0.8;
+            margin-top: 3px;
+        }
+        .nedit-modal__body {
+            padding: 16px 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .nedit-row {
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+        }
+        .nedit-row textarea {
+            flex: 1;
+            min-height: 52px;
+            font-size: 14px;
+        }
+        .nedit-row__remove {
+            flex-shrink: 0;
+            border: 1.5px solid var(--danger);
+            background: #fff;
+            color: var(--danger);
+            font-size: 16px;
+            font-weight: 700;
+            width: 38px;
+            height: 38px;
+            border-radius: 9px;
+            cursor: pointer;
+            line-height: 1;
+        }
+        .nedit-row__remove:hover { background: var(--danger); color: #fff; }
+        .nedit-add {
+            border: 1.5px dashed var(--primary-light);
+            background: #f4f9fd;
+            color: var(--primary);
+            font-family: 'Noto Sans JP', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            padding: 10px;
+            border-radius: 9px;
+            cursor: pointer;
+        }
+        .nedit-add:hover { background: #e8f0f8; }
+        .nedit-modal__footer {
+            padding: 14px 20px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 10px;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+        .nedit-modal__footer .nedit-footer-right {
+            display: flex;
+            gap: 10px;
+            margin-left: auto;
+        }
+        .nedit-empty-note {
+            font-size: 12px;
             color: var(--text-light);
         }
         .trend-table td {
@@ -5765,6 +5780,9 @@ function resetRsstTimer(options = {}) {
     if (countInput) {
         countInput.value = '0';
     }
+    if (typeof updateRsstJudge === 'function') {
+        updateRsstJudge();
+    }
     updateRsstDisplay();
     if (!options.quiet) {
         showToast('⏱️ RSSTタイマーをリセットしました');
@@ -5989,6 +6007,7 @@ function ensureNutritionAssessmentPanel() {
             </div>
         </div>
         <input type="hidden" id="${NUTRITION_SELECTION_FIELD_ID}" value="{}">
+        <input type="hidden" id="${NUTRITION_OVERRIDE_FIELD_ID}" value="{}">
         <div id="nutritionAssessmentChips" class="metric-chip-list"></div>
         <div id="nutritionAssessmentSummary" class="stage2-panel__summary">BMI・MNA-SF・口腔機能を入力すると自動評価を表示します。</div>
         <div id="nutritionAssessmentCards" class="nutrition-cause-grid"></div>
@@ -6008,6 +6027,19 @@ function ensureNutritionAssessmentPanel() {
             nextState[actionKey] = Boolean(target.checked);
             setNutritionSelectionState(nextState, { fromUser: true });
             renderNutritionAssessmentPanel();
+        });
+        panel.addEventListener('click', (event) => {
+            const editBtn = event.target.closest('[data-nutrition-edit]');
+            if (!editBtn || !panel.contains(editBtn)) {
+                return;
+            }
+            openNutritionEditModal({
+                modeId: editBtn.getAttribute('data-mode') || '',
+                causeId: editBtn.getAttribute('data-cause') || '',
+                role: editBtn.getAttribute('data-role') || '',
+                roleLabel: editBtn.getAttribute('data-rolelabel') || '',
+                causeLabel: editBtn.getAttribute('data-causelabel') || '',
+            });
         });
         panel.dataset.boundNutritionPanel = '1';
     }
@@ -6077,6 +6109,65 @@ function buildNutritionActionKey(modeId, causeId, role, index) {
     return [modeId, causeId, role, index].join('::');
 }
 
+// ---- Nutrition action text overrides (editable guidance) ----
+// Stored as { "modeId::causeId::role": ["項目1", "項目2", ...] }
+function buildNutritionOverrideKey(modeId, causeId, role) {
+    return [modeId, causeId, role].join('::');
+}
+
+function getNutritionOverrideState() {
+    const field = document.getElementById(NUTRITION_OVERRIDE_FIELD_ID);
+    if (!field) {
+        return {};
+    }
+    try {
+        const parsed = JSON.parse(String(field.value || '{}'));
+        return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
+    } catch {
+        return {};
+    }
+}
+
+function setNutritionOverrideState(state, options = {}) {
+    const field = document.getElementById(NUTRITION_OVERRIDE_FIELD_ID);
+    if (!field) {
+        return;
+    }
+    const normalized = {};
+    Object.entries(state || {}).forEach(([key, value]) => {
+        const normalizedKey = String(key || '').trim();
+        if (!normalizedKey || !Array.isArray(value)) {
+            return;
+        }
+        const cleaned = value.map((item) => String(item || '').trim()).filter(Boolean);
+        if (cleaned.length) {
+            normalized[normalizedKey] = cleaned;
+        }
+    });
+    const nextValue = JSON.stringify(normalized);
+    if (field.value === nextValue) {
+        return;
+    }
+    field.value = nextValue;
+    if (options.fromUser) {
+        scheduleAutosave();
+    }
+}
+
+// returns the base (default) action items for a cause/role
+function getNutritionBaseActionItems(modeId, causeId, role) {
+    const modeConfig = NUTRITION_GUIDANCE_LIBRARY[modeId];
+    const causeConfig = modeConfig && modeConfig.causes ? modeConfig.causes[causeId] : null;
+    if (!causeConfig) {
+        return [];
+    }
+    const sourceKey = role === 'rehabSt' ? 'st'
+        : role === 'rehabPt' ? 'pt'
+        : role === 'rehabOt' ? 'ot'
+        : role;
+    return Array.isArray(causeConfig[sourceKey]) ? causeConfig[sourceKey].slice() : [];
+}
+
 function dedupeTextItems(items) {
     return [...new Set((items || []).map((item) => String(item || '').trim()).filter(Boolean))];
 }
@@ -6088,17 +6179,25 @@ function buildNutritionCause(modeId, causeId, reasons) {
     if (!causeConfig || !normalizedReasons.length) {
         return null;
     }
+    const overrides = getNutritionOverrideState();
+    const resolveRole = (role) => {
+        const overrideKey = buildNutritionOverrideKey(modeId, causeId, role);
+        if (Array.isArray(overrides[overrideKey])) {
+            return overrides[overrideKey].slice();
+        }
+        return getNutritionBaseActionItems(modeId, causeId, role);
+    };
     return {
         modeId,
         causeId,
         icon: causeConfig.icon,
         label: causeConfig.label,
         reasons: normalizedReasons,
-        patientFamily: causeConfig.patientFamily || [],
-        rehabSt: causeConfig.st || [],
-        rehabPt: causeConfig.pt || [],
-        rehabOt: causeConfig.ot || [],
-        ns: causeConfig.ns || [],
+        patientFamily: resolveRole('patientFamily'),
+        rehabSt: resolveRole('rehabSt'),
+        rehabPt: resolveRole('rehabPt'),
+        rehabOt: resolveRole('rehabOt'),
+        ns: resolveRole('ns'),
         modeLabel: modeConfig.label,
         modeTone: modeConfig.chipTone,
     };
@@ -6412,6 +6511,9 @@ function syncNutritionCommentDraft(data, selectionState) {
     commentField.value = nextValue;
     commentField.dispatchEvent(new Event('input', { bubbles: true }));
     commentField.dispatchEvent(new Event('change', { bubbles: true }));
+    if (typeof autoSizeTextarea === 'function') {
+        autoSizeTextarea(commentField);
+    }
 }
 
 function renderNutritionAssessmentPanel() {
@@ -6438,24 +6540,34 @@ function renderNutritionAssessmentPanel() {
     }
 
     cards.innerHTML = data.causes.map((cause) => {
+        const editBtn = (role, roleLabel) => `<button type="button" class="nutrition-edit-btn" data-nutrition-edit="1" data-mode="${escapeHtml(cause.modeId)}" data-cause="${escapeHtml(cause.causeId)}" data-role="${escapeHtml(role)}" data-rolelabel="${escapeHtml(roleLabel)}" data-causelabel="${escapeHtml(cause.label)}" title="この項目を編集">✎ 編集</button>`;
         const roleHtml = `
             <div class="nutrition-action-group">
-                <div class="nutrition-action-group__title">${escapeHtml(NUTRITION_ACTION_ROLE_LABELS.patientFamily)}</div>
+                <div class="nutrition-action-group__title">
+                    <span>${escapeHtml(NUTRITION_ACTION_ROLE_LABELS.patientFamily)}</span>
+                    ${editBtn('patientFamily', NUTRITION_ACTION_ROLE_LABELS.patientFamily)}
+                </div>
                 <div class="nutrition-action-list">${buildNutritionActionListHtml(cause, 'patientFamily', selectionState)}</div>
             </div>
             <div class="nutrition-action-group">
-                <div class="nutrition-action-group__title">${escapeHtml(NUTRITION_ACTION_ROLE_LABELS.rehab)}</div>
+                <div class="nutrition-action-group__title"><span>${escapeHtml(NUTRITION_ACTION_ROLE_LABELS.rehab)}</span></div>
                 <div class="nutrition-action-subgrid">
                     ${NUTRITION_REHAB_ROLE_CONFIGS.map((roleConfig) => `
                         <div class="nutrition-action-subgroup">
-                            <div class="nutrition-action-subtitle">${escapeHtml(roleConfig.shortLabel)}</div>
+                            <div class="nutrition-action-subtitle">
+                                <span>${escapeHtml(roleConfig.shortLabel)}</span>
+                                ${editBtn(roleConfig.key, NUTRITION_ACTION_ROLE_LABELS[roleConfig.key] || roleConfig.shortLabel)}
+                            </div>
                             <div class="nutrition-action-list">${buildNutritionActionListHtml(cause, roleConfig.key, selectionState)}</div>
                         </div>
                     `).join('')}
                 </div>
             </div>
             <div class="nutrition-action-group">
-                <div class="nutrition-action-group__title">${escapeHtml(NUTRITION_ACTION_ROLE_LABELS.ns)}</div>
+                <div class="nutrition-action-group__title">
+                    <span>${escapeHtml(NUTRITION_ACTION_ROLE_LABELS.ns)}</span>
+                    ${editBtn('ns', NUTRITION_ACTION_ROLE_LABELS.ns)}
+                </div>
                 <div class="nutrition-action-list">${buildNutritionActionListHtml(cause, 'ns', selectionState)}</div>
             </div>
         `;
@@ -6481,6 +6593,150 @@ function renderNutritionAssessmentPanel() {
     }
     latestNutritionAssessmentData = { ...data, commentDraft: draft };
     syncNutritionCommentDraft(data, selectionState);
+}
+
+// ==================== 栄養アセスメント 項目編集モーダル ====================
+let nutritionEditContext = null;
+
+function openNutritionEditModal(context) {
+    if (!context || !context.modeId || !context.causeId || !context.role) {
+        return;
+    }
+    nutritionEditContext = context;
+    const overlay = document.getElementById('nutritionEditOverlay');
+    const title = document.getElementById('nutritionEditTitle');
+    const sub = document.getElementById('nutritionEditSub');
+    if (!overlay || !title || !sub) {
+        return;
+    }
+    title.textContent = `${context.causeLabel}　${context.roleLabel}`;
+    sub.textContent = '提案項目を加筆・修正・追加・削除できます。保存すると以降の表示とコメント反映に適用されます。';
+
+    const overrides = getNutritionOverrideState();
+    const overrideKey = buildNutritionOverrideKey(context.modeId, context.causeId, context.role);
+    const items = Array.isArray(overrides[overrideKey])
+        ? overrides[overrideKey].slice()
+        : getNutritionBaseActionItems(context.modeId, context.causeId, context.role);
+
+    renderNutritionEditRows(items.length ? items : ['']);
+    overlay.classList.add('open');
+}
+
+function renderNutritionEditRows(items) {
+    const body = document.getElementById('nutritionEditBody');
+    if (!body) {
+        return;
+    }
+    const list = Array.isArray(items) ? items : [''];
+    body.innerHTML = list.map((item) => `
+        <div class="nedit-row">
+            <textarea class="nedit-row__text" rows="2">${escapeHtml(item)}</textarea>
+            <button type="button" class="nedit-row__remove" title="この項目を削除">×</button>
+        </div>
+    `).join('') + `
+        <button type="button" class="nedit-add" id="nutritionEditAddRow">＋ 項目を追加</button>
+        <div class="nedit-empty-note">すべて空欄にして保存すると、この項目は提案なしになります。</div>
+    `;
+}
+
+function collectNutritionEditRows() {
+    const body = document.getElementById('nutritionEditBody');
+    if (!body) {
+        return [];
+    }
+    return Array.from(body.querySelectorAll('.nedit-row__text'))
+        .map((textarea) => String(textarea.value || '').trim())
+        .filter(Boolean);
+}
+
+function closeNutritionEditModal() {
+    const overlay = document.getElementById('nutritionEditOverlay');
+    if (overlay) {
+        overlay.classList.remove('open');
+    }
+    nutritionEditContext = null;
+}
+
+function saveNutritionEditModal() {
+    if (!nutritionEditContext) {
+        closeNutritionEditModal();
+        return;
+    }
+    const { modeId, causeId, role } = nutritionEditContext;
+    const overrideKey = buildNutritionOverrideKey(modeId, causeId, role);
+    const editedItems = collectNutritionEditRows();
+    const baseItems = getNutritionBaseActionItems(modeId, causeId, role);
+    const overrides = getNutritionOverrideState();
+
+    // if edited content equals the default, drop the override entry
+    const sameAsBase = editedItems.length === baseItems.length
+        && editedItems.every((item, index) => item === baseItems[index]);
+    if (sameAsBase) {
+        delete overrides[overrideKey];
+    } else {
+        overrides[overrideKey] = editedItems;
+    }
+    setNutritionOverrideState(overrides, { fromUser: true });
+    closeNutritionEditModal();
+    renderNutritionAssessmentPanel();
+    showToast('✏️ 提案項目を更新しました');
+}
+
+function resetNutritionEditModal() {
+    if (!nutritionEditContext) {
+        return;
+    }
+    const { modeId, causeId, role } = nutritionEditContext;
+    const baseItems = getNutritionBaseActionItems(modeId, causeId, role);
+    renderNutritionEditRows(baseItems.length ? baseItems : ['']);
+}
+
+function bindNutritionEditModal() {
+    const overlay = document.getElementById('nutritionEditOverlay');
+    if (!overlay || overlay.dataset.bound === '1') {
+        return;
+    }
+    overlay.dataset.bound = '1';
+
+    overlay.addEventListener('click', (event) => {
+        if (event.target === overlay) {
+            closeNutritionEditModal();
+        }
+        if (event.target.closest('#nutritionEditAddRow')) {
+            const current = collectNutritionEditRows();
+            current.push('');
+            renderNutritionEditRows(current);
+            const textareas = overlay.querySelectorAll('.nedit-row__text');
+            if (textareas.length) {
+                textareas[textareas.length - 1].focus();
+            }
+        }
+        const removeBtn = event.target.closest('.nedit-row__remove');
+        if (removeBtn) {
+            const row = removeBtn.closest('.nedit-row');
+            if (row) {
+                row.remove();
+            }
+        }
+    });
+
+    const cancelBtn = document.getElementById('nutritionEditCancelButton');
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', closeNutritionEditModal);
+    }
+    const saveBtn = document.getElementById('nutritionEditSaveButton');
+    if (saveBtn) {
+        saveBtn.addEventListener('click', saveNutritionEditModal);
+    }
+    const resetBtn = document.getElementById('nutritionEditResetButton');
+    if (resetBtn) {
+        resetBtn.addEventListener('click', resetNutritionEditModal);
+    }
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && overlay.classList.contains('open')) {
+            closeNutritionEditModal();
+        }
+    });
 }
 
 function stripTerminalPunctuation(value) {
@@ -7607,7 +7863,36 @@ async function initializeApp() {
     updateDraftStatusDisplays();
     updateStage2Panels();
     attachStatusIndicatorListeners();
+    bindNutritionEditModal();
+    setupAutogrowTextareas();
+    if (typeof updateRsstJudge === 'function') updateRsstJudge();
     syncStatusIndicators();
+}
+
+// ---- Auto-grow textareas: expand to fit full content so nothing is hidden ----
+function autoSizeTextarea(textarea) {
+    if (!textarea) {
+        return;
+    }
+    textarea.style.height = 'auto';
+    const minHeight = parseInt(window.getComputedStyle(textarea).minHeight, 10) || 0;
+    textarea.style.height = Math.max(textarea.scrollHeight, minHeight) + 'px';
+}
+
+function setupAutogrowTextareas() {
+    document.querySelectorAll('textarea.autogrow').forEach((textarea) => {
+        autoSizeTextarea(textarea);
+        if (textarea.dataset.autogrowBound === '1') {
+            return;
+        }
+        textarea.addEventListener('input', () => autoSizeTextarea(textarea));
+        textarea.dataset.autogrowBound = '1';
+    });
+}
+
+// re-measure every auto-grow textarea (after programmatic value changes)
+function refreshAutogrowTextareas() {
+    document.querySelectorAll('textarea.autogrow').forEach((textarea) => autoSizeTextarea(textarea));
 }
 
 // listen for changes that affect the score bar / step chips
@@ -7632,6 +7917,9 @@ function showTab(id) {
   if (id === 'summary') updateSummary();
   updateScoreBar();
   updateStepProgress();
+  if (typeof refreshAutogrowTextareas === 'function') {
+    refreshAutogrowTextareas();
+  }
   window.scrollTo(0, 0);
 }
 
@@ -7712,6 +8000,43 @@ function autoBMI(bmi) {
   else if (bmi < 23) score = 2;
   else score = 3;
   // visually pre-select
+}
+
+// ==================== RSST 自動判定 ====================
+// RSSTは30秒固定。回数から専門職判断を自動算出する（3回以上=問題なし / 3回未満=問題あり）。
+function updateRsstJudge() {
+  const countInput = document.getElementById('rsst_count');
+  const display = document.getElementById('rsst_judge_auto');
+  const hidden = document.getElementById('rsst_judge');
+  if (!display || !hidden) {
+    return;
+  }
+  const raw = countInput ? String(countInput.value || '').trim() : '';
+  if (raw === '') {
+    display.className = 'auto-judge auto-judge--empty';
+    display.textContent = '回数を入力すると自動判定されます';
+    hidden.value = '';
+    if (typeof syncStatusIndicators === 'function') syncStatusIndicators();
+    return;
+  }
+  const count = Number.parseInt(raw, 10);
+  if (Number.isNaN(count) || count < 0) {
+    display.className = 'auto-judge auto-judge--empty';
+    display.textContent = '回数を入力すると自動判定されます';
+    hidden.value = '';
+    if (typeof syncStatusIndicators === 'function') syncStatusIndicators();
+    return;
+  }
+  if (count >= 3) {
+    display.className = 'auto-judge auto-judge--ok';
+    display.textContent = '✓ 問題なし（30秒で' + count + '回：3回以上）';
+    hidden.value = '1';
+  } else {
+    display.className = 'auto-judge auto-judge--ng';
+    display.textContent = '⚠ 問題あり（30秒で' + count + '回：3回未満）';
+    hidden.value = '2';
+  }
+  if (typeof syncStatusIndicators === 'function') syncStatusIndicators();
 }
 
 // ==================== MNA ====================
@@ -7808,176 +8133,6 @@ function updateSummary() {
   syncStatusIndicators();
 }
 
-// ==================== GUIDANCE UI ====================
-(function() {
-  const GUID_DATA = {
-    低栄養: {
-      modeClass:'active-low', selClass:'sel-low', chkClass:'chk-low', lblClass:'lbl-low', dotClass:'dot-low',
-      categories:[
-        { id:'weight', icon:'⚖️', label:'体重減少・るいそう',
-          observations:['BMI 18.5未満、または直近3〜6か月で5%以上の体重減少','皮下脂肪の減少、骨の突出（肩甲骨・肋骨・腸骨など）','筋力低下・握力低下・易疲労感','浮腫・腹水（低アルブミンによる浸透圧低下）','血液検査：Alb低値、TP低値、リンパ球数減少'],
-          patientFamily:['「1回の食事量が少なくても、回数を増やすことで補えます」','高カロリー・高タンパクな食品を優先（卵・豆腐・チーズなど）','好きな食べ物を中心に、食べる意欲を大切にしましょう','市販の栄養補助食品（ONS）の活用を提案する','「体重が増えてきたら食事がうまくいっているサインです」と伝える'],
-          rehab:{ st:['摂食嚥下機能評価を実施（RSST・水飲みテスト・VE/VF検討）','食形態・とろみの適正化（現状より食べやすい形態の検討）','摂食姿勢・口腔準備期・咀嚼機能の評価','代償法（頸部前屈・複数回嚥下など）の指導','栄養摂取量改善のための食事環境・姿勢調整'], pt:['全身筋力・体力低下の評価（握力・6分間歩行・下肢筋力）','廃用予防を目的とした段階的な離床・活動プログラムの立案','食事姿勢保持に必要な体幹筋力・バランス機能の評価と強化訓練','栄養状態改善に向けた運動介入（抵抗運動・有酸素運動）の計画','PT・栄養士・STの連携による栄養リハビリテーション計画の立案'], ot:['食事動作のADL評価（食具操作・上肢機能・座位保持）','上肢筋力低下・巧緻性低下に対する作業療法訓練の立案','適切な自助具・食具の選定と使用訓練（スプーン・箸・皿）','食事環境の整備（テーブル高・椅子・照明・食器の工夫）','意欲・QOLを高める作業活動の導入（食にまつわる作業療法）'] },
-          ns:['体重・体組成（筋肉量）の定期モニタリング（週1回以上）','食事摂取率の記録と報告（主食・副食別）','IN/OUTバランスの確認','栄養補助食品の導入・服薬状況との相互作用確認','医師・管理栄養士・NSTへの早期報告・連携'] },
-        { id:'dysphagia', icon:'🍵', label:'摂食・嚥下障害',
-          observations:['むせ・咳嗽（食中・食後）、声質の変化（湿性嗄声）','食事時間の延長（30分以上）、疲労による中断','食物の口腔内残留、飲み込み後の残留感','食事形態の自己制限（柔らかいものしか食べない）','体重減少・発熱（誤嚥性肺炎の既往・反復）'],
-          patientFamily:['「ゆっくり少量ずつ食べることが大切です」','食事中の姿勢（90度座位、頸部前屈）を説明・指導','水分には必要に応じてとろみをつける理由を丁寧に説明','「むせが増えたらすぐ教えてください」と観察ポイントを伝える','誤嚥性肺炎のリスクと口腔ケアの重要性を伝える'],
-          rehab:{ st:['VE（嚥下内視鏡）またはVF（嚥下造影）による精密評価','咽頭残留・誤嚥パターンの特定と記録','適切な食形態・とろみ濃度の決定','直接訓練（段階的摂食訓練）・間接訓練（口腔・咽頭筋訓練）','食事場面の観察・環境設定・ポジショニング指導'], pt:['呼吸機能評価（肺活量・咳嗽力・呼吸パターン）と呼吸訓練','誤嚥性肺炎予防のための排痰訓練・呼吸理学療法の実施','食事姿勢に必要な体幹安定性・頸部コントロールの評価と強化','歩行・全身活動量向上による嚥下関連筋群の間接的強化','体力低下による嚥下疲労への対応（活動強度の段階的調整）'], ot:['食事動作の詳細観察（食具操作・食器の持ち方・ペース）','上肢機能評価と食事動作訓練（スプーン・コップ操作の改善）','食事時の座位保持・ポジショニング補助具の選定','誤嚥リスクを考慮した食事環境の設定と介助方法の指導','食事動作に影響する上肢・体幹機能の作業療法的アプローチ'] },
-          ns:['食事中・食後の観察（むせ・声質変化・SpO₂低下）','口腔ケアの実施・介助（食前後）','食後の体位管理（30〜60分の上体挙上）','誤嚥性肺炎の早期徴候（発熱・SpO₂低下）の監視','STと連携し食形態の統一を全スタッフに周知'] },
-        { id:'anorexia', icon:'🍽️', label:'食欲不振・摂取量低下',
-          observations:['食事摂取率50%未満が続いている','食事への興味・意欲の低下','早期満腹感・腹部膨満感の訴え','味覚変化・口腔乾燥（薬剤性含む）','抑うつ・無気力・認知機能低下の合併'],
-          patientFamily:['「食べられるときに食べやすいものを選びましょう」','食事の雰囲気づくり（好きな食器・会話・音楽）の工夫','少量・高頻度の食事で1日の総摂取量を確保','食前の口腔ケアで唾液分泌を促し、食欲を引き出す','家族と一緒に食べる機会をつくることの大切さを伝える'],
-          rehab:{ st:['食行動・食環境の評価（摂食前後の状態観察）','口腔感覚・先行期の評価（認知〜口腔準備期）','食欲に関わる口腔機能（唾液分泌・感覚）の確認','食の楽しみを引き出すアプローチ（嗜好品・質感調整）'], pt:['活動量増加による食欲促進プログラムの立案（散歩・体操）','廃用・筋力低下が食欲低下に及ぼす影響の評価','日中の覚醒・生活リズム改善を目的とした離床促進','消化機能・腸管運動改善に向けた運動療法の検討'], ot:['食事に関わる生活全体のルーティン評価と再構築支援','食事準備への参加（献立選び・調理補助）による食への意欲引き出し','好きな活動・作業を通じた意欲・QOL向上アプローチ','食事環境（食卓・食器・座席配置）の個別最適化'] },
-          ns:['摂取量記録と傾向の把握（悪化時期・好む食品）','薬剤の食欲低下への影響確認（医師と相談）','食前の口腔ケア実施による食欲促進','栄養補助食品・高カロリー飲料の導入検討','心理的サポート・傾聴（食への不安・意欲低下の背景探索）'] },
-        { id:'oral', icon:'🦷', label:'口腔機能低下',
-          observations:['義歯の不適合・未装着（疼痛・嫌がり）','咀嚼力の低下（硬いものを避ける・丸呑み傾向）','口腔乾燥（口が渇く・話しにくい）','口腔衛生不良（プラーク・歯石・舌苔の堆積）','口腔粘膜病変（口内炎・カンジダ）'],
-          patientFamily:['「義歯が合わなくなってきたら歯科に相談しましょう」','毎食後の口腔ケアの重要性と具体的方法を説明','口腔乾燥には保湿剤や少量の水・お茶で対応','食べにくい食品リストと代替食品の提案','「口の中を清潔にすると食事がおいしく感じられます」'],
-          rehab:{ st:['口腔機能評価（舌圧・咬合力・口唇閉鎖力・唾液分泌）','口腔機能訓練（舌運動・口唇体操・頬筋訓練）','義歯装着の確認・歯科連携の検討','食形態調整（咀嚼能力に合わせたテクスチャー選定）','口腔乾燥への対応（保湿・唾液腺マッサージ指導）'], pt:['口腔機能に関わる頸部・体幹筋の柔軟性・筋力評価','頸部のストレッチ・可動域訓練（嚥下・咀嚼関連筋への影響）','全身的な廃用改善による口腔機能維持・向上の間接的支援','呼吸機能改善を通じた口腔・咽頭機能への波及効果の活用'], ot:['手指巧緻性・上肢機能の評価と口腔ケア動作への応用','口腔ケアが自立して行えるための自助具選定・動作訓練','義歯着脱動作の評価と訓練（手指機能・認知機能の考慮）','口腔ケアを日常生活の習慣に組み込むための作業分析・支援'] },
-          ns:['口腔ケアの実施・介助（専用ブラシ・保湿剤の使用）','義歯の管理（清潔保持・就寝時の保管）','口腔内観察（炎症・出血・カンジダ）の記録','歯科衛生士・歯科医師との連携調整','水分摂取状況の確認（口腔乾燥との関連）'] },
-        { id:'cognitive', icon:'🧠', label:'認知機能低下・行動変化',
-          observations:['食事の認識困難（食べ物とわからない・食べることを忘れる）','食具の使い方がわからない（スプーン・箸の使用困難）','食事中の注意散漫・食事を途中でやめてしまう','異食行動・過食衝動（前頭側頭型認知症）','拒食・拒薬行動'],
-          patientFamily:['「一品ずつ出すと食べやすい場合があります」','手づかみで食べられるフィンガーフード形態の提案','静かで落ち着いた食事環境づくり（テレビ・雑音を減らす）','「食べない日もあります。無理強いは逆効果です」と伝える','見守り・声かけの工夫（視線・肩の高さを合わせる）'],
-          rehab:{ st:['認知機能と摂食行動の関連評価（先行期〜咽頭期）','食事場面観察（声かけ・環境・食具・ペースの影響確認）','介助方法の統一指導（スタッフ・家族）','食形態の認知に配慮した選定（色・香り・温度の活用）'], pt:['認知機能低下に伴う転倒リスクの評価と予防介入','運動による認知機能維持・改善効果を意識した活動プログラムの立案','食事前の軽い運動（散歩・体操）による覚醒・意欲向上の活用','夜間不穏・昼夜逆転に対する日中活動量増加プログラムの提案'], ot:['認知機能評価（HDS-R・MMSEなど）と食事動作への影響分析','食事動作の段階的介助方法の立案と統一（最大限の自立支援）','視覚・触覚・嗅覚を活用した食事への先行期刺激の工夫','食具・食器の認知に配慮した選定（色・形・シンプルさ）','家族・介護者への食事介助技術の指導（OT視点から）'] },
-          ns:['食事時の見守り・声かけ介助の実施','食事環境の整備（座位・食具・照明・ノイズ管理）','摂取量・行動パターンの記録（拒食のタイミング・理由）','家族への介助方法指導と精神的サポート','必要に応じて抗精神病薬・食欲増進薬の効果確認'] },
-      ]
-    },
-    過栄養: {
-      modeClass:'active-high', selClass:'sel-high', chkClass:'chk-high', lblClass:'lbl-high', dotClass:'dot-high',
-      categories:[
-        { id:'overeating', icon:'🍱', label:'過食・摂取量過多',
-          observations:['BMI 25以上、または急激な体重増加','食事量・間食量が多い（本人の自覚がない場合も）','早食い・ながら食いの習慣','食事記録と実際の摂取量のギャップ','空腹感・満腹感の感知異常（認知症・精神疾患）'],
-          patientFamily:['「食べる速度をゆっくりにすると自然と量が減ります」','食器を小さくする・盛り付けを工夫して満足感を高める方法を提案','食事日記・記録アプリの活用を勧める','間食の内容・タイミングを見直す（低カロリー代替品の提案）','「食事を楽しみながら、量のコントロールを少しずつ」と伝える'],
-          rehab:{ st:['摂食ペースの評価（早食い・丸呑みの有無）','口腔機能と食行動の関連評価（咀嚼不足・嚥下の代償）','食行動修正プログラムへの参加検討（行動変容支援）','食事時間・食環境の評価と改善提案'], pt:['肥満・過体重に対応した有酸素運動プログラムの立案（転倒リスク考慮）','筋力低下を伴うサルコペニック肥満の評価と運動介入','関節への負担を軽減した水中運動・自転車エルゴメーター等の提案','活動量・歩数の目標設定と段階的な身体活動増加プログラム','体重管理に向けた運動消費カロリー目標の設定と記録支援'], ot:['食行動パターンの分析（ストレス食い・環境誘因の特定）','食事環境の改善（食器・食卓の整理・食事に集中できる環境設定）','食事以外の楽しみ・生きがいとなる作業活動の導入（代替行動の提案）','日常生活活動（家事・趣味）による活動量増加の支援','肥満に関連する生活習慣（睡眠・ストレス管理）への作業療法的アプローチ'] },
-          ns:['食事摂取量・間食の記録（定量的な把握）','体重・腹囲の定期測定（週1回）','血糖・脂質・血圧などの生活習慣病関連指標のモニタリング','管理栄養士・医師との連携（食事指導・処方見直し）','家族への協力依頼（食事環境の整備）'] },
-        { id:'imbalance', icon:'🥗', label:'栄養バランスの偏り',
-          observations:['特定食品への偏食（炭水化物過多・タンパク不足など）','野菜・食物繊維の摂取不足','加工食品・塩分・糖分の過剰摂取','ビタミン・ミネラル欠乏の兆候（口内炎・皮膚症状など）','血液検査：HbA1c上昇・脂質異常・尿酸高値'],
-          patientFamily:['「毎食、主食・主菜・副菜を揃えるイメージで」と伝える','色とりどりの食材を取り入れる目安の説明','加工食品・外食時のポイント（栄養成分表示の見方）を教える','好きな食材を活かしながらバランスを整える提案','水分摂取（甘い飲料から水・お茶への切り替え）の促進'],
-          rehab:{ st:['食品の質感・食べやすさと偏食の関連評価','口腔機能低下による特定食品への偏りの確認','咀嚼機能に合わせたバランス食の形態提案'], pt:['生活習慣病（糖尿病・高血圧・脂質異常症）に対応した運動療法の立案','血糖コントロールを意識した運動強度・タイミングの設定','関節疾患・心肺機能を考慮した安全な運動プログラムの提供','栄養改善と運動の相乗効果を活用した筋力・持久力向上計画'], ot:['栄養バランスを意識した食事準備・調理への参加支援','食材選びや献立づくりの作業療法的活用（食への関心向上）','食習慣改善につながる生活全体のルーティン再構築支援','食事記録の継続支援（日常作業としての定着化アプローチ）'] },
-          ns:['食事内容の観察・記録（食品カテゴリー別摂取状況）','血液データの定期モニタリング（HbA1c・脂質・電解質）','管理栄養士による食事指導の調整・依頼','服薬中の薬剤と食事相互作用の確認（ワルファリン・糖尿病薬など）','生活習慣病管理のための定期的な体重・血圧測定'] },
-        { id:'activity', icon:'🚶', label:'活動量低下・代謝低下',
-          observations:['ADLの低下・寝たきり・車椅子生活','筋肉量は少ないが脂肪量が多い（サルコペニック肥満）','褥瘡リスクの上昇','廃用性変化（関節可動域制限・筋力低下）','疼痛・呼吸困難による活動制限'],
-          patientFamily:['「座った状態でできる体操も効果があります」','食後の短時間の活動（散歩・体操）を少しずつ取り入れる提案','「動くことが食欲にもつながります」とメリットを伝える','転倒リスクへの配慮と安全な活動環境の整備を促す'],
-          rehab:{ st:['摂食に関わる姿勢・体幹機能の評価','活動量低下による嚥下機能への影響評価','食事中の疲労感・体力低下の観察','PT・OTとの連携による包括的リハビリ計画の検討'], pt:['廃用症候群の評価（筋力・関節可動域・耐久性・バランス）','段階的な離床・起立・歩行訓練プログラムの立案','筋力増強訓練（下肢・体幹を中心とした抵抗運動）','有酸素運動による代謝改善プログラム（歩行・自転車エルゴ）','褥瘡予防のための体位変換プログラムと除圧指導'], ot:['ADL・IADL評価と活動量低下が日常生活に及ぼす影響分析','日常生活動作（着替え・入浴・家事）を活用した活動量増加支援','興味・役割に基づく作業活動の導入による活動意欲の引き出し','自助具・補装具の選定による活動参加の促進','家族・介護者への介助量軽減・自立支援の方法指導'] },
-          ns:['体重・BMI・体組成の定期測定','褥瘡リスク評価と予防ケアの実施','活動量増加のための環境整備（ベッドサイドリハビリ）','PT・OTへの連携依頼','活動促進のための動機付けと精神的サポート'] },
-        { id:'oral_hygiene', icon:'🦠', label:'口腔衛生・生活習慣関連',
-          observations:['糖分過多による口腔内環境悪化（う蝕・歯周病）','口腔内ネバつき・口臭の増加','睡眠時無呼吸症候群の疑い（肥満との関連）','GERD（逆流性食道炎）の症状（げっぷ・胸やけ）','口腔内の炎症や出血（歯周病進行）'],
-          patientFamily:['「食後の口腔ケアで虫歯・歯周病を予防しましょう」','糖分の多い飲食物の摂取タイミングと頻度の見直しを促す','定期的な歯科受診の重要性を伝える','「口の健康は全身の健康とつながっています」と説明','就寝前の口腔ケアと食事の関係を伝える（GERD予防含む）'],
-          rehab:{ st:['口腔内環境の評価（炎症・乾燥・プラーク状況）','食後の唾液クリアランス・残留確認','GERDと嚥下機能の関連評価','歯科・歯科衛生士との連携調整'], pt:['肥満改善を目的とした運動療法（睡眠時無呼吸・GERDへの間接的改善効果）','腹圧を下げるための体幹強化・姿勢改善プログラム','GERD症状緩和を目的とした食後の姿勢・体位管理の指導','体重減少目標に向けた有酸素運動・生活活動量増加計画'], ot:['口腔ケアを自立して行うための動作分析と自助具の選定','生活習慣（睡眠・食事・活動）全体を見直すルーティン再構築','食後の活動・体位管理をADLに組み込む生活指導','口腔衛生への関心を高める健康教育的アプローチ（作業療法視点）'] },
-          ns:['口腔ケアの実施・指導（食後・就寝前）','口腔内観察（炎症・出血・口臭の変化）の記録','GERDの症状観察と食後の体位管理（頭部挙上30分）','歯科定期受診のスケジューリング支援','睡眠時無呼吸の兆候（いびき・無呼吸）の観察・報告'] },
-      ]
-    }
-  };
-
-  const GUID_MAIN_TABS = [
-    {id:'observations',  label:'🔍 初見候補',      cls:'t-obs', numCls:'num-obs'},
-    {id:'patientFamily', label:'👨‍👩‍👧 本人・家族対応', cls:'t-fam', numCls:'num-fam'},
-    {id:'rehab',         label:'🏥 リハビリ対応',   cls:'t-reh', numCls:'num-reh'},
-    {id:'ns',            label:'💊 Ns 対応',        cls:'t-ns',  numCls:'num-ns'},
-  ];
-  const GUID_REHAB_SUBS = [
-    {id:'st', label:'💬 ST', badge:'guid-role-st'},
-    {id:'pt', label:'🦵 PT', badge:'guid-role-pt'},
-    {id:'ot', label:'🖐 OT', badge:'guid-role-ot'},
-  ];
-  const GUID_REHAB_LABELS = { st:'言語聴覚士（ST）の対応', pt:'理学療法士（PT）の対応', ot:'作業療法士（OT）の対応' };
-
-  let guidMode = null, guidSelectedIds = new Set(), guidActiveTab = 'observations', guidRehabSub = 'st', guidExpandedId = null;
-
-  window.guidSetMode = function(m) {
-    guidMode = m; guidSelectedIds.clear(); guidExpandedId = null; guidActiveTab = 'observations'; guidRender();
-  };
-  window.guidToggleCat = function(id) {
-    if (guidSelectedIds.has(id)) guidSelectedIds.delete(id); else guidSelectedIds.add(id);
-    guidExpandedId = null; guidRender();
-  };
-  window.guidSetTab = function(t) { guidActiveTab = t; guidExpandedId = null; guidRender(); };
-  window.guidSetRehabSub = function(s) { guidRehabSub = s; guidExpandedId = null; guidRender(); };
-  window.guidToggleCard = function(id) { guidExpandedId = (guidExpandedId === id) ? null : id; guidRender(); };
-
-  function guidRender() {
-    const d = guidMode ? GUID_DATA[guidMode] : null;
-    const btnLow  = document.getElementById('guid-btn-low');
-    const btnHigh = document.getElementById('guid-btn-high');
-    if (!btnLow) return;
-    btnLow.className  = 'guid-mode-btn' + (guidMode==='低栄養' ? ' active-low'  : '');
-    btnHigh.className = 'guid-mode-btn' + (guidMode==='過栄養' ? ' active-high' : '');
-
-    const step2   = document.getElementById('guid-step2');
-    const catList = document.getElementById('guid-cat-list');
-    if (!d) { step2.style.display='none'; }
-    else {
-      step2.style.display='block';
-      catList.innerHTML = d.categories.map(cat => {
-        const sel = guidSelectedIds.has(cat.id);
-        return `<button class="guid-cat-btn ${sel ? d.selClass : ''}" onclick="guidToggleCat('${cat.id}')">
-          <div class="guid-checkbox ${sel ? d.chkClass : ''}">${sel ? '✓' : ''}</div>
-          <span class="guid-cat-icon">${cat.icon}</span>
-          <span class="guid-cat-text ${sel ? d.lblClass : ''}">${cat.label}</span>
-        </button>`;
-      }).join('');
-    }
-
-    const step3    = document.getElementById('guid-step3');
-    const tabBar   = document.getElementById('guid-tab-bar');
-    const rehabSec = document.getElementById('guid-rehab-sub');
-    const cardList = document.getElementById('guid-card-list');
-    const selCats  = d ? d.categories.filter(c => guidSelectedIds.has(c.id)) : [];
-
-    if (selCats.length === 0) { step3.style.display='none'; }
-    else {
-      step3.style.display='block';
-      tabBar.innerHTML = GUID_MAIN_TABS.map(t =>
-        `<button class="guid-tab-btn ${guidActiveTab===t.id ? t.cls : ''}" onclick="guidSetTab('${t.id}')">${t.label}</button>`
-      ).join('');
-
-      if (guidActiveTab === 'rehab') {
-        rehabSec.style.display='block';
-        rehabSec.innerHTML = `<div class="guid-rehab-sub-bar">
-          ${GUID_REHAB_SUBS.map(s =>
-            `<button class="guid-rehab-sub-btn ${guidRehabSub===s.id ? 'active-sub' : ''}" onclick="guidSetRehabSub('${s.id}')">${s.label}</button>`
-          ).join('')}
-        </div>`;
-      } else { rehabSec.style.display='none'; }
-
-      const openHdrCls = {observations:'open-obs',patientFamily:'open-fam',rehab:'open-reh',ns:'open-ns'}[guidActiveTab];
-      const numCls = {observations:'num-obs',patientFamily:'num-fam',rehab:'num-reh',ns:'num-ns'}[guidActiveTab];
-
-      cardList.innerHTML = selCats.map(cat => {
-        const isOpen = guidExpandedId === cat.id;
-        let items = guidActiveTab === 'rehab' ? cat.rehab[guidRehabSub] : cat[guidActiveTab];
-        let bodyHTML = '';
-        if (isOpen) {
-          if (guidActiveTab === 'rehab') {
-            const sub = GUID_REHAB_SUBS.find(s => s.id === guidRehabSub);
-            bodyHTML = `<div class="guid-role-badge ${sub.badge}">${sub.label}　${GUID_REHAB_LABELS[guidRehabSub]}</div>`;
-          }
-          bodyHTML += (items||[]).map((item, i) =>
-            `<div class="guid-item-row">
-              <div class="guid-item-num ${numCls}">${i+1}</div>
-              <span class="guid-item-text">${item}</span>
-            </div>`
-          ).join('');
-        }
-        return `<div class="guid-card">
-          <button class="guid-card-header ${isOpen ? openHdrCls : ''}" onclick="guidToggleCard('${cat.id}')">
-            <div class="guid-card-title">
-              <div class="guid-card-dot ${d.dotClass}"></div>
-              <span class="guid-card-name">${cat.icon} ${cat.label}</span>
-            </div>
-            <span class="guid-card-arrow ${isOpen ? 'open' : ''}">›</span>
-          </button>
-          ${isOpen ? `<div class="guid-card-body visible">${bodyHTML}</div>` : ''}
-        </div>`;
-      }).join('');
-    }
-
-    const emptyMsg = document.getElementById('guid-empty-msg');
-    if (emptyMsg) emptyMsg.style.display = (guidMode ? 'none' : 'block');
-  }
-
-  // expose for re-render if needed
-  window.guidRender = guidRender;
-})();
 async function saveRecord() {
   const name = document.getElementById('name').value;
   if (!name) { showToast('⚠️ 氏名を入力してください'); return; }
@@ -8085,6 +8240,12 @@ function clearAll() {
   document.getElementById('mna_score_num').textContent = '―';
   document.getElementById('mna_score_result').textContent = '回答を選択してください';
   document.getElementById('mna_score_display').className = 'score-display score-neutral';
+  // RSST: keep fixed measurement time at 30s, reset auto-judge
+  const rsstTime = document.getElementById('rsst_time');
+  if (rsstTime) rsstTime.value = '30';
+  const rsstJudge = document.getElementById('rsst_judge');
+  if (rsstJudge) rsstJudge.value = '';
+  if (typeof updateRsstJudge === 'function') updateRsstJudge();
   showTab('patient');
   showToast('🔄 クリアしました');
 }
