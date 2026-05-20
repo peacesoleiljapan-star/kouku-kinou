@@ -32,6 +32,8 @@ Searched for files matching `**/TailscaleClientLauncher.settings.json`, 1 match
 6. 新しい index.html を受け取ったときに検証し、本番へ反映する
 7. Synology、Docker、Tailscale の状態を確認する
 
+
+
 この資料は、日常運用に必要な内容へ整理し直したものです。詳しい背景資料や個別手順書は巻末の関連資料にまとめています。
 
 ## 2. システム概要
