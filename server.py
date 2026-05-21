@@ -82,6 +82,8 @@ ASSET_CONTENT_TYPES = {
     ".webp": "image/webp",
 }
 HELP_STATIC_ROUTES = {
+    HELP_ROUTE_PATH: (README_HTML_PATH, "text/html; charset=utf-8"),
+    "/README.html": (README_HTML_PATH, "text/html; charset=utf-8"),
     "/README.md": (BASE_DIR / "README.md", "text/markdown; charset=utf-8"),
     "/DEPLOY_SYNOLOGY_JA.md": (BASE_DIR / "DEPLOY_SYNOLOGY_JA.md", "text/markdown; charset=utf-8"),
     "/OPERATIONS_MANUAL_JA.md": (BASE_DIR / "OPERATIONS_MANUAL_JA.md", "text/markdown; charset=utf-8"),
