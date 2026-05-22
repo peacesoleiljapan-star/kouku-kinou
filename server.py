@@ -6803,6 +6803,11 @@ def build_client_template_from_wrapper_html(
 ) -> str:
     embedded_html, mode = extract_client_html_and_mode(wrapper_html)
     if mode == CLIENT_HTML_MODE_MANAGED:
+        if auth_enabled:
+            match = HEADER_STATUS_BLOCK_PATTERN.search(embedded_html)
+            if not match:
+                raise RuntimeError("Managed client auth status block not found")
+            return embedded_html[:match.start(2)] + AUTH_STATUS_PLACEHOLDER + embedded_html[match.end(2):]
         return embedded_html
     return transform_client_html(
         embedded_html,

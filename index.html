@@ -457,7 +457,8 @@
         .tab-btn { gap: 0; }
     }
 
-  .print-sheet { display: none; }
+    .print-sheet { display: none; }
+        .print-textarea-mirror { display: none; }
     .print-toolbar {
         display: flex;
         flex-wrap: wrap;
@@ -492,6 +493,20 @@
                 body:not(.print-mode):not(.print-all-mode) .tab-content { display: none !important; }
                 body:not(.print-mode):not(.print-all-mode) .tab-content.active { display: block !important; padding: 0; }
                 body:not(.print-mode):not(.print-all-mode) .card { box-shadow: none; break-inside: avoid; }
+                textarea { display: none !important; }
+                .print-textarea-mirror {
+                    display: block !important;
+                    min-height: 88px;
+                    padding: 12px 14px;
+                    border: 1.5px solid var(--border);
+                    border-radius: 9px;
+                    background: #fafcff;
+                    color: var(--text);
+                    white-space: pre-wrap;
+                    word-break: break-word;
+                    line-height: 1.6;
+                }
+                .print-textarea-mirror.is-empty { color: var(--text-light); }
 
                 body.print-all-mode .app-header,
                 body.print-all-mode .tab-bar,
@@ -3815,6 +3830,51 @@ function buildPrintItem(label, value, wide = false) {
     return '<div class="' + className + '"><div class="print-sheet__label">' + escapeHtml(label) + '</div><div class="print-sheet__value">' + escapeHtml(formatDisplayValue(value)) + '</div></div>';
 }
 
+function ensurePrintTextareaMirror(textarea) {
+    if (!textarea) {
+        return null;
+    }
+
+    let mirror = textarea.nextElementSibling;
+    if (!mirror || !mirror.classList || !mirror.classList.contains('print-textarea-mirror')) {
+        mirror = document.createElement('div');
+        mirror.className = 'print-textarea-mirror';
+        mirror.setAttribute('aria-hidden', 'true');
+        textarea.insertAdjacentElement('afterend', mirror);
+    }
+    return mirror;
+}
+
+function syncPrintTextareaMirror(textarea) {
+    const mirror = ensurePrintTextareaMirror(textarea);
+    if (!mirror) {
+        return;
+    }
+
+    const value = String(textarea.value || '');
+    const normalizedValue = value.trim();
+    const minHeight = parseInt(window.getComputedStyle(textarea).minHeight, 10) || 88;
+    mirror.textContent = normalizedValue || '―';
+    mirror.classList.toggle('is-empty', !normalizedValue);
+    mirror.style.minHeight = `${minHeight}px`;
+}
+
+function syncAllPrintTextareaMirrors() {
+    document.querySelectorAll('textarea').forEach((textarea) => syncPrintTextareaMirror(textarea));
+}
+
+function setupPrintTextareaMirrors() {
+    document.querySelectorAll('textarea').forEach((textarea) => {
+        syncPrintTextareaMirror(textarea);
+        if (textarea.dataset.printMirrorBound === '1') {
+            return;
+        }
+        textarea.addEventListener('input', () => syncPrintTextareaMirror(textarea));
+        textarea.addEventListener('change', () => syncPrintTextareaMirror(textarea));
+        textarea.dataset.printMirrorBound = '1';
+    });
+}
+
 function splitMarkedCommentSections(value, startMarker, endMarker) {
     const text = String(value || '');
     const startIndex = text.indexOf(startMarker);
@@ -3930,6 +3990,16 @@ function getPrintFriendlyComment(value) {
         .join(String.fromCharCode(10) + String.fromCharCode(10));
 }
 
+function getPrintableCommentText(value) {
+    const printFriendlyComment = getPrintFriendlyComment(value);
+    if (printFriendlyComment) {
+        return printFriendlyComment;
+    }
+
+    const commentWithoutClinicalMarkers = stripClinicalCommentMarkers(value);
+    return stripNutritionCommentMarkers(commentWithoutClinicalMarkers);
+}
+
 function buildPrintReportData() {
     const name = getFieldElementValue('name').trim();
     const birthdate = getFieldElementValue('birthdate').trim();
@@ -3978,7 +4048,7 @@ function buildPrintReportData() {
         oralPlan: getFieldElementValue('oral_eval3'),
         mnaScore: getFieldElementValue('mna_summary_num'),
         mnaResult: getFieldElementValue('mna_summary_result'),
-        comment: getPrintFriendlyComment(getFieldElementValue('summary_comment')),
+        comment: getPrintableCommentText(getFieldElementValue('summary_comment')),
         nextMonitor: formatYearMonthDisplay(getFieldElementValue('next_monitor')),
         clinicalPrintLines: buildClinicalPrintLines(clinicalSupportData),
     };
@@ -4047,6 +4117,7 @@ function preparePrintSheet(report) {
 }
 
 function printAllRecordPages() {
+    syncAllPrintTextareaMirrors();
     clearPrintMode();
     document.body.classList.add('print-all-mode');
     requestAnimationFrame(() => {
@@ -7865,6 +7936,8 @@ async function initializeApp() {
     attachStatusIndicatorListeners();
     bindNutritionEditModal();
     setupAutogrowTextareas();
+    setupPrintTextareaMirrors();
+    window.addEventListener('beforeprint', syncAllPrintTextareaMirrors);
     if (typeof updateRsstJudge === 'function') updateRsstJudge();
     syncStatusIndicators();
 }
