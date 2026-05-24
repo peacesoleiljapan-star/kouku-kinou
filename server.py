@@ -301,6 +301,7 @@ PRINT_CSS_APPEND = """  .print-sheet { display: none; }
                 body:not(.print-mode):not(.print-all-mode) .tab-content { display: none !important; }
                 body:not(.print-mode):not(.print-all-mode) .tab-content.active { display: block !important; padding: 0; }
                 body:not(.print-mode):not(.print-all-mode) .card { box-shadow: none; break-inside: avoid; }
+                .toast { display: none !important; }
 
                 body.print-all-mode .app-header,
                 body.print-all-mode .tab-bar,
@@ -381,6 +382,10 @@ PRINT_CSS_APPEND = """  .print-sheet { display: none; }
             color: var(--primary);
             margin: 0 0 6px;
         }
+        body.print-mode .print-sheet__section--comment {
+            break-inside: auto;
+            page-break-inside: auto;
+        }
         body.print-mode .print-sheet__info-grid {
             display: grid;
             grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -441,8 +446,8 @@ PRINT_CSS_APPEND = """  .print-sheet { display: none; }
         }
         body.print-mode .print-sheet__note {
             min-height: 36mm;
-            max-height: 48mm;
-            overflow: hidden;
+            max-height: none;
+            overflow: visible;
             white-space: pre-wrap;
             word-break: break-word;
             font-size: 10px;
@@ -3137,7 +3142,7 @@ function buildPrintSheetHtml(report) {
         + '<div><div class="print-sheet__title">口腔機能・栄養評価記録</div><div class="print-sheet__subtitle">印刷対象は現在表示中の 1 名分のみです</div></div>'
         + '<div class="print-sheet__meta">' + escapeHtml(formatDisplayValue(headerMeta)) + '</div>'
         + '</div>'
-        + '<div class="print-sheet__section">'
+        + '<div class="print-sheet__section print-sheet__section--comment">'
         + '<div class="print-sheet__section-title">利用者情報</div>'
         + '<div class="print-sheet__value" style="font-size:16px;color:var(--primary);margin-bottom:6px;">' + escapeHtml(formatDisplayValue(report.name)) + '</div>'
         + '<div class="print-sheet__info-grid">' + infoGrid + '</div>'
