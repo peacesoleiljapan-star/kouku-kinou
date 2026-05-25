@@ -549,7 +549,7 @@
             print-color-adjust: exact;
         }
         body.print-mode #printSheet {
-            width: 190mm;
+            width: 189mm;
             max-width: 100%;
             margin: 0 auto;
         }
@@ -653,7 +653,7 @@
             word-break: break-word;
         }
         body.print-mode .print-sheet__note {
-            min-height: 36mm;
+            min-height: 24mm;
             max-height: none;
             overflow: visible;
             white-space: pre-wrap;
@@ -3025,6 +3025,9 @@ function ensureHistoryTools() {
 
 const PRINT_SHEET_ID = 'printSheet';
 const PRINT_MODE_SELECT_ID = 'printModeSelect';
+const PRINT_PAGE_WIDTH_MM = 189;
+const PRINT_PAGE_HEIGHT_MM = 277;
+const CSS_PIXELS_PER_MM = 96 / 25.4;
 
 function ensurePrintControls() {
         const actionBar = document.querySelector('#tab-summary .card.no-print .action-bar');
@@ -3050,6 +3053,31 @@ function ensurePrintControls() {
 function getSelectedPrintMode() {
         const select = document.getElementById(PRINT_MODE_SELECT_ID);
         return select ? String(select.value || 'summary') : 'summary';
+}
+
+function mmToCssPixels(value) {
+    return Number(value || 0) * CSS_PIXELS_PER_MM;
+}
+
+function fitPrintSheetToSinglePage() {
+    const sheet = document.getElementById(PRINT_SHEET_ID);
+    if (!sheet) {
+        return;
+    }
+
+    const page = sheet.querySelector('.print-sheet__page');
+    if (!page) {
+        sheet.style.zoom = '';
+        return;
+    }
+
+    sheet.style.zoom = '1';
+
+    const widthScale = mmToCssPixels(PRINT_PAGE_WIDTH_MM) / Math.max(page.scrollWidth, 1);
+    const heightScale = mmToCssPixels(PRINT_PAGE_HEIGHT_MM) / Math.max(page.scrollHeight, 1);
+    const scale = Math.min(1, widthScale, heightScale);
+
+    sheet.style.zoom = scale < 0.999 ? scale.toFixed(3) : '1';
 }
 
 function padDatePart(value) {
@@ -4134,6 +4162,10 @@ function printAllRecordPages() {
 function clearPrintMode() {
     document.body.classList.remove('print-mode');
     document.body.classList.remove('print-all-mode');
+    const sheet = document.getElementById(PRINT_SHEET_ID);
+    if (sheet) {
+        sheet.style.zoom = '';
+    }
 }
 
 function ensureStage1Styles() {
@@ -8342,8 +8374,11 @@ function printRecord() {
   preparePrintSheet(reportData);
   document.body.classList.add('print-mode');
   requestAnimationFrame(() => {
-    window.print();
-    clearPrintMode();
+        fitPrintSheetToSinglePage();
+        requestAnimationFrame(() => {
+            window.print();
+            clearPrintMode();
+        });
   });
 }
 
