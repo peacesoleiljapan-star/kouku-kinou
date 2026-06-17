@@ -147,6 +147,7 @@ git fetch "$DEPLOY_REMOTE" "$DEPLOY_BRANCH" --prune
 target_ref="$DEPLOY_REMOTE/$DEPLOY_BRANCH"
 current_head="$(git rev-parse HEAD)"
 target_head="$(git rev-parse "$target_ref")"
+diff_base="$current_head"
 changed_files=""
 
 tracked_changes="$(git status --porcelain --untracked-files=no)"
@@ -154,11 +155,11 @@ if [ -n "$tracked_changes" ]; then
     echo "Tracked local changes exist on Synology. Resetting tracked files to $target_ref."
     echo "$tracked_changes"
     git reset --hard "$target_ref" >/dev/null 2>&1
-    current_head="$target_head"
+    current_head="$(git rev-parse HEAD)"
 fi
 
-if [ "$current_head" != "$target_head" ]; then
-    changed_files="$(git diff --name-only "$current_head" "$target_head")"
+if [ "$diff_base" != "$target_head" ]; then
+    changed_files="$(git diff --name-only "$diff_base" "$target_head")"
     echo "Changed files:"
     printf '%s\n' "$changed_files"
 fi
@@ -168,7 +169,7 @@ git checkout -B "$DEPLOY_BRANCH" "$target_ref" >/dev/null 2>&1
 needs_rebuild=0
 if [ "$DEPLOY_FORCE_REBUILD" = "1" ] || [ "$DEPLOY_FORCE_REBUILD" = "true" ]; then
     needs_rebuild=1
-elif printf '%s\n' "$changed_files" | grep -Eq '^(Dockerfile|compose\.yaml|server\.py|index\.html|assets/|README\.html|README\.md|DEPLOY_SYNOLOGY_JA\.md|OPERATIONS_MANUAL_JA\.md|TAILSCALE_CLIENT_GUIDE_JA\.md|TAILSCALE_TABLET_GUIDE_JA\.md|TAILSCALE_TABLET_MESSAGE_TEMPLATE_JA\.md|TAILSCALE_TABLET_QR_SHEET_JA\.md|TailscaleClientLauncher\.cmd|TailscaleClientLauncher\.ps1|TailscaleClientLauncher\.settings\.json|\.env\.example)'; then
+elif printf '%s\n' "$changed_files" | grep -Eq '^(Dockerfile|compose\.yaml|server\.py|index\.html|assets/|README\.html|README\.md|DEPLOY_SYNOLOGY_JA\.md|OPERATIONS_MANUAL_JA\.md|TAILSCALE_CLIENT_GUIDE_JA\.md|TAILSCALE_TABLET_GUIDE_JA\.md|TAILSCALE_TABLET_MESSAGE_TEMPLATE_JA\.md|TAILSCALE_TABLET_QR_SHEET_JA\.md|TailscaleClientLauncher\.cmd|TailscaleClientLauncher\.ps1|TailscaleClientLauncher\.settings\.json|scripts/deploy_synology\.sh|\.env\.example)'; then
     needs_rebuild=1
 elif ! container_running; then
     needs_rebuild=1
