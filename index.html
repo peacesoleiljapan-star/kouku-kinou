@@ -6,7 +6,6 @@
 <title>口腔機能・栄養評価アプリ</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Noto+Serif+JP:wght@400;700&display=swap');
-
   :root {
     --primary: #1a4a6b;
     --primary-light: #2d6a9f;
@@ -24,9 +23,7 @@
     --oral-color: #1a4a6b;
     --section-bg: #eef4fa;
   }
-
   * { box-sizing: border-box; margin: 0; padding: 0; }
-
   body {
     font-family: 'Noto Sans JP', sans-serif;
     background: var(--bg);
@@ -35,7 +32,6 @@
     line-height: 1.65;
     -webkit-text-size-adjust: 100%;
   }
-
   /* HEADER */
   .app-header {
     background: var(--primary);
@@ -68,7 +64,6 @@
     border-radius: 20px;
     font-weight: 700;
   }
-
   /* TABS — five equal-width tabs */
   .tab-bar {
     display: flex;
@@ -134,7 +129,6 @@
     color: rgba(255,255,255,0.55);
   }
   .tab-label-text { line-height: 1.2; }
-
   /* STICKY SCORE BAR — always-visible scores (inside sticky header) */
   .score-bar {
     display: flex;
@@ -178,11 +172,9 @@
   .score-bar__item.is-bad    { background: #fcefed; }
   .score-bar__item.is-bad    .score-bar__value { color: var(--danger); }
   .score-bar__item.is-empty  .score-bar__value { color: var(--text-light); font-weight: 600; }
-
   /* CONTENT */
   .tab-content { display: none; padding: 16px; max-width: 900px; margin: 0 auto; }
   .tab-content.active { display: block; }
-
   /* CARDS */
   .card {
     background: var(--card);
@@ -216,7 +208,6 @@
     font-size: 12px;
     color: var(--text-light);
   }
-
   /* FORM ELEMENTS */
   .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
   .form-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
@@ -246,7 +237,6 @@
     box-shadow: 0 0 0 3px rgba(45,106,159,0.14);
   }
   textarea { resize: vertical; min-height: 88px; }
-
   /* RADIO / CHECKBOX GROUPS — full-row tappable, 44px+ targets */
   .radio-group { display: flex; flex-direction: column; gap: 8px; }
   .radio-option {
@@ -275,7 +265,6 @@
     font-weight: 700;
     flex-shrink: 0;
   }
-
   /* SECTION LABELS */
   .section-label {
     font-size: 14px;
@@ -286,7 +275,6 @@
     padding-left: 8px;
     border-left: 3px solid var(--accent);
   }
-
   /* SCORE DISPLAY */
   .score-display {
     text-align: center;
@@ -305,7 +293,6 @@
   .score-risk { background: #fff8e8; color: var(--warning); }
   .score-bad { background: #fdf0ee; color: var(--danger); }
   .score-neutral { background: var(--section-bg); color: var(--text); }
-
   /* STATUS PILL — color + icon + border shape, never color alone */
   .status-pill {
     display: inline-flex;
@@ -322,7 +309,6 @@
   .status-pill.is-risk { background: #fff8e8; color: var(--warning); border-color: var(--warning); border-style: dashed; }
   .status-pill.is-bad  { background: #fdf0ee; color: var(--danger);  border-color: var(--danger); }
   .status-pill.is-empty{ background: var(--section-bg); color: var(--text-light); border-color: var(--border); }
-
   /* BUTTONS */
   .btn {
     padding: 13px 22px;
@@ -353,14 +339,12 @@
   .btn-outline:hover { background: var(--section-bg); }
   .btn-danger { background: var(--danger); color: white; }
   .btn-sm { padding: 8px 16px; min-height: 38px; font-size: 13px; }
-
   .action-bar {
     display: flex;
     gap: 10px;
     flex-wrap: wrap;
     margin-top: 16px;
   }
-
   /* HISTORY TABLE */
   .history-table {
     width: 100%;
@@ -390,7 +374,6 @@
   .tag-good { background: #d4edda; color: var(--success); }
   .tag-risk { background: #fff3cd; color: var(--warning); }
   .tag-bad { background: #f8d7da; color: var(--danger); }
-
   /* SEPARATOR */
   .divider {
     height: 1px;
@@ -399,7 +382,6 @@
   }
   /* trailing divider in summary card (panel-injection anchor) stays invisible until panels exist */
   .card > .divider:last-child { display: none; }
-
   /* INLINE SCORE PREVIEW */
   .mini-score {
     display: inline-block;
@@ -411,7 +393,6 @@
     color: var(--primary);
     margin-top: 8px;
   }
-
   /* PRINT */
   @media print {
     .app-header, .tab-bar, .action-bar, .no-print { display: none !important; }
@@ -419,7 +400,6 @@
     .card { box-shadow: none; break-inside: avoid; }
     body { font-size: 12px; background: white; }
   }
-
   /* RESPONSIVE */
     @media (max-width: 900px) {
         .tab-content { padding: 14px; }
@@ -434,7 +414,6 @@
         .action-bar { flex-direction: column; }
         .action-bar .btn { width: 100%; }
     }
-
     @media (max-width: 600px) {
         .header-top { padding: 10px 14px; }
         .header-top h1 { font-size: 15px; }
@@ -451,12 +430,10 @@
             white-space: normal;
         }
     }
-
     @media (max-width: 380px) {
         .tab-label-text { display: none; }
         .tab-btn { gap: 0; }
     }
-
     .print-sheet { display: none; }
         .print-textarea-mirror { display: none; }
     .print-toolbar {
@@ -483,12 +460,10 @@
         color: var(--text);
         font: inherit;
     }
-
     @page {
         size: A4 portrait;
         margin: 10mm;
     }
-
     @media print {
                 body:not(.print-mode):not(.print-all-mode) .tab-content { display: none !important; }
                 body:not(.print-mode):not(.print-all-mode) .tab-content.active { display: block !important; padding: 0; }
@@ -508,7 +483,6 @@
                     line-height: 1.6;
                 }
                 .print-textarea-mirror.is-empty { color: var(--text-light); }
-
                 body.print-all-mode .app-header,
                 body.print-all-mode .tab-bar,
                 body.print-all-mode .score-bar,
@@ -536,7 +510,6 @@
                         -webkit-print-color-adjust: exact;
                         print-color-adjust: exact;
                 }
-
         body.print-mode > * { display: none !important; }
         body.print-mode > #printSheet { display: block !important; }
         body.print-mode,
@@ -662,7 +635,6 @@
             line-height: 1.5;
         }
     }
-
         /* NOTIFICATION */
   .toast {
     position: fixed;
@@ -680,7 +652,6 @@
     white-space: nowrap;
   }
   .toast.show { transform: translateX(-50%) translateY(0); }
-
   .empty-state {
     text-align: center;
     padding: 40px;
@@ -688,7 +659,6 @@
     font-size: 14px;
   }
   .empty-state .icon { font-size: 40px; margin-bottom: 8px; }
-
   .info-box {
     background: var(--section-bg);
     border-left: 4px solid var(--primary-light);
@@ -698,7 +668,6 @@
     color: var(--text-light);
     margin-bottom: 12px;
   }
-
   /* AUTO-JUDGE BADGE (e.g. RSST result from count) */
   .auto-judge {
     display: flex;
@@ -723,7 +692,6 @@
     border-color: var(--danger);
     color: var(--danger);
   }
-
   /* ── SUMMARY GUIDANCE UI ── */
   .summ-identity {
     display: flex; align-items: center; gap: 14px;
@@ -751,11 +719,9 @@
   .summ-score-card.bad { background: #fdf0ee; border-color: #c0392b40; }
   .summ-score-card.bad .summ-score-card__value,
   .summ-score-card.bad .summ-score-card__result { color: var(--danger); }
-
 </style>
 </head>
 <body>
-
 <div class="app-header">
   <div class="header-top" style="justify-content:space-between;gap:12px">
     <h1>🦷 口腔機能・栄養評価システム</h1>
@@ -772,7 +738,6 @@
       <button class="tab-btn manage" data-tab="history" onclick="showTab('history')" title="記録一覧">📋<span class="tab-label-text">記録</span></button>
     </div>
   </div>
-
   <!-- STICKY SCORE BAR — always-visible scores -->
   <div class="score-bar" id="scoreBar">
     <div class="score-bar__item is-empty" id="scoreBarOral">
@@ -791,7 +756,6 @@
     </div>
   </div>
 </div>
-
 <!-- ==================== TAB 1: 利用者情報 ==================== -->
 <div id="tab-patient" class="tab-content active">
   <div class="card">
@@ -886,17 +850,14 @@
     </div>
   </div>
 </div>
-
 <!-- ==================== TAB 2: 口腔機能 ==================== -->
 <div id="tab-oral" class="tab-content">
-
   <div class="card">
     <div class="card-header">
       <div class="icon" style="background:#eef4fa">📋</div>
       <div><h2>1. 質問と観察（別紙1）</h2><div class="subtitle">問診項目・観察項目</div></div>
     </div>
     <div class="info-box">実施期間中にくまなく1回記入。評価項目に沿って回答してください。</div>
-
     <p class="section-label">① 問診項目</p>
     <div class="form-group" style="margin-bottom:10px">
       <label>① 硬いものは食べにくいですか</label>
@@ -908,13 +869,12 @@
     </div>
     <div class="form-group" style="margin-bottom:10px">
       <label>③ 口が渇きやすいですか</label>
-      <select id="q3"><option value="">選択</option><option>1.いいえ</option><option>2.はい</option></select>
+      <select id="q3"><option value="">選択</option><option>1.いいえ（口の渇きは気にならない）</option><option>2.はい（口の渇きが気になる）</option></select>
     </div>
-
     <p class="section-label" style="margin-top:14px">② 観察項目</p>
     <div class="form-group" style="margin-bottom:10px">
       <label>自分の歯または入れ歯で左右の奥歯をしっかりかみしめられますか</label>
-      <select id="q4"><option value="">選択</option><option>1.面方でできる</option><option>2.片方だけできる</option><option>3.どちらもできない</option></select>
+      <select id="q4"><option value="">選択</option><option>1.両方でできる</option><option>2.片方だけできる</option><option>3.どちらもできない</option></select>
     </div>
     <div class="form-group" style="margin-bottom:10px">
       <label>全体的にみて、過去1ヶ月間の健康状態はいかがですか</label>
@@ -949,13 +909,11 @@
       <textarea id="oral_note1" placeholder="特記事項があれば記入してください"></textarea>
     </div>
   </div>
-
   <div class="card">
     <div class="card-header">
       <div class="icon" style="background:#eef4fa">🔬</div>
       <div><h2>2. 専門職によるアセスメント・モニタリング</h2><div class="subtitle">課題把握の確認（別紙1・第2部）</div></div>
     </div>
-
     <p class="section-label">① 右側の咬合の確認（収縮）</p>
     <div class="form-grid" style="margin-bottom:10px">
       <div class="form-group">
@@ -967,17 +925,14 @@
         <select id="a2"><option value="">選択</option><option>1強い</option><option>2強い</option><option>3無し</option><option>3多い</option></select>
       </div>
     </div>
-
     <p class="section-label">② 歯や義歯のよごれ</p>
     <div class="form-group" style="margin-bottom:10px">
       <select id="a3"><option value="">選択</option><option>1ない</option><option>2ある</option><option>3多い</option></select>
     </div>
-
     <p class="section-label">③ 舌のよごれ</p>
     <div class="form-group" style="margin-bottom:10px">
       <select id="a4"><option value="">選択</option><option>1ない</option><option>2ある</option><option>3多い</option></select>
     </div>
-
     <p class="section-label">④ RSST（反復唾液嚥下テスト）</p>
     <div class="form-grid">
       <div class="form-group">
@@ -994,14 +949,12 @@
       <div id="rsst_judge_auto" class="auto-judge auto-judge--empty">回数を入力すると自動判定されます</div>
       <input type="hidden" id="rsst_judge" value="">
     </div>
-
         <p class="section-label" style="margin-top:14px">⑤ ブクブクうがい</p>
         <div class="form-group" style="margin-bottom:10px">
             <label>ブクブクうがい</label>
             <select id="bukubuku"><option value="">選択</option><option>1できる</option><option>2やや不十分</option><option>3不十分</option></select>
         </div>
-
-        <p class="section-label" style="margin-top:14px">⑥ オーラルジスキネジア</p>
+        <p class="section-label" style="margin-top:14px">⑥ ディアドコキネシス</p>
     <div class="form-grid">
       <div class="form-group">
         <label>パ（回/秒）</label>
@@ -1016,13 +969,11 @@
         <input type="number" id="ka" step="0.1" placeholder="5.0">
       </div>
     </div>
-
         <div class="form-group" style="margin-top:12px">
-            <label>⑧ 特記事項等</label>
+            <label>⑦ 特記事項等</label>
             <textarea id="oral_note2" placeholder="専門職によるアセスメントの特記事項"></textarea>
         </div>
   </div>
-
   <div class="card">
     <div class="card-header">
       <div class="icon" style="background:#eef4fa">📝</div>
@@ -1040,13 +991,15 @@
             <label>③ 備考</label>
             <textarea id="oral_biko" placeholder="備考・その他特記事項"></textarea>
         </div>
+        <div class="form-group" style="margin-top:10px">
+            <label>⑤ 歯科医による自由記載</label>
+            <textarea id="dentist_free_note" class="autogrow" placeholder="歯科医による所見・指示・コメントなどを自由に記載してください"></textarea>
+        </div>
   </div>
-
   <div class="action-bar no-print">
     <button class="btn btn-primary" onclick="showTab('mna')">次へ：MNA-SF →</button>
   </div>
 </div>
-
 <!-- ==================== TAB 3: MNA-SF ==================== -->
 <div id="tab-mna" class="tab-content">
   <div class="card">
@@ -1055,7 +1008,6 @@
       <div><h2>簡易栄養状態評価表（MNA®-SF）</h2><div class="subtitle">Mini Nutritional Assessment - Short Form</div></div>
     </div>
     <div class="info-box">各質問に回答すると、スクリーニングスコアが自動計算されます。（最大14ポイント）</div>
-
     <!-- Q A -->
     <p class="section-label">A 食事量の変化（過去3ヶ月間）</p>
     <div class="radio-group" id="mna_a_group">
@@ -1072,9 +1024,7 @@
         <span class="score-badge">2点</span>
       </label>
     </div>
-
     <div class="divider"></div>
-
     <!-- Q B -->
     <p class="section-label">B 体重の変化（過去3ヶ月間）</p>
     <div class="radio-group" id="mna_b_group">
@@ -1095,9 +1045,7 @@
         <span class="score-badge">3点</span>
       </label>
     </div>
-
     <div class="divider"></div>
-
     <!-- Q C -->
     <p class="section-label">C 自力歩行</p>
     <div class="radio-group" id="mna_c_group">
@@ -1114,9 +1062,7 @@
         <span class="score-badge">2点</span>
       </label>
     </div>
-
     <div class="divider"></div>
-
     <!-- Q D -->
     <p class="section-label">D 精神的ストレス・急性疾患（過去3ヶ月間）</p>
     <div class="radio-group" id="mna_d_group">
@@ -1129,9 +1075,7 @@
         <span class="score-badge">2点</span>
       </label>
     </div>
-
     <div class="divider"></div>
-
     <!-- Q E -->
     <p class="section-label">E 神経・精神的問題</p>
     <div class="radio-group" id="mna_e_group">
@@ -1148,13 +1092,10 @@
         <span class="score-badge">2点</span>
       </label>
     </div>
-
     <div class="divider"></div>
-
     <!-- Q F1 / F2 -->
     <p class="section-label">F BMI または ふくらはぎ周囲長</p>
     <div class="info-box">BMIが測定できる場合はF1、できない場合はF2に回答してください。</div>
-
     <p style="font-size:13px;font-weight:700;color:var(--primary);margin-bottom:8px">F1 BMI（体重÷身長²）</p>
     <div class="radio-group" id="mna_f1_group">
       <label class="radio-option" onclick="selectMNA('f1',0,this)">
@@ -1174,7 +1115,6 @@
         <span class="score-badge">3点</span>
       </label>
     </div>
-
     <p style="font-size:13px;font-weight:700;color:var(--mna-color);margin:12px 0 8px">F2 ふくらはぎ周囲長（CC）</p>
     <div class="radio-group" id="mna_f2_group">
       <label class="radio-option" onclick="selectMNA('f2',0,this)">
@@ -1186,9 +1126,7 @@
         <span class="score-badge">3点</span>
       </label>
     </div>
-
     <div class="divider"></div>
-
     <!-- SCORE -->
     <p class="section-label">スクリーニングスコア（自動計算）</p>
     <div id="mna_score_display" class="score-display score-neutral">
@@ -1197,22 +1135,18 @@
       <div style="margin-top:8px;font-size:14px;font-weight:700" id="mna_score_result">回答を選択してください</div>
     </div>
   </div>
-
   <div class="action-bar no-print">
     <button class="btn btn-primary" onclick="showTab('summary')">次へ：総合評価 →</button>
   </div>
 </div>
-
 <!-- ==================== TAB 4: 総合評価 ==================== -->
 <div id="tab-summary" class="tab-content">
-
   <!-- ① 患者・スコアサマリー -->
   <div class="card">
     <div class="card-header">
       <div class="icon" style="background:#fff8e8">📊</div>
       <div><h2>総合評価サマリー</h2><div class="subtitle">口腔機能 + 栄養状態</div></div>
     </div>
-
     <div class="summ-identity">
       <div style="font-size:32px">👤</div>
       <div>
@@ -1220,7 +1154,6 @@
         <div class="summ-identity__meta" id="summary_date">評価日：―</div>
       </div>
     </div>
-
     <div class="summ-score-row">
       <div id="oral_summary_box" class="summ-score-card">
         <div class="summ-score-card__label">🦷 口腔機能評価</div>
@@ -1233,10 +1166,8 @@
         <div class="summ-score-card__result" id="mna_summary_result">MNAタブを入力してください</div>
       </div>
     </div>
-
     <div class="divider"></div>
   </div>
-
   <!-- ③ コメント・記録 -->
   <div class="card">
     <div class="card-header">
@@ -1247,12 +1178,15 @@
       <label>支援の方向性・コメント</label>
       <textarea id="summary_comment" class="autogrow" placeholder="例：口腔清掃状態良好。MNAスコアにより低栄養のリスクあり。栄養士への連携を検討。" style="min-height:120px;overflow:hidden;resize:vertical"></textarea>
     </div>
+    <div class="form-group" style="margin-bottom:12px">
+      <label>栄養ケア提供経過記録</label>
+      <textarea id="nutrition_care_progress" class="autogrow" placeholder="栄養ケアの提供経過を自由に記載してください（例：前回からの変化、提供した支援・指導内容、本人・家族の反応、多職種との連携、次回への申し送りなど）" style="min-height:120px;overflow:hidden;resize:vertical"></textarea>
+    </div>
     <div class="form-group">
       <label>次回モニタリング予定日</label>
       <input type="date" id="next_monitor">
     </div>
   </div>
-
   <!-- ④ 保存・出力 -->
   <div class="card no-print">
     <div class="card-header">
@@ -1266,7 +1200,6 @@
     </div>
   </div>
 </div>
-
 <!-- ==================== TAB 5: 記録一覧 ==================== -->
 <div id="tab-history" class="tab-content">
   <div class="card">
@@ -1293,7 +1226,6 @@
     </div>
   </div>
 </div>
-
 <!-- ==================== TAB 6: 設定 ==================== -->
 <div class="tab-content" id="tab-settings">
     <div class="card">
@@ -1327,10 +1259,8 @@
         </div>
     </div>
 </div>
-
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
-
 <!-- 栄養アセスメント 項目編集モーダル -->
 <div class="nedit-overlay" id="nutritionEditOverlay">
   <div class="nedit-modal" role="dialog" aria-modal="true" aria-labelledby="nutritionEditTitle">
@@ -1348,12 +1278,10 @@
     </div>
   </div>
 </div>
-
 <script>
 // ==================== STATE ====================
 let mnaScores = { a: null, b: null, c: null, d: null, e: null, f: null };
 let records = [];
-
 const API_ROOT = '/api/records';
 const SETTINGS_API_ROOT = '/api/settings';
 const HISTORY_FILTER_STATE = { query: '', view: 'latest', sort: 'evalDate' };
@@ -1436,110 +1364,160 @@ const NUTRITION_GUIDANCE_LIBRARY = {
                 icon: '⚖️',
                 label: '体重減少・るいそう',
                 patientFamily: [
-                    '1回の食事量が少なくても、回数を増やして補うことを説明する',
-                    '高カロリー・高タンパク食品や栄養補助食品の活用を提案する',
+                    '1回の食事量が少なくても、間食や補食を加えて食事回数（4〜6回）を増やすよう説明する',
+                    '高エネルギー・高たんぱくの食品（卵・乳製品・肉魚・大豆製品・油脂）を1品足す工夫を提案する',
+                    '少量で栄養がとれる栄養補助食品（ドリンク・ゼリー・プリン状）の活用を提案する',
+                    '本人の好物・食べやすい味付け・温度に合わせ、まず食べられる量から始めるよう助言する',
+                    '毎週決まった曜日に体重を測り、記録を共有してもらうよう依頼する',
+                    '調理する家族の負担に配慮し、市販総菜・宅配食・冷凍食品の併用も選択肢として伝える',
                 ],
                 st: [
-                    '摂食嚥下機能と食べやすい食形態を評価する',
-                    '食事姿勢や代償手段を調整する',
+                    '摂食嚥下機能を評価し、安全に食べられる食形態・一口量・とろみを提案する',
+                    '咀嚼・食塊形成・送り込み・嚥下のどの段階に問題があるかを評価する',
+                    '食事姿勢や代償嚥下（うなずき嚥下・交互嚥下・複数回嚥下）を調整する',
+                    'むせ・咽頭残留・声質変化を確認し、必要に応じてVE/VFなど精査を提案する',
                 ],
                 pt: [
-                    '食事時の座位保持と体幹・頸部アライメントを調整する',
+                    '食事に耐えられる座位保持力・体幹と頸部のアライメントを評価し調整する',
+                    '食事時間の疲労を軽減する椅子・テーブル高さ・フットサポートを提案する',
+                    'サルコペニア進行に対し、低負荷から始める下肢・全身運動を提案する',
+                    '離床時間を確保し、エネルギー消費と食欲のバランスを整える',
                 ],
                 ot: [
-                    '食具操作や自助具、配膳環境を整えて摂取量を確保する',
+                    'すくいやすい食器・持ちやすいスプーンなど食具・自助具を選定する',
+                    '配膳位置・食卓の高さ・利き手を考慮し、自力摂取量を確保する',
+                    '食事に集中できる環境（テレビを消す・明るさ・騒音調整）を整える',
+                    '疲労に応じて休憩を挟む食事の段取りを一緒に組み立てる',
                 ],
                 ns: [
-                    '体重と食事摂取率を定期モニタリングする',
-                    '医師・管理栄養士・NSTへ早期共有する',
+                    '体重・食事摂取率・水分量を定期的にモニタリングし記録する',
+                    '医師・管理栄養士・NSTへ早期に情報共有し、栄養補給方法を検討する',
+                    '内服薬や基礎疾患（甲状腺・がん・感染等）による食欲・代謝への影響を確認する',
+                    '脱水・浮腫・褥瘡などるいそうに伴うリスクを観察し予防する',
+                    '採血データ（Alb・総たんぱく・CRP等）の推移を多職種で共有する',
                 ],
             },
             dysphagia: {
                 icon: '🍵',
                 label: '摂食・嚥下障害',
                 patientFamily: [
-                    'ゆっくり少量ずつ食べることと食事姿勢を説明する',
-                    'とろみや食形態調整の理由を丁寧に共有する',
+                    'ひと口量を少なくし、よく噛んでから飲み込むよう説明する',
+                    '食事中は足底接地・体幹を起こした安定姿勢をとるよう助言する',
+                    'とろみ付けや食形態調整の目的と方法をていねいに共有する',
+                    'むせ・声がわり・食後の痰がらみがあれば中止して報告するよう伝える',
+                    '食後30分程度は座位を保ち、すぐ横にならないよう説明する',
+                    '一度に出さず、少量ずつ・声かけしながら介助するコツを伝える',
                 ],
                 st: [
-                    'VE/VFを含む嚥下評価を検討する',
-                    '食形態ととろみ濃度を再評価する',
+                    '嚥下スクリーニング（RSST・改訂水飲みテスト・フードテスト）を実施する',
+                    '必要に応じてVE/VFによる精査を提案し、誤嚥の有無を確認する',
+                    '食形態ととろみ濃度（嚥下調整食分類）を再評価し適正化する',
+                    '間接訓練（嚥下体操・アイスマッサージ）と直接訓練を計画する',
+                    '安全な一口量・ペース・代償法を本人と介助者へ指導する',
                 ],
                 pt: [
-                    '安全に摂食できる座位・移乗方法と呼吸状態を確認する',
+                    '安全に摂食できる座位・頸部前屈位と移乗方法を確認・調整する',
+                    '呼吸状態・排痰能力・咳嗽力を評価し、誤嚥性肺炎予防につなげる',
+                    '座位耐久性を高め、食事を最後まで続けられる体力づくりを支援する',
                 ],
                 ot: [
-                    '一口量や食具選択、食事ペースを調整する',
+                    '一口量・ペース配分を整える食具や自助具を提案する',
+                    'ペーシング（交互嚥下・追加嚥下）を生活場面で実践できるよう支援する',
+                    '集中して安全に食べられる食事環境・配膳を整える',
                 ],
                 ns: [
-                    '食事中・食後のむせやSpO2変化を観察する',
-                    '口腔ケアと食後の体位管理を徹底する',
+                    '食事中・食後のむせ、SpO2低下、発熱の有無を観察する',
+                    '食前後の口腔ケアを徹底し、誤嚥性肺炎のリスクを下げる',
+                    '食後の体位管理（座位保持・ギャッジアップ）を行う',
+                    '服薬時の誤嚥に注意し、剤形変更や服薬ゼリーを医師・薬剤師と検討する',
+                    'むせの頻度・タイミングを記録し、変化を多職種で共有する',
                 ],
             },
             anorexia: {
                 icon: '🍽️',
                 label: '食欲不振・摂取量低下',
                 patientFamily: [
-                    '少量高頻度で食べられる時間帯を活かすよう提案する',
-                    '食前口腔ケアや食事環境づくりを案内する',
+                    '食べられる時間帯を活かし、少量を回数に分けて提供するよう提案する',
+                    '盛り付けを少なめにし、「食べきれた」成功体験につなげるよう助言する',
+                    '食前の口腔ケアや軽い体操・離床で食事の準備を整えるよう案内する',
+                    '本人の嗜好・思い出の味・行事食など食べたくなる工夫を一緒に考える',
+                    '便秘・口腔内の痛み・義歯不調など食欲を下げる要因がないか確認するよう伝える',
+                    '無理強いせず、楽しい雰囲気で一緒に食べる時間をつくるよう助言する',
                 ],
                 st: [
-                    '食行動や先行期の問題を評価する',
-                    '嗜好や食感を活かして食べる意欲を引き出す',
+                    '先行期（食欲・認知・食べ始め）の問題を評価する',
+                    '嗜好・食感・温度を活かして食べる意欲を引き出す関わりを提案する',
+                    'においや見た目など感覚面からの摂取量アップを検討する',
                 ],
                 pt: [
-                    '離床や日中活動を整え、食欲につながる生活リズムをつくる',
+                    '離床時間や日中活動を増やし、空腹感が出る生活リズムをつくる',
+                    '食前の軽い運動・散歩・座位活動で食欲を促す',
                 ],
                 ot: [
-                    '食事への注意を向けやすい環境づくりと食事動作支援を行う',
+                    '食事に注意を向けやすい環境調整と、楽しめる食事場面づくりを行う',
+                    '配膳・盛り付けなどの役割を通じて食事への動機づけを高める',
                 ],
                 ns: [
-                    '摂取量と好みの変化を記録する',
-                    '薬剤影響や心理面の要因を確認する',
+                    '摂取量・水分量・体重の変化を記録し、低下の経過を把握する',
+                    '薬剤性食欲低下（多剤併用・抗うつ薬等）や疼痛・抑うつの影響を確認する',
+                    '脱水・便秘・口腔内トラブルなど身体要因をアセスメントする',
+                    '必要時は補助栄養・点滴・栄養補給方法を医師・管理栄養士と検討する',
                 ],
             },
             oral: {
                 icon: '🦷',
                 label: '口腔機能低下',
                 patientFamily: [
-                    '義歯不適合や口腔乾燥時は歯科相談を勧める',
-                    '毎食後の口腔ケアと保湿を説明する',
+                    '義歯の不適合・痛み・がたつきがあれば歯科受診を勧める',
+                    '毎食後と就寝前の口腔ケア、義歯の洗浄・保管方法を説明する',
+                    '口腔乾燥には保湿ジェル・こまめな水分・うがいを案内する',
+                    'パタカ体操や唾液腺マッサージなど自宅でできる口腔体操を一緒に行う',
+                    '食事前の準備体操として口・舌・頬を動かす習慣づけを提案する',
                 ],
                 st: [
-                    '舌圧・口唇・咀嚼機能を評価する',
-                    '口腔機能訓練と食形態調整を行う',
+                    '舌圧・口唇閉鎖力・咀嚼・嚥下など口腔機能を評価する',
+                    '口腔機能向上訓練（舌・口唇・頬の運動、発音・構音訓練）を計画する',
+                    '機能に合わせた食形態調整と訓練を組み合わせる',
+                    'オーラルディアドコキネシス（パ・タ・カ）を指標に経過を確認する',
                 ],
                 pt: [
-                    '咀嚼しやすい姿勢と休息配分を調整する',
+                    '咀嚼・嚥下しやすい姿勢と頸部の安定を整える',
+                    '呼吸・発声・咳嗽力を高め、口腔機能を支える全身調整を行う',
                 ],
                 ot: [
-                    '口腔ケアや食具操作を続けやすい手順と環境を整える',
+                    '口腔ケアを継続しやすい手順・道具（電動歯ブラシ・自助具）を提案する',
+                    '上肢機能に合わせた歯みがき動作・義歯着脱の練習を支援する',
                 ],
                 ns: [
-                    '口腔ケア介助と義歯管理を行う',
-                    '歯科・歯科衛生士との連携を調整する',
+                    '口腔ケアの介助と義歯管理を行い、口腔内の清潔を保つ',
+                    '歯科医師・歯科衛生士との連携（訪問歯科等）を調整する',
+                    '口腔乾燥・口内炎・カンジダなど粘膜トラブルを観察する',
                 ],
             },
             cognitive: {
                 icon: '🧠',
                 label: '認知機能低下・行動変化',
                 patientFamily: [
-                    '一品ずつ出す、手づかみ食にするなど環境調整を提案する',
-                    '静かな食事環境と無理強いしない関わりを共有する',
+                    '一品ずつ提供する、手づかみ食にするなど食べやすい環境調整を提案する',
+                    '静かで落ち着いた食事環境を整え、無理強いしない関わりを共有する',
+                    '決まった時間・場所・食器で食事し、見通しを持ちやすくするよう助言する',
+                    '食事を促す声かけや、一緒に食べる工夫を提案する',
                 ],
                 st: [
-                    '認知機能と摂食行動の関連を評価する',
-                    '介助方法を家族・スタッフで統一する',
+                    '認知機能と摂食行動（失行・失認・注意障害）の関連を評価する',
+                    '介助方法・声かけを家族・スタッフで統一できるよう整理する',
                 ],
                 pt: [
-                    '覚醒度と座位保持を整え、食事場面への参加を支える',
+                    '覚醒度・座位保持を整え、食事場面に安全に参加できるようにする',
                 ],
                 ot: [
-                    '注意が向きやすい配置や手順の単純化で摂食行動を支援する',
+                    '注意が向きやすい配置・手順の単純化で摂食行動を引き出す',
+                    '道具や合図など食事動作の手がかりを用いて自力摂取を支援する',
                 ],
                 ns: [
-                    '見守りと声かけ、食事環境調整を行う',
-                    '拒食のタイミングや背景を記録し家族支援につなげる',
+                    '見守り・声かけ・食事環境調整を行い、誤嚥や窒息を予防する',
+                    '拒食・過食・ためこみなどのタイミングや背景を記録し、家族支援につなげる',
+                    '脱水・低栄養の進行兆候を観察し、多職種で共有する',
                 ],
             },
         },
@@ -1552,44 +1530,49 @@ const NUTRITION_GUIDANCE_LIBRARY = {
                 icon: '🍱',
                 label: '過食・摂取量過多',
                 patientFamily: [
-                    '食べる速度をゆっくりにし、小さい食器を使う工夫を提案する',
-                    '間食の内容とタイミングを記録して見直す',
+                    '食べる速度をゆっくりにし、小さめの食器でよそうよう提案する',
+                    '間食の内容・量・時間を記録して見直すよう助言する',
+                    'よく噛んで満腹感を得やすくする工夫を伝える',
+                    '空腹時のまとめ食いを避け、食事と間食のメリハリをつけるよう共有する',
                 ],
                 st: [
-                    '摂食ペースや丸飲み傾向を評価する',
-                    '食行動修正に向けた関わり方を整理する',
+                    '早食い・丸のみ傾向や摂食ペースを評価する',
+                    'ゆっくり食べるための関わり方・声かけを整理する',
                 ],
                 pt: [
-                    '食後の安全な活動や運動習慣を提案する',
+                    '食後の安全な活動や、継続できる運動習慣を提案する',
                 ],
                 ot: [
-                    '早食いを防ぐ食具・配膳方法と間食管理を整える',
+                    '早食いを防ぐ食具・配膳方法と、間食を管理しやすい環境を整える',
                 ],
                 ns: [
-                    '食事量・間食量と体重推移を定期記録する',
-                    '管理栄養士・医師と連携して量の調整を検討する',
+                    '食事量・間食量と体重推移を定期的に記録する',
+                    '管理栄養士・医師と連携し、エネルギー量の調整を検討する',
+                    '血糖・血圧・脂質など関連データを確認する',
                 ],
             },
             imbalance: {
                 icon: '🥗',
                 label: '栄養バランスの偏り',
                 patientFamily: [
-                    '主食・主菜・副菜をそろえる目安を説明する',
-                    '甘い飲料を水やお茶へ切り替えることを提案する',
+                    '主食・主菜・副菜をそろえる目安をわかりやすく説明する',
+                    '甘い飲料・菓子を水やお茶に置き換えることを提案する',
+                    '野菜・たんぱく質を先に食べるなど食べ方の工夫を伝える',
                 ],
                 st: [
                     '食べやすさと偏食の関連を評価する',
-                    '咀嚼能力に合うバランス食の形態を提案する',
+                    '咀嚼能力に合うバランスのとれた食形態を提案する',
                 ],
                 pt: [
-                    '活動量に見合った摂取量かを確認し、継続しやすい運動を提案する',
+                    '活動量に見合った摂取内容かを確認し、継続できる運動習慣を提案する',
                 ],
                 ot: [
-                    '買い物・配膳・記録など生活行為から食習慣を見直す',
+                    '買い物・配膳・調理など生活行為から食習慣を見直す',
                 ],
                 ns: [
-                    '食事内容と血液データを継続確認する',
+                    '食事内容と血液データ（Alb・血糖・脂質等）を継続確認する',
                     '服薬と食事内容の相互作用を確認する',
+                    '塩分・糖分・脂質の摂取状況を把握し助言する',
                 ],
             },
             activity: {
@@ -1597,29 +1580,32 @@ const NUTRITION_GUIDANCE_LIBRARY = {
                 label: '活動量低下・代謝低下',
                 patientFamily: [
                     '座位体操や食後の短時間活動を提案する',
-                    '転倒に配慮した安全な活動環境を整える',
+                    '転倒に配慮した安全な活動環境を整えるよう助言する',
+                    '生活の中で立つ・歩く機会を増やす工夫を共有する',
                 ],
                 st: [
                     '姿勢・体幹機能や食事中の疲労を評価する',
-                    'PT・OTと連携した包括的リハビリを検討する',
+                    'PT・OTと連携した包括的なリハビリを検討する',
                 ],
                 pt: [
-                    '歩行・移動・体力を評価し活動量向上を支援する',
+                    '歩行・移動・体力を評価し、活動量向上を支援する',
+                    '下肢筋力・バランス練習など継続できる運動を提案する',
                 ],
                 ot: [
-                    '家事や余暇を活かして座位時間を減らす工夫を行う',
+                    '家事・趣味・余暇を活かして座位時間を減らす工夫を行う',
                 ],
                 ns: [
                     '活動量を増やす環境整備と声かけを行う',
-                    '体重・体組成・褥瘡リスクを定期確認する',
+                    '体重・体組成・浮腫・褥瘡リスクを定期的に確認する',
                 ],
             },
             oral_hygiene: {
                 icon: '🦠',
                 label: '口腔衛生・生活習慣関連',
                 patientFamily: [
-                    '食後・就寝前の口腔ケアと歯科受診を勧める',
-                    '糖分の多い飲食物の摂取頻度を見直す',
+                    '食後・就寝前の口腔ケアと定期的な歯科受診を勧める',
+                    '糖分の多い飲食物の摂取頻度を見直すよう助言する',
+                    'だらだら食べ・夜間の飲食を控える工夫を伝える',
                 ],
                 st: [
                     '口腔内環境と唾液クリアランスを評価する',
@@ -1632,8 +1618,9 @@ const NUTRITION_GUIDANCE_LIBRARY = {
                     'セルフケア手順の見える化と道具選択を支援する',
                 ],
                 ns: [
-                    '口腔内の炎症や口臭の変化を観察する',
-                    'GERDや睡眠時無呼吸の兆候を観察し共有する',
+                    '口腔内の炎症・口臭・う蝕の変化を観察する',
+                    '逆流性食道炎や睡眠時無呼吸の兆候を観察し共有する',
+                    '禁煙・節酒など生活習慣の見直しを支援する',
                 ],
             },
         },
@@ -1788,7 +1775,6 @@ let managedFieldHooksInstalled = false;
 let latestClinicalSupportData = null;
 let latestNutritionAssessmentData = null;
 let sharedSettingsState = { staffList: [], dentistList: [] };
-
 async function readJsonIfAvailable(response) {
     const contentType = response.headers.get('Content-Type') || '';
     if (!contentType.includes('application/json')) {
@@ -1796,7 +1782,6 @@ async function readJsonIfAvailable(response) {
     }
     return response.json();
 }
-
 async function extractErrorMessage(response, fallbackMessage) {
     const payload = await readJsonIfAvailable(response);
     if (payload && typeof payload.error === 'string' && payload.error) {
@@ -1807,7 +1792,6 @@ async function extractErrorMessage(response, fallbackMessage) {
     }
     return fallbackMessage;
 }
-
 async function fetchRecords() {
     const response = await fetch(API_ROOT, { cache: 'no-store' });
     if (!response.ok) {
@@ -1815,7 +1799,6 @@ async function fetchRecords() {
     }
     return response.json();
 }
-
 async function persistRecord(record) {
     const response = await fetch(API_ROOT, {
         method: 'POST',
@@ -1827,14 +1810,12 @@ async function persistRecord(record) {
     }
     return response.json();
 }
-
 async function removeRecord(id) {
     const response = await fetch(`${API_ROOT}/${id}`, { method: 'DELETE' });
     if (!response.ok) {
         throw new Error(await extractErrorMessage(response, '記録の削除に失敗しました'));
     }
 }
-
 async function fetchSharedSettings() {
     const response = await fetch(SETTINGS_API_ROOT, { cache: 'no-store' });
     if (!response.ok) {
@@ -1842,7 +1823,6 @@ async function fetchSharedSettings() {
     }
     return response.json();
 }
-
 async function persistSharedSettings(settings) {
     const response = await fetch(SETTINGS_API_ROOT, {
         method: 'POST',
@@ -1854,14 +1834,12 @@ async function persistSharedSettings(settings) {
     }
     return response.json();
 }
-
 function buildDefaultSharedSettings() {
     return {
         staffList: DEFAULT_STAFF_OPTIONS.slice(),
         dentistList: [],
     };
 }
-
 function applySharedSettingsState(settings) {
     const source = settings && typeof settings === 'object' ? settings : {};
     const defaults = buildDefaultSharedSettings();
@@ -1871,7 +1849,6 @@ function applySharedSettingsState(settings) {
     };
     return sharedSettingsState;
 }
-
 function buildSharedSettingsPayload(overrides = {}) {
     const source = {
         staffList: Array.isArray(overrides.staffList) ? overrides.staffList : sharedSettingsState.staffList,
@@ -1882,12 +1859,10 @@ function buildSharedSettingsPayload(overrides = {}) {
         dentistList: mergeUniqueTextValues([], source.dentistList || []),
     };
 }
-
 async function saveSharedSettingsState(overrides = {}) {
     const saved = await persistSharedSettings(buildSharedSettingsPayload(overrides));
     return applySharedSettingsState(saved);
 }
-
 function escapeHtml(value) {
     return String(value ?? '')
         .replace(/&/g, '&amp;')
@@ -1896,11 +1871,9 @@ function escapeHtml(value) {
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#39;');
 }
-
 function normalizeSearchText(value) {
     return String(value ?? '').trim().replace(/\s+/g, ' ').toLowerCase();
 }
-
 function getSelectedMnaFieldMode() {
     if (document.querySelector('#mna_f2_group input[name="mna_f"]:checked')) {
         return 'f2';
@@ -1910,7 +1883,6 @@ function getSelectedMnaFieldMode() {
     }
     return '';
 }
-
 function collectFieldValues() {
     const fields = {};
     document.querySelectorAll('input[id], select[id], textarea[id]').forEach((element) => {
@@ -1924,18 +1896,15 @@ function collectFieldValues() {
     });
     return fields;
 }
-
 function getCompatibleSelectValue(selectElement, rawValue) {
     const text = String(rawValue ?? '').trim();
     if (!text) {
         return '';
     }
-
     const directMatch = Array.from(selectElement.options).find((option) => option.value === text);
     if (directMatch) {
         return directMatch.value;
     }
-
     const numericCode = parseChoiceCode(text);
     if (numericCode !== null) {
         const codedMatch = Array.from(selectElement.options).find((option) => parseChoiceCode(option.value) === numericCode);
@@ -1943,7 +1912,6 @@ function getCompatibleSelectValue(selectElement, rawValue) {
             return codedMatch.value;
         }
     }
-
     if (selectElement.id === 'oral_eval2' && text === 'あり（継続）') {
         return 'あり（継続） 口腔清掃・唾液分泌・咀嚼・嚥下・食事摂取などの口腔機能の低下が認められる状態';
     }
@@ -1952,7 +1920,6 @@ function getCompatibleSelectValue(selectElement, rawValue) {
     }
     return text;
 }
-
 function restoreFieldValues(fields) {
     Object.entries(fields || {}).forEach(([id, value]) => {
         const element = document.getElementById(id);
@@ -1987,18 +1954,15 @@ function restoreFieldValues(fields) {
         refreshAutogrowTextareas();
     }
 }
-
 function restoreMnaSelections() {
     document.querySelectorAll('.radio-option').forEach((option) => option.classList.remove('selected'));
     document.querySelectorAll('input[type="radio"]').forEach((input) => {
         input.checked = false;
     });
-
     Object.entries(mnaScores).forEach(([key, value]) => {
         if (value === null || value === undefined) {
             return;
         }
-
         if (key === 'f') {
             const selector = currentMnaFieldMode === 'f2'
                 ? '#mna_f2_group input[name="mna_f"]'
@@ -2014,7 +1978,6 @@ function restoreMnaSelections() {
             });
             return;
         }
-
         const names = [`mna_${key}`];
         names.forEach((name) => {
             document.querySelectorAll(`input[name="${name}"]`).forEach((input) => {
@@ -2029,7 +1992,6 @@ function restoreMnaSelections() {
         });
     });
 }
-
 function buildHistoryIdentityLine(record) {
     const parts = [];
     if (record.birthdate) {
@@ -2040,15 +2002,12 @@ function buildHistoryIdentityLine(record) {
     }
     return parts.join(' / ');
 }
-
 function getHistoryDisplayMode() {
     return HISTORY_FILTER_STATE.view === 'records' ? 'records' : 'latest';
 }
-
 function getHistorySortMode() {
     return String(HISTORY_FILTER_STATE.sort || 'evalDate').trim() || 'evalDate';
 }
-
 function getHistoryDisplayConfig() {
     if (getHistoryDisplayMode() === 'records') {
         return {
@@ -2061,7 +2020,6 @@ function getHistoryDisplayConfig() {
         hint: '同じ利用者ごとに最新の評価日だけをまとめて表示します。',
     };
 }
-
 function updateHistoryDisplayHeading() {
     const title = document.getElementById('historyDisplayTitle');
     const hint = document.getElementById('historyDisplayHint');
@@ -2073,15 +2031,12 @@ function updateHistoryDisplayHeading() {
         hint.textContent = config.hint;
     }
 }
-
 function compareTextAsc(left, right) {
     return String(left || '').localeCompare(String(right || ''), 'ja');
 }
-
 function getHistoryNameSortKey(record) {
     return String(record.furigana || record.name || '').trim();
 }
-
 function getNutritionSortRank(label) {
     const text = String(label || '').trim();
     if (text === '低栄養') {
@@ -2095,7 +2050,6 @@ function getNutritionSortRank(label) {
     }
     return 3;
 }
-
 function getNextMonitorSortValue(record) {
     const text = String(record?.nextMonitor || '').trim();
     if (!text) {
@@ -2108,7 +2062,6 @@ function getNextMonitorSortValue(record) {
     const parts = parseYmdParts(text);
     return parts ? Date.UTC(parts.year, parts.month - 1, parts.day) : Number.POSITIVE_INFINITY;
 }
-
 function compareRecordsByHistorySort(left, right) {
     const sortMode = getHistorySortMode();
     if (sortMode === 'name') {
@@ -2128,11 +2081,9 @@ function compareRecordsByHistorySort(left, right) {
     }
     return compareRecordsByDateDesc(left, right);
 }
-
 function sortRecordsForHistoryDisplay(sourceRecords) {
     return [...sourceRecords].sort(compareRecordsByHistorySort);
 }
-
 function getNutritionTagClass(label) {
     const text = String(label || '').trim();
     if (text === '良好') {
@@ -2146,7 +2097,6 @@ function getNutritionTagClass(label) {
     }
     return '';
 }
-
 function getOralContinueTagClass(label) {
     const text = String(label || '').trim();
     if (!text) {
@@ -2163,7 +2113,6 @@ function getOralContinueTagClass(label) {
     }
     return '';
 }
-
 function buildHistoryFieldHtml(label, valueHtml) {
     return `
         <section class="history-field">
@@ -2172,7 +2121,6 @@ function buildHistoryFieldHtml(label, valueHtml) {
         </section>
     `;
 }
-
 function buildHistoryTagBlockHtml(text, className = '', note = '') {
     const valueText = String(text || '').trim();
     const noteText = String(note || '').trim();
@@ -2187,13 +2135,11 @@ function buildHistoryTagBlockHtml(text, className = '', note = '') {
         </div>
     `;
 }
-
 function buildPatientLookupKey(name, birthdate) {
     const normalizedName = normalizeSearchText(name);
     const normalizedBirthdate = String(birthdate ?? '').trim();
     return normalizedName && normalizedBirthdate ? `${normalizedName}::${normalizedBirthdate}` : '';
 }
-
 function parseYmdParts(value) {
     const match = String(value || '').trim().match(/^(\d{4})-(\d{2})-(\d{2})$/);
     if (!match) {
@@ -2205,7 +2151,6 @@ function parseYmdParts(value) {
         day: Number.parseInt(match[3], 10),
     };
 }
-
 function parseYearMonthParts(value) {
     const text = String(value || '').trim();
     const monthOnlyMatch = text.match(/^(\d{4})-(\d{2})$/);
@@ -2215,7 +2160,6 @@ function parseYearMonthParts(value) {
             month: Number.parseInt(monthOnlyMatch[2], 10),
         };
     }
-
     const fullDateParts = parseYmdParts(text);
     if (!fullDateParts) {
         return null;
@@ -2225,11 +2169,9 @@ function parseYearMonthParts(value) {
         month: fullDateParts.month,
     };
 }
-
 function isYearMonthValue(value) {
     return /^(\d{4})-(\d{2})$/.test(String(value || '').trim());
 }
-
 function formatYearMonthDisplay(value) {
     const parts = parseYearMonthParts(value);
     if (!parts) {
@@ -2237,7 +2179,6 @@ function formatYearMonthDisplay(value) {
     }
     return `${parts.year}年${parts.month}月`;
 }
-
 function getMonthsUntil(value) {
     const parts = parseYearMonthParts(value);
     if (!parts) {
@@ -2248,7 +2189,6 @@ function getMonthsUntil(value) {
     const currentMonth = now.getMonth() + 1;
     return (parts.year - currentYear) * 12 + (parts.month - currentMonth);
 }
-
 function isNextMonitorDueSoon(value) {
     const text = String(value || '').trim();
     if (!text) {
@@ -2261,28 +2201,24 @@ function isNextMonitorDueSoon(value) {
     const days = getDaysUntil(text);
     return days !== null && days <= NEXT_MONITOR_ALERT_DAYS;
 }
-
 function ymdPartsToUtc(parts) {
     if (!parts) {
         return null;
     }
     return Date.UTC(parts.year, parts.month - 1, parts.day);
 }
-
 function calculateAgeAtDate(birthdate, referenceDate) {
     const birth = parseYmdParts(birthdate);
     const ref = parseYmdParts(referenceDate || new Date().toISOString().slice(0, 10));
     if (!birth || !ref) {
         return null;
     }
-
     let age = ref.year - birth.year;
     if (ref.month < birth.month || (ref.month === birth.month && ref.day < birth.day)) {
         age -= 1;
     }
     return age >= 0 ? age : null;
 }
-
 function parseSortableDate(value) {
     const text = String(value || '').trim();
     if (!text) {
@@ -2292,7 +2228,6 @@ function parseSortableDate(value) {
     const timestamp = Date.parse(normalized);
     return Number.isNaN(timestamp) ? Number.NEGATIVE_INFINITY : timestamp;
 }
-
 function getRecordSortTimestamp(record) {
     return Math.max(
         parseSortableDate(record.date),
@@ -2300,15 +2235,12 @@ function getRecordSortTimestamp(record) {
         parseSortableDate(record.savedAt),
     );
 }
-
 function compareRecordsByDateDesc(left, right) {
     return getRecordSortTimestamp(right) - getRecordSortTimestamp(left);
 }
-
 function sortRecordsByLatest(sourceRecords) {
     return [...sourceRecords].sort(compareRecordsByDateDesc);
 }
-
 function toMetricNumber(value) {
     if (value === null || value === undefined) {
         return null;
@@ -2316,12 +2248,10 @@ function toMetricNumber(value) {
     const parsed = Number.parseFloat(String(value).replace(/,/g, '').trim());
     return Number.isFinite(parsed) ? parsed : null;
 }
-
 function formatMetricValue(value, unit = '') {
     const numeric = toMetricNumber(value);
     return numeric === null ? '―' : `${numeric.toFixed(1)}${unit}`;
 }
-
 function getTrendDirection(currentValue, previousValue) {
     if (currentValue === null || previousValue === null) {
         return 'na';
@@ -2332,7 +2262,6 @@ function getTrendDirection(currentValue, previousValue) {
     }
     return delta > 0 ? 'up' : 'down';
 }
-
 function formatSignedDelta(currentValue, previousValue, unit = '') {
     if (currentValue === null || previousValue === null) {
         return '初回';
@@ -2344,7 +2273,6 @@ function formatSignedDelta(currentValue, previousValue, unit = '') {
     const sign = delta > 0 ? '+' : '';
     return `${sign}${delta.toFixed(1)}${unit}`;
 }
-
 function buildTrendDeltaHtml(currentValue, previousValue, unit = '', label = '') {
     const direction = getTrendDirection(currentValue, previousValue);
     const prefix = label ? `${escapeHtml(label)}: ` : '';
@@ -2354,7 +2282,6 @@ function buildTrendDeltaHtml(currentValue, previousValue, unit = '', label = '')
     const symbol = direction === 'up' ? '▲' : direction === 'down' ? '▼' : '■';
     return `<span class="trend-delta trend-delta--${direction}">${prefix}${symbol} ${escapeHtml(formatSignedDelta(currentValue, previousValue, unit))}</span>`;
 }
-
 function buildMetricChipHtml(label, value, tone = 'info') {
     return `
         <div class="metric-chip metric-chip--${escapeHtml(tone)}">
@@ -2363,7 +2290,6 @@ function buildMetricChipHtml(label, value, tone = 'info') {
         </div>
     `;
 }
-
 function getBmiReference(age) {
     if (age === null) {
         return null;
@@ -2373,7 +2299,6 @@ function getBmiReference(age) {
     }
     return { label: '成人の参考帯', low: 18.5, high: 24.9 };
 }
-
 function classifyBmiReference(bmi, reference) {
     if (bmi === null || !reference) {
         return 'info';
@@ -2386,7 +2311,6 @@ function classifyBmiReference(bmi, reference) {
     }
     return 'success';
 }
-
 function getMnaF1ScoreInfo(bmi) {
     if (bmi === null) {
         return null;
@@ -2402,7 +2326,6 @@ function getMnaF1ScoreInfo(bmi) {
     }
     return { score: 3, label: 'BMI 23以上' };
 }
-
 function parseChoiceCode(value) {
     const match = String(value || '').trim().match(/^(\d+)/);
     if (!match) {
@@ -2410,7 +2333,6 @@ function parseChoiceCode(value) {
     }
     return Number.parseInt(match[1], 10);
 }
-
 function getRecordFieldValue(record, id) {
     if (!record) {
         return '';
@@ -2420,7 +2342,6 @@ function getRecordFieldValue(record, id) {
     }
     return String(record[id] ?? '');
 }
-
 function buildOralAssessmentState(readValue) {
     const q1Value = String(readValue('q1') || '').trim();
     const q2Value = String(readValue('q2') || '').trim();
@@ -2438,7 +2359,6 @@ function buildOralAssessmentState(readValue) {
     const guguguValue = String(readValue('gugugu') || '').trim();
     const oralContinue = String(readValue('oral_eval2') || '').trim();
     const oralPlan = String(readValue('oral_eval3') || '').trim();
-
     return {
         q1Value,
         q1Code: parseChoiceCode(q1Value),
@@ -2476,15 +2396,12 @@ function buildOralAssessmentState(readValue) {
         oralPlan,
     };
 }
-
 function getCurrentOralAssessmentState() {
     return buildOralAssessmentState((id) => getFieldElementValue(id));
 }
-
 function getRecordOralAssessmentState(record) {
     return buildOralAssessmentState((id) => getRecordFieldValue(record, id));
 }
-
 function hasOralAssessmentData(state) {
     if (!state) {
         return false;
@@ -2507,7 +2424,6 @@ function hasOralAssessmentData(state) {
     ].some((value) => value !== null)
         || [state.rsstCount, state.pa, state.ta, state.ka].some((value) => value !== null && value > 0);
 }
-
 function classifyStage3Risk(score) {
     if (score >= 3) {
         return 'alert';
@@ -2517,7 +2433,6 @@ function classifyStage3Risk(score) {
     }
     return 'success';
 }
-
 function formatStage3DomainLabel(score) {
     if (score >= 3) {
         return '要注意';
@@ -2527,7 +2442,6 @@ function formatStage3DomainLabel(score) {
     }
     return '安定';
 }
-
 function getCleaningHabitRisk(code) {
     if (code === 1) {
         return 2;
@@ -2537,7 +2451,6 @@ function getCleaningHabitRisk(code) {
     }
     return 0;
 }
-
 function getLowOdkLabels(state) {
     return [
         ['パ', state.pa],
@@ -2546,7 +2459,6 @@ function getLowOdkLabels(state) {
     ].filter(([, value]) => value !== null && value < ODK_REFERENCE_PER_SECOND)
         .map(([label, value]) => `${label} ${value.toFixed(1)}回/秒`);
 }
-
 function getComparisonHistoryRecord(history, evalDate) {
     if (!Array.isArray(history) || !history.length) {
         return null;
@@ -2560,7 +2472,6 @@ function getComparisonHistoryRecord(history, evalDate) {
         return recordDate && recordDate !== normalizedEvalDate;
     }) || history[0] || null;
 }
-
 function buildStage3ListHtml(items, emptyText, extraClass = '') {
     const uniqueItems = [...new Set((items || []).map((item) => String(item || '').trim()).filter(Boolean))];
     const className = extraClass ? `stage3-list ${extraClass}` : 'stage3-list';
@@ -2569,25 +2480,21 @@ function buildStage3ListHtml(items, emptyText, extraClass = '') {
     }
     return `<ul class="${className}">${uniqueItems.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul>`;
 }
-
 function hasWorsenedCode(currentCode, previousCode) {
     return currentCode !== null && previousCode !== null && currentCode > previousCode;
 }
-
 function hasMeaningfulDrop(currentValue, previousValue, threshold) {
     if (currentValue === null || previousValue === null) {
         return false;
     }
     return currentValue <= previousValue - threshold;
 }
-
 function hasMeaningfulRise(currentValue, previousValue, threshold) {
     if (currentValue === null || previousValue === null) {
         return false;
     }
     return currentValue >= previousValue + threshold;
 }
-
 function getDaysUntil(dateText) {
     const target = parseYmdParts(dateText);
     const today = parseYmdParts(new Date().toISOString().slice(0, 10));
@@ -2598,7 +2505,6 @@ function getDaysUntil(dateText) {
     }
     return Math.round((targetUtc - todayUtc) / 86400000);
 }
-
 function buildNextMonitorHtml(dateText) {
     const text = String(dateText || '').trim();
     if (!text) {
@@ -2633,16 +2539,13 @@ function buildNextMonitorHtml(dateText) {
     }
     return `${escapeHtml(text)}<br><small class="monitor-status ${className}">${escapeHtml(suffix)}</small>`;
 }
-
 function getRecordPatientKey(record) {
     const explicitKey = String(record.patientKey ?? '').trim();
     if (explicitKey) {
         return explicitKey;
     }
-
     return buildPatientLookupKey(record.name, record.birthdate);
 }
-
 function countUniquePatients(sourceRecords) {
     const patientKeys = new Set();
     sourceRecords.forEach((record) => {
@@ -2653,7 +2556,6 @@ function countUniquePatients(sourceRecords) {
     });
     return patientKeys.size;
 }
-
 function buildPatientRecordGroups(sourceRecords) {
     const groups = new Map();
     sourceRecords.forEach((record) => {
@@ -2671,7 +2573,6 @@ function buildPatientRecordGroups(sourceRecords) {
     });
     return groups;
 }
-
 function getLatestPatientRecords(filteredRecords) {
     const patientGroups = buildPatientRecordGroups(records);
     const latestRecords = [];
@@ -2684,31 +2585,25 @@ function getLatestPatientRecords(filteredRecords) {
         seen.add(key);
         latestRecords.push((patientGroups.get(key) || [record])[0]);
     });
-
     return { latestRecords, patientGroups };
 }
-
 function updateLatestPatientsStats(latestRecords) {
     const latestCount = latestRecords.length;
     const stats = document.getElementById('historyDisplayStats');
     if (!stats) {
         return;
     }
-
     const totalPatients = countUniquePatients(records);
     const query = normalizeSearchText(HISTORY_FILTER_STATE.query);
     stats.textContent = query ? `${latestCount} / ${totalPatients}名を表示` : `${latestCount}名を表示`;
-
     const summary = document.getElementById('historyDisplaySummary');
     if (!summary) {
         return;
     }
-
     if (!latestRecords.length) {
         summary.innerHTML = '';
         return;
     }
-
     const bmiAttentionCount = latestRecords.filter((record) => {
         const bmi = toMetricNumber(record.bmi ?? record.fields?.bmi);
         const age = calculateAgeAtDate(record.birthdate, record.date);
@@ -2722,7 +2617,6 @@ function updateLatestPatientsStats(latestRecords) {
         const label = String(record.mnaLabel || '').trim();
         return label && label !== '良好' && label !== '―';
     }).length;
-
     summary.innerHTML = [
         buildMetricChipHtml('表示中', `${latestCount}名`, 'info'),
         buildMetricChipHtml('BMI要確認', `${bmiAttentionCount}名`, bmiAttentionCount ? 'alert' : 'success'),
@@ -2730,33 +2624,27 @@ function updateLatestPatientsStats(latestRecords) {
         buildMetricChipHtml('栄養注意', `${riskCount}名`, riskCount ? 'alert' : 'success'),
     ].join('');
 }
-
 function updateHistoryRecordStats(filteredRecords) {
     const stats = document.getElementById('historyDisplayStats');
     if (!stats) {
         return;
     }
-
     const query = normalizeSearchText(HISTORY_FILTER_STATE.query);
     stats.textContent = query ? `${filteredRecords.length} / ${records.length}件を表示` : `${filteredRecords.length}件を表示`;
-
     const summary = document.getElementById('historyDisplaySummary');
     if (!summary) {
         return;
     }
-
     if (!filteredRecords.length) {
         summary.innerHTML = '';
         return;
     }
-
     const dueSoonCount = filteredRecords.filter((record) => isNextMonitorDueSoon(record.nextMonitor)).length;
     const riskCount = filteredRecords.filter((record) => {
         const label = String(record.mnaLabel || '').trim();
         return label && label !== '良好' && label !== '―';
     }).length;
     const reEvalCount = filteredRecords.filter((record) => String(record.oralContinue || '').includes('再評価')).length;
-
     summary.innerHTML = [
         buildMetricChipHtml('表示中', `${filteredRecords.length}件`, 'info'),
         buildMetricChipHtml('栄養注意', `${riskCount}件`, riskCount ? 'alert' : 'success'),
@@ -2764,7 +2652,6 @@ function updateHistoryRecordStats(filteredRecords) {
         buildMetricChipHtml('要再評価', `${reEvalCount}件`, reEvalCount ? 'alert' : 'success'),
     ].join('');
 }
-
 function buildLatestPatientCardHtml(record, patientHistory) {
     const previousRecord = patientHistory[1] || null;
     const visitCount = patientHistory.length;
@@ -2783,7 +2670,6 @@ function buildLatestPatientCardHtml(record, patientHistory) {
     if (record.furigana) {
         identityParts.push(escapeHtml(record.furigana));
     }
-
     const metricParts = [];
     if (currentWeight !== null) {
         metricParts.push(`<strong>${escapeHtml(formatMetricValue(currentWeight, 'kg'))}</strong>`);
@@ -2791,10 +2677,8 @@ function buildLatestPatientCardHtml(record, patientHistory) {
     if (currentBmi !== null) {
         metricParts.push(`<div class="history-field__note">BMI ${escapeHtml(formatMetricValue(currentBmi))}</div>`);
     }
-
     const nutritionLabel = String(record.mnaLabel || '').trim() || '―';
     const scoreLabel = record.mnaScore !== null && record.mnaScore !== undefined ? `${record.mnaScore}/14` : 'MNA未入力';
-
     return `
         <article class="history-card history-card--latest">
             <div class="history-card__header">
@@ -2825,13 +2709,11 @@ function buildLatestPatientCardHtml(record, patientHistory) {
         </article>
     `;
 }
-
 function buildHistoryRecordCardHtml(record) {
     const identityLine = buildHistoryIdentityLine(record) || '患者情報なし';
     const nutritionLabel = String(record.mnaLabel || '').trim() || '―';
     const oralLabel = String(record.oralContinue || '').trim() || '―';
     const scoreLabel = record.mnaScore !== null && record.mnaScore !== undefined ? `${record.mnaScore}/14` : 'MNA未入力';
-
     return `
         <article class="history-card history-card--record">
             <div class="history-card__header">
@@ -2855,50 +2737,41 @@ function buildHistoryRecordCardHtml(record) {
         </article>
     `;
 }
-
 function renderHistoryRecords(filteredRecords) {
     const container = document.getElementById('historyDisplayBody');
     if (!container) {
         return;
     }
-
     updateHistoryDisplayHeading();
     updateHistoryRecordStats(filteredRecords);
-
     if (filteredRecords.length === 0) {
         const emptyMessage = records.length === 0 ? '保存された記録はありません' : '検索条件に一致する記録はありません';
         container.innerHTML = `<div class="empty-state"><div class="icon">📂</div>${emptyMessage}</div>`;
         return;
     }
-
     container.innerHTML = sortRecordsForHistoryDisplay(filteredRecords)
         .map((record) => buildHistoryRecordCardHtml(record))
         .join('');
 }
-
 function renderLatestPatients(filteredRecords) {
     const container = document.getElementById('historyDisplayBody');
     if (!container) {
         return;
     }
-
     const { latestRecords, patientGroups } = getLatestPatientRecords(filteredRecords);
     updateHistoryDisplayHeading();
     updateLatestPatientsStats(latestRecords);
-
     if (latestRecords.length === 0) {
         const emptyMessage = records.length === 0 ? '保存された利用者はありません' : '検索条件に一致する利用者はありません';
         container.innerHTML = `<div class="empty-state"><div class="icon">👥</div>${emptyMessage}</div>`;
         return;
     }
-
     container.innerHTML = sortRecordsForHistoryDisplay(latestRecords).map((record) => {
         const patientKey = getRecordPatientKey(record);
         const patientHistory = patientGroups.get(patientKey) || [record];
         return buildLatestPatientCardHtml(record, patientHistory);
     }).join('');
 }
-
 function renderActiveHistoryView(filteredRecords) {
     if (getHistoryDisplayMode() === 'records') {
         renderHistoryRecords(filteredRecords);
@@ -2906,13 +2779,11 @@ function renderActiveHistoryView(filteredRecords) {
     }
     renderLatestPatients(filteredRecords);
 }
-
 function getFilteredRecords() {
     const query = normalizeSearchText(HISTORY_FILTER_STATE.query);
     if (!query) {
         return records;
     }
-
     return records.filter((record) => {
         const candidates = [
             record.name,
@@ -2925,23 +2796,19 @@ function getFilteredRecords() {
         return candidates.some((value) => normalizeSearchText(value).includes(query));
     });
 }
-
 function updateHistoryStats(filteredCount) {
     const stats = document.getElementById('historyStats');
     if (!stats) {
         return;
     }
-
     const query = normalizeSearchText(HISTORY_FILTER_STATE.query);
     stats.textContent = query ? `${filteredCount} / ${records.length}件を表示` : `${records.length}件を表示`;
 }
-
 function ensureHistoryTools() {
     const historyTable = document.getElementById('historyTable');
     if (!historyTable || document.getElementById('historySearch')) {
         return;
     }
-
     const historyWrapper = historyTable.parentElement;
     const historyCard = historyWrapper.parentElement;
     historyWrapper.classList.add('history-records-wrapper');
@@ -2951,10 +2818,8 @@ function ensureHistoryTools() {
     [0, 2, 3, 4, 5].forEach((index) => {
         historyTable.querySelector(`thead th:nth-child(${index + 1})`)?.classList.add('history-table__nowrap');
     });
-
     const toolbar = document.createElement('div');
     toolbar.className = 'history-toolbar';
-
     toolbar.innerHTML = `
       <label class="history-toolbar__search">
         <span class="history-toolbar__label">利用者検索</span>
@@ -2962,7 +2827,6 @@ function ensureHistoryTools() {
       </label>
       <div id="historyStats" class="history-stats"></div>
     `;
-
     const patientPanel = document.createElement('section');
     patientPanel.id = 'historyDisplayPanel';
     patientPanel.className = 'history-panel';
@@ -2999,10 +2863,8 @@ function ensureHistoryTools() {
             <div class="empty-state"><div class="icon">👥</div>利用者データを読み込み中です</div>
         </div>
     `;
-
     historyCard.insertBefore(toolbar, historyWrapper);
     historyCard.insertBefore(patientPanel, historyWrapper);
-
     const searchInput = document.getElementById('historySearch');
     const viewSelect = document.getElementById('historyViewSelect');
     const sortSelect = document.getElementById('historySortSelect');
@@ -3022,19 +2884,16 @@ function ensureHistoryTools() {
         renderHistory();
     });
 }
-
 const PRINT_SHEET_ID = 'printSheet';
 const PRINT_MODE_SELECT_ID = 'printModeSelect';
 const PRINT_PAGE_WIDTH_MM = 189;
 const PRINT_PAGE_HEIGHT_MM = 277;
 const CSS_PIXELS_PER_MM = 96 / 25.4;
-
 function ensurePrintControls() {
         const actionBar = document.querySelector('#tab-summary .card.no-print .action-bar');
         if (!actionBar || document.getElementById(PRINT_MODE_SELECT_ID)) {
                 return;
         }
-
         const controls = document.createElement('div');
         controls.className = 'print-toolbar';
         controls.innerHTML = `
@@ -3046,51 +2905,40 @@ function ensurePrintControls() {
                 </select>
             </label>
         `;
-
         actionBar.parentElement.insertBefore(controls, actionBar);
 }
-
 function getSelectedPrintMode() {
         const select = document.getElementById(PRINT_MODE_SELECT_ID);
         return select ? String(select.value || 'summary') : 'summary';
 }
-
 function mmToCssPixels(value) {
     return Number(value || 0) * CSS_PIXELS_PER_MM;
 }
-
 function fitPrintSheetToSinglePage() {
     const sheet = document.getElementById(PRINT_SHEET_ID);
     if (!sheet) {
         return;
     }
-
     const page = sheet.querySelector('.print-sheet__page');
     if (!page) {
         sheet.style.zoom = '';
         return;
     }
-
     sheet.style.zoom = '1';
-
     const widthScale = mmToCssPixels(PRINT_PAGE_WIDTH_MM) / Math.max(page.scrollWidth, 1);
     const heightScale = mmToCssPixels(PRINT_PAGE_HEIGHT_MM) / Math.max(page.scrollHeight, 1);
     const scale = Math.min(1, widthScale, heightScale);
-
     sheet.style.zoom = scale < 0.999 ? scale.toFixed(3) : '1';
 }
-
 function padDatePart(value) {
     return String(value || '').padStart(2, '0');
 }
-
 function getDaysInMonth(year, month) {
     if (!year || !month) {
         return 31;
     }
     return new Date(Number(year), Number(month), 0).getDate();
 }
-
 function renderSelectOptions(selectElement, options, placeholderLabel, formatter = null) {
     if (!selectElement) {
         return;
@@ -3103,7 +2951,6 @@ function renderSelectOptions(selectElement, options, placeholderLabel, formatter
     }).join('');
     selectElement.innerHTML = placeholder + renderedOptions;
 }
-
 function buildPatientSelectGroup(id, label, options) {
     const group = document.createElement('div');
     group.className = 'form-group';
@@ -3118,7 +2965,6 @@ function buildPatientSelectGroup(id, label, options) {
     );
     return group;
 }
-
 function ensurePatientAgeField(anchorGroup) {
     let ageGroup = document.getElementById('patientAgeGroup');
     if (!ageGroup) {
@@ -3129,7 +2975,6 @@ function ensurePatientAgeField(anchorGroup) {
         anchorGroup.insertAdjacentElement('afterend', ageGroup);
     }
 }
-
 function updatePatientAgeDisplay() {
     const ageDisplay = document.getElementById('patientAgeDisplay');
     if (!ageDisplay) {
@@ -3140,7 +2985,6 @@ function updatePatientAgeDisplay() {
     const age = calculateAgeAtDate(birthdate, evalDate);
     ageDisplay.value = age === null ? '' : `${age}歳`;
 }
-
 function ensureDateSelectorRow(groupElement, rowId, html) {
     let row = document.getElementById(rowId);
     if (row) {
@@ -3158,7 +3002,51 @@ function ensureDateSelectorRow(groupElement, rowId, html) {
     groupElement.appendChild(row);
     return row;
 }
-
+// 西暦 → 和暦（元号）変換。境界年は両方の元号を併記する。
+function getJapaneseEraLabelForYear(year) {
+    const y = Number.parseInt(year, 10);
+    if (!Number.isFinite(y)) {
+        return '';
+    }
+    const eraYear = (n) => (n === 1 ? '元' : String(n));
+    if (y >= 2020) {
+        return `令和${eraYear(y - 2018)}年`;
+    }
+    if (y === 2019) {
+        return '令和元年/平成31年';
+    }
+    if (y >= 1990 && y <= 2018) {
+        return `平成${eraYear(y - 1988)}年`;
+    }
+    if (y === 1989) {
+        return '平成元年/昭和64年';
+    }
+    if (y >= 1927 && y <= 1988) {
+        return `昭和${eraYear(y - 1925)}年`;
+    }
+    if (y === 1926) {
+        return '昭和元年/大正15年';
+    }
+    if (y >= 1913 && y <= 1925) {
+        return `大正${eraYear(y - 1911)}年`;
+    }
+    if (y === 1912) {
+        return '大正元年/明治45年';
+    }
+    if (y >= 1900 && y <= 1911) {
+        return `明治${eraYear(y - 1867)}年`;
+    }
+    return '';
+}
+// 生年月日の年プルダウン用ラベル（例: 1993年（平成5年））
+function formatBirthYearWithEra(year) {
+    const y = Number.parseInt(year, 10);
+    if (!Number.isFinite(y)) {
+        return String(year);
+    }
+    const era = getJapaneseEraLabelForYear(y);
+    return era ? `${y}年（${era}）` : `${y}年`;
+}
 function populateBirthdateYearMonthSelectors() {
     const yearSelect = document.getElementById('birthdate_year');
     const monthSelect = document.getElementById('birthdate_month');
@@ -3170,7 +3058,7 @@ function populateBirthdateYearMonthSelectors() {
         yearSelect,
         Array.from({ length: currentYear - BIRTHDATE_YEAR_MIN + 1 }, (_, index) => ({ value: String(currentYear - index) })),
         '年',
-        (option) => option.value,
+        (option) => formatBirthYearWithEra(option.value),
     );
     renderSelectOptions(
         monthSelect,
@@ -3180,7 +3068,6 @@ function populateBirthdateYearMonthSelectors() {
     );
     yearSelect.dataset.ready = '1';
 }
-
 function populateBirthdateDaySelector(selectedDay = '') {
     const year = document.getElementById('birthdate_year')?.value || '';
     const month = document.getElementById('birthdate_month')?.value || '';
@@ -3197,7 +3084,6 @@ function populateBirthdateDaySelector(selectedDay = '') {
     );
     daySelect.value = selectedDay && Number(selectedDay) <= dayCount ? padDatePart(selectedDay) : '';
 }
-
 function syncBirthdateHiddenFromSelectors() {
     const hiddenInput = document.getElementById('birthdate');
     const year = document.getElementById('birthdate_year')?.value || '';
@@ -3210,7 +3096,6 @@ function syncBirthdateHiddenFromSelectors() {
     hiddenInput.dispatchEvent(new Event('input', { bubbles: true }));
     updatePatientAgeDisplay();
 }
-
 function syncBirthdateSelectorsFromHidden() {
     const hiddenInput = document.getElementById('birthdate');
     if (!hiddenInput) {
@@ -3228,7 +3113,6 @@ function syncBirthdateSelectorsFromHidden() {
     populateBirthdateDaySelector(parts ? parts.day : '');
     updatePatientAgeDisplay();
 }
-
 function ensureBirthdateSelector() {
     const birthInput = document.getElementById('birthdate');
     if (!birthInput) {
@@ -3244,17 +3128,16 @@ function ensureBirthdateSelector() {
     birthInput.tabIndex = -1;
     const label = birthGroup.querySelector('label');
     if (label) {
-        label.textContent = '生年月日';
+        label.textContent = '生年月日（西暦／和暦併記）';
     }
     ensureDateSelectorRow(
         birthGroup,
         'birthdateSelectorRow',
-        '<select id="birthdate_year" data-skip-persist="1" style="flex:1 1 110px;min-width:90px;"></select><span>年</span><select id="birthdate_month" data-skip-persist="1" style="width:88px;"></select><span>月</span><select id="birthdate_day" data-skip-persist="1" style="width:88px;"></select><span>日</span>',
+        '<select id="birthdate_year" data-skip-persist="1" style="flex:1 1 240px;min-width:170px;"></select><span>年</span><select id="birthdate_month" data-skip-persist="1" style="width:88px;"></select><span>月</span><select id="birthdate_day" data-skip-persist="1" style="width:88px;"></select><span>日</span>',
     );
     ensurePatientAgeField(birthGroup);
     populateBirthdateYearMonthSelectors();
     populateBirthdateDaySelector();
-
     const yearSelect = document.getElementById('birthdate_year');
     const monthSelect = document.getElementById('birthdate_month');
     const daySelect = document.getElementById('birthdate_day');
@@ -3270,7 +3153,6 @@ function ensureBirthdateSelector() {
     }
     syncBirthdateSelectorsFromHidden();
 }
-
 function populateEvalDateYearMonthSelectors() {
     const yearSelect = document.getElementById('evalDate_year');
     const monthSelect = document.getElementById('evalDate_month');
@@ -3294,7 +3176,6 @@ function populateEvalDateYearMonthSelectors() {
     );
     yearSelect.dataset.ready = '1';
 }
-
 function populateEvalDateDaySelector(selectedDay = '') {
     const year = document.getElementById('evalDate_year')?.value || '';
     const month = document.getElementById('evalDate_month')?.value || '';
@@ -3311,7 +3192,6 @@ function populateEvalDateDaySelector(selectedDay = '') {
     );
     daySelect.value = selectedDay && Number(selectedDay) <= dayCount ? padDatePart(selectedDay) : '';
 }
-
 function syncEvalDateHiddenFromSelectors() {
     const hiddenInput = document.getElementById('evalDate');
     const year = document.getElementById('evalDate_year')?.value || '';
@@ -3324,7 +3204,6 @@ function syncEvalDateHiddenFromSelectors() {
     hiddenInput.dispatchEvent(new Event('input', { bubbles: true }));
     updatePatientAgeDisplay();
 }
-
 function syncEvalDateSelectorsFromHidden() {
     const hiddenInput = document.getElementById('evalDate');
     if (!hiddenInput) {
@@ -3341,7 +3220,6 @@ function syncEvalDateSelectorsFromHidden() {
     monthSelect.value = parts ? padDatePart(parts.month) : '';
     populateEvalDateDaySelector(parts ? parts.day : '');
 }
-
 function ensureEvalDateSelector() {
     const evalDateInput = document.getElementById('evalDate');
     if (!evalDateInput) {
@@ -3366,7 +3244,6 @@ function ensureEvalDateSelector() {
     );
     populateEvalDateYearMonthSelectors();
     populateEvalDateDaySelector();
-
     const yearSelect = document.getElementById('evalDate_year');
     const monthSelect = document.getElementById('evalDate_month');
     const daySelect = document.getElementById('evalDate_day');
@@ -3382,7 +3259,6 @@ function ensureEvalDateSelector() {
     }
     syncEvalDateSelectorsFromHidden();
 }
-
 function populateNextMonitorSelectors() {
     const yearSelect = document.getElementById('next_monitor_year');
     const monthSelect = document.getElementById('next_monitor_month');
@@ -3404,7 +3280,6 @@ function populateNextMonitorSelectors() {
     );
     yearSelect.dataset.ready = '1';
 }
-
 function syncNextMonitorHiddenFromSelectors() {
     const hiddenInput = document.getElementById('next_monitor');
     const year = document.getElementById('next_monitor_year')?.value || '';
@@ -3415,7 +3290,6 @@ function syncNextMonitorHiddenFromSelectors() {
     hiddenInput.value = year && month ? `${year}-${month}` : '';
     hiddenInput.dispatchEvent(new Event('input', { bubbles: true }));
 }
-
 function syncNextMonitorSelectorsFromHidden() {
     const hiddenInput = document.getElementById('next_monitor');
     if (!hiddenInput) {
@@ -3434,7 +3308,6 @@ function syncNextMonitorSelectorsFromHidden() {
         hiddenInput.value = `${parts.year}-${padDatePart(parts.month)}`;
     }
 }
-
 function ensureNextMonitorSelector() {
     const nextMonitorInput = document.getElementById('next_monitor');
     if (!nextMonitorInput) {
@@ -3458,7 +3331,6 @@ function ensureNextMonitorSelector() {
         '<select id="next_monitor_year" data-skip-persist="1" style="flex:1 1 120px;min-width:96px;"></select><span>年</span><select id="next_monitor_month" data-skip-persist="1" style="width:88px;"></select><span>月</span>',
     );
     populateNextMonitorSelectors();
-
     const yearSelect = document.getElementById('next_monitor_year');
     const monthSelect = document.getElementById('next_monitor_month');
     if (yearSelect && !yearSelect.dataset.boundNextMonitor) {
@@ -3469,7 +3341,6 @@ function ensureNextMonitorSelector() {
     }
     syncNextMonitorSelectorsFromHidden();
 }
-
 function ensurePatientFieldOrder() {
     const furiganaInput = document.getElementById('furigana');
     const nameInput = document.getElementById('name');
@@ -3492,7 +3363,6 @@ function ensurePatientFieldOrder() {
         furiganaLabel.textContent = 'ふりがな';
     }
 }
-
 function removeLegacyServiceFields() {
     ['serviceStart', 'serviceEnd'].forEach((id) => {
         const element = document.getElementById(id);
@@ -3502,7 +3372,6 @@ function removeLegacyServiceFields() {
         }
     });
 }
-
 function ensureFoodTextureFields() {
     const bmiInput = document.getElementById('bmi');
     if (!bmiInput || document.getElementById('food_staple')) {
@@ -3519,14 +3388,12 @@ function ensureFoodTextureFields() {
     stapleGroup.insertAdjacentElement('afterend', mainGroup);
     mainGroup.insertAdjacentElement('afterend', waterGroup);
 }
-
 function syncCustomDateSelectors() {
     syncBirthdateSelectorsFromHidden();
     syncEvalDateSelectorsFromHidden();
     syncNextMonitorSelectorsFromHidden();
     updatePatientAgeDisplay();
 }
-
 function ensurePatientFormEnhancements() {
     ensurePatientFieldOrder();
     ensureBirthdateSelector();
@@ -3543,7 +3410,6 @@ function ensurePatientFormEnhancements() {
     }
     updatePatientAgeDisplay();
 }
-
 function findNearestSectionLabelElement(fieldElement) {
     let cursor = fieldElement?.closest('.form-group') || fieldElement?.parentElement || null;
     while (cursor) {
@@ -3562,7 +3428,6 @@ function findNearestSectionLabelElement(fieldElement) {
     }
     return null;
 }
-
 function applySelectConfig(fieldId, config, options = {}) {
     const selectElement = document.getElementById(fieldId);
     if (!selectElement || selectElement.tagName !== 'SELECT' || !config) {
@@ -3582,13 +3447,11 @@ function applySelectConfig(fieldId, config, options = {}) {
     }
     selectElement.value = getCompatibleSelectValue(selectElement, currentValue);
 }
-
 function ensureOralEvaluationFields() {
     const oralEval2 = document.getElementById('oral_eval2');
     if (!oralEval2) {
         return;
     }
-
     const oralEval2Group = oralEval2.closest('.form-group');
     let oralEval3 = document.getElementById('oral_eval3');
     if (!oralEval3 && oralEval2Group) {
@@ -3599,17 +3462,14 @@ function ensureOralEvaluationFields() {
         oralEval2Group.insertAdjacentElement('afterend', group);
         oralEval3 = group.querySelector('select');
     }
-
     const oralBiko = document.getElementById('oral_biko');
     const oralBikoLabel = oralBiko?.closest('.form-group')?.querySelector('label');
     if (oralBikoLabel) {
         oralBikoLabel.textContent = '④ 備考';
     }
-
     applySelectConfig('oral_eval2', ORAL_SELECT_CONFIG.oral_eval2);
     applySelectConfig('oral_eval3', ORAL_SELECT_CONFIG.oral_eval3);
 }
-
 function ensureOralDyskinesiaInlineLayout() {
     const paInput = document.getElementById('pa');
     const taInput = document.getElementById('ta');
@@ -3627,19 +3487,15 @@ function ensureOralDyskinesiaInlineLayout() {
     container.classList.add('odk-inline-grid');
     [paGroup, taGroup, kaGroup].forEach((group) => group.classList.add('odk-inline-grid__item'));
 }
-
 function getOdkHelperLabel(fieldId) {
     return fieldId === 'pa' ? 'パ' : fieldId === 'ta' ? 'タ' : 'カ';
 }
-
 function getOdkCountInput(fieldId) {
     return document.getElementById(`${fieldId}_count`);
 }
-
 function getOdkTimerDisplay(fieldId) {
     return document.getElementById(`${fieldId}TimerDisplay`);
 }
-
 function updateOdkDisplay(fieldId) {
     const display = getOdkTimerDisplay(fieldId);
     if (!display) {
@@ -3647,7 +3503,6 @@ function updateOdkDisplay(fieldId) {
     }
     display.textContent = `${odkRemainingSeconds[fieldId]}秒`;
 }
-
 function syncOdkRateFromCount(fieldId) {
     const countInput = getOdkCountInput(fieldId);
     const rateInput = document.getElementById(fieldId);
@@ -3658,7 +3513,6 @@ function syncOdkRateFromCount(fieldId) {
     rateInput.value = count > 0 ? (count / ODK_TIMER_SECONDS).toFixed(1) : '';
     rateInput.dispatchEvent(new Event('input', { bubbles: true }));
 }
-
 function resetOdkTimer(fieldId, options = {}) {
     if (odkTimerHandles[fieldId]) {
         window.clearInterval(odkTimerHandles[fieldId]);
@@ -3679,7 +3533,6 @@ function resetOdkTimer(fieldId, options = {}) {
         showToast(`⏱️ ${getOdkHelperLabel(fieldId)} 10秒タイマーをリセットしました`);
     }
 }
-
 function incrementOdkCount(fieldId) {
     const countInput = getOdkCountInput(fieldId);
     if (!countInput) {
@@ -3689,7 +3542,6 @@ function incrementOdkCount(fieldId) {
     countInput.value = String(current + 1);
     syncOdkRateFromCount(fieldId);
 }
-
 function startOdkTimer(fieldId) {
     if (odkTimerHandles[fieldId]) {
         return;
@@ -3697,7 +3549,6 @@ function startOdkTimer(fieldId) {
     resetOdkTimer(fieldId, { quiet: true });
     odkRemainingSeconds[fieldId] = ODK_TIMER_SECONDS;
     updateOdkDisplay(fieldId);
-
     odkTimerHandles[fieldId] = window.setInterval(() => {
         odkRemainingSeconds[fieldId] -= 1;
         updateOdkDisplay(fieldId);
@@ -3708,7 +3559,6 @@ function startOdkTimer(fieldId) {
         }
     }, 1000);
 }
-
 function syncOdkHelperFieldsFromRates() {
     ['pa', 'ta', 'ka'].forEach((fieldId) => {
         odkRemainingSeconds[fieldId] = ODK_TIMER_SECONDS;
@@ -3720,14 +3570,12 @@ function syncOdkHelperFieldsFromRates() {
         }
     });
 }
-
 function ensureOralReferencePanel(fieldId, config) {
     const selectElement = document.getElementById(fieldId);
     const group = selectElement?.closest('.form-group');
     if (!group || !config) {
         return;
     }
-
     let panel = document.getElementById(`${fieldId}ReferencePanel`);
     if (!panel) {
         panel = document.createElement('div');
@@ -3742,7 +3590,6 @@ function ensureOralReferencePanel(fieldId, config) {
         `;
         group.insertAdjacentElement('afterend', panel);
     }
-
     const image = panel.querySelector('img');
     if (image && !image.dataset.boundFallback) {
         image.addEventListener('error', () => {
@@ -3756,19 +3603,16 @@ function ensureOralReferencePanel(fieldId, config) {
         image.dataset.boundFallback = '1';
     }
 }
-
 function ensureOralReferencePanels() {
     Object.entries(ORAL_REFERENCE_IMAGE_CONFIG).forEach(([fieldId, config]) => {
         ensureOralReferencePanel(fieldId, config);
     });
 }
-
 function ensureOdkTimerTools() {
     const odkGrid = document.getElementById('pa')?.closest('.form-grid');
     if (!odkGrid || document.getElementById('odkTimerPanel')) {
         return;
     }
-
     const panel = document.createElement('div');
     panel.id = 'odkTimerPanel';
     panel.className = 'rsst-timer-panel';
@@ -3801,7 +3645,6 @@ function ensureOdkTimerTools() {
         </div>
     `;
     odkGrid.insertAdjacentElement('afterend', panel);
-
     ['pa', 'ta', 'ka'].forEach((fieldId) => {
         panel.querySelector(`#${fieldId}TimerStartButton`)?.addEventListener('click', () => startOdkTimer(fieldId));
         panel.querySelector(`#${fieldId}TimerResetButton`)?.addEventListener('click', () => resetOdkTimer(fieldId));
@@ -3809,7 +3652,6 @@ function ensureOdkTimerTools() {
     });
     syncOdkHelperFieldsFromRates();
 }
-
 function ensureOralAssessmentEnhancements() {
     applySelectConfig('q6', ORAL_SELECT_CONFIG.q6);
     applySelectConfig('q7', ORAL_SELECT_CONFIG.q7);
@@ -3830,7 +3672,6 @@ function ensureOralAssessmentEnhancements() {
     ensureOralDyskinesiaInlineLayout();
     ensureOralReferencePanels();
 }
-
 function getFieldElementValue(id) {
     const element = document.getElementById(id);
     if (!element) {
@@ -3841,12 +3682,10 @@ function getFieldElementValue(id) {
     }
     return String(element.textContent || '');
 }
-
 function formatDisplayValue(value) {
     const text = String(value || '').trim();
     return text || '―';
 }
-
 function ensurePrintSheet() {
     let sheet = document.getElementById(PRINT_SHEET_ID);
     if (!sheet) {
@@ -3857,17 +3696,14 @@ function ensurePrintSheet() {
     }
     return sheet;
 }
-
 function buildPrintItem(label, value, wide = false) {
     const className = wide ? 'print-sheet__item print-sheet__item--wide' : 'print-sheet__item';
     return '<div class="' + className + '"><div class="print-sheet__label">' + escapeHtml(label) + '</div><div class="print-sheet__value">' + escapeHtml(formatDisplayValue(value)) + '</div></div>';
 }
-
 function ensurePrintTextareaMirror(textarea) {
     if (!textarea) {
         return null;
     }
-
     let mirror = textarea.nextElementSibling;
     if (!mirror || !mirror.classList || !mirror.classList.contains('print-textarea-mirror')) {
         mirror = document.createElement('div');
@@ -3877,13 +3713,11 @@ function ensurePrintTextareaMirror(textarea) {
     }
     return mirror;
 }
-
 function syncPrintTextareaMirror(textarea) {
     const mirror = ensurePrintTextareaMirror(textarea);
     if (!mirror) {
         return;
     }
-
     const value = String(textarea.value || '');
     const normalizedValue = value.trim();
     const minHeight = parseInt(window.getComputedStyle(textarea).minHeight, 10) || 88;
@@ -3891,11 +3725,9 @@ function syncPrintTextareaMirror(textarea) {
     mirror.classList.toggle('is-empty', !normalizedValue);
     mirror.style.minHeight = `${minHeight}px`;
 }
-
 function syncAllPrintTextareaMirrors() {
     document.querySelectorAll('textarea').forEach((textarea) => syncPrintTextareaMirror(textarea));
 }
-
 function setupPrintTextareaMirrors() {
     document.querySelectorAll('textarea').forEach((textarea) => {
         syncPrintTextareaMirror(textarea);
@@ -3907,7 +3739,6 @@ function setupPrintTextareaMirrors() {
         textarea.dataset.printMirrorBound = '1';
     });
 }
-
 function splitMarkedCommentSections(value, startMarker, endMarker) {
     const text = String(value || '');
     const startIndex = text.indexOf(startMarker);
@@ -3920,7 +3751,6 @@ function splitMarkedCommentSections(value, startMarker, endMarker) {
             isLegacyBlock: false,
         };
     }
-
     const endIndex = text.indexOf(endMarker, startIndex + startMarker.length);
     if (endIndex < 0) {
         return {
@@ -3931,7 +3761,6 @@ function splitMarkedCommentSections(value, startMarker, endMarker) {
             isLegacyBlock: true,
         };
     }
-
     const blockEnd = endIndex + endMarker.length;
     return {
         before: text.slice(0, startIndex).trim(),
@@ -3941,7 +3770,6 @@ function splitMarkedCommentSections(value, startMarker, endMarker) {
         isLegacyBlock: false,
     };
 }
-
 function buildMarkedCommentBlock(lines, startMarker, endMarker) {
     const normalizedLines = (lines || []).map((line) => String(line || '').trim()).filter(Boolean);
     if (!normalizedLines.length) {
@@ -3949,23 +3777,18 @@ function buildMarkedCommentBlock(lines, startMarker, endMarker) {
     }
     return [startMarker, ...normalizedLines, endMarker].join(String.fromCharCode(10));
 }
-
 function splitClinicalCommentSections(value) {
     return splitMarkedCommentSections(value, CLINICAL_COMMENT_START_MARKER, CLINICAL_COMMENT_END_MARKER);
 }
-
 function splitNutritionCommentSections(value) {
     return splitMarkedCommentSections(value, NUTRITION_COMMENT_START_MARKER, NUTRITION_COMMENT_END_MARKER);
 }
-
 function buildClinicalCommentBlock(lines) {
     return buildMarkedCommentBlock(lines, CLINICAL_COMMENT_START_MARKER, CLINICAL_COMMENT_END_MARKER);
 }
-
 function buildNutritionCommentBlock(lines) {
     return buildMarkedCommentBlock(lines, NUTRITION_COMMENT_START_MARKER, NUTRITION_COMMENT_END_MARKER);
 }
-
 function parseLegacyClinicalCommentBlock(block) {
     const lines = normalizeCommentBlock(
         String(block || '').replace(CLINICAL_COMMENT_START_MARKER, '')
@@ -3973,7 +3796,6 @@ function parseLegacyClinicalCommentBlock(block) {
     const generatedLines = [];
     const trailingManualLines = [];
     let summaryAssigned = false;
-
     lines.forEach((line) => {
         const isGeneratedLine = line.startsWith('所見候補:')
             || line.startsWith('変化:')
@@ -3989,13 +3811,11 @@ function parseLegacyClinicalCommentBlock(block) {
         }
         trailingManualLines.push(line);
     });
-
     return {
         generatedBlock: buildClinicalCommentBlock(generatedLines),
         trailingText: trailingManualLines.join(String.fromCharCode(10)),
     };
 }
-
 function getPrintFriendlyComment(value) {
     const clinicalSections = splitClinicalCommentSections(value);
     let visibleText = '';
@@ -4008,7 +3828,6 @@ function getPrintFriendlyComment(value) {
             .filter(Boolean)
             .join(String.fromCharCode(10) + String.fromCharCode(10));
     }
-
     const nutritionSections = splitNutritionCommentSections(visibleText);
     if (!nutritionSections.hasBlock) {
         return visibleText;
@@ -4022,23 +3841,19 @@ function getPrintFriendlyComment(value) {
         .filter(Boolean)
         .join(String.fromCharCode(10) + String.fromCharCode(10));
 }
-
 function getPrintableCommentText(value) {
     const printFriendlyComment = getPrintFriendlyComment(value);
     if (printFriendlyComment) {
         return printFriendlyComment;
     }
-
     const commentWithoutClinicalMarkers = stripClinicalCommentMarkers(value);
     return stripNutritionCommentMarkers(commentWithoutClinicalMarkers);
 }
-
 function buildPrintReportData() {
     const name = getFieldElementValue('name').trim();
     const birthdate = getFieldElementValue('birthdate').trim();
     const evalDate = getFieldElementValue('evalDate');
     const clinicalSupportData = buildClinicalSupportData();
-
     if (!name) {
         showToast('⚠️ 氏名を入力してください');
         return null;
@@ -4047,7 +3862,6 @@ function buildPrintReportData() {
         showToast('⚠️ 生年月日を入力してください');
         return null;
     }
-
     return {
         name,
         furigana: getFieldElementValue('furigana'),
@@ -4079,14 +3893,15 @@ function buildPrintReportData() {
         oralSummary: getFieldElementValue('oral_summary_text'),
         oralContinue: getFieldElementValue('oral_eval2'),
         oralPlan: getFieldElementValue('oral_eval3'),
+        dentistFreeNote: getFieldElementValue('dentist_free_note'),
         mnaScore: getFieldElementValue('mna_summary_num'),
         mnaResult: getFieldElementValue('mna_summary_result'),
         comment: getPrintableCommentText(getFieldElementValue('summary_comment')),
+        nutritionCareProgress: getFieldElementValue('nutrition_care_progress'),
         nextMonitor: formatYearMonthDisplay(getFieldElementValue('next_monitor')),
         clinicalPrintLines: buildClinicalPrintLines(clinicalSupportData),
     };
 }
-
 function buildPrintMetricLines(values) {
     return values
         .map((value) => String(value || '').trim())
@@ -4094,14 +3909,12 @@ function buildPrintMetricLines(values) {
         .map((value) => '<div class="print-sheet__metric-line">' + escapeHtml(value) + '</div>')
         .join('');
 }
-
 function buildPrintSheetHtml(report) {
     const headerMeta = [
         report.furigana ? 'ふりがな: ' + formatDisplayValue(report.furigana) : '',
         '生年月日: ' + formatDisplayValue(report.birthdate),
         '評価日: ' + formatDisplayValue(report.evalDate),
     ].filter(Boolean).join(' / ');
-
     const infoGrid = [
         buildPrintItem('性別', report.gender),
         buildPrintItem('年齢', report.age === null || report.age === undefined ? '' : `${report.age}歳`),
@@ -4116,12 +3929,10 @@ function buildPrintSheetHtml(report) {
         buildPrintItem('水分形態', report.waterTexture, true),
         buildPrintItem('次回モニタリング', report.nextMonitor, true),
     ].join('');
-
     const oralLines = buildPrintMetricLines(report.oralSummary ? [report.oralSummary] : [report.oralContinue, report.oralPlan]);
     const mnaLines = '<div class="print-sheet__metric-score">' + escapeHtml(formatDisplayValue(report.mnaScore)) + '</div>'
         + '<div class="print-sheet__metric-line">' + escapeHtml(formatDisplayValue(report.mnaResult)) + '</div>';
     const clinicalPrintLines = buildPrintMetricLines(report.clinicalPrintLines || []);
-
     return '<div class="print-sheet__page">'
         + '<div class="print-sheet__header">'
         + '<div><div class="print-sheet__title">口腔機能・栄養評価記録</div><div class="print-sheet__subtitle">印刷対象は現在表示中の 1 名分のみです</div></div>'
@@ -4138,17 +3949,23 @@ function buildPrintSheetHtml(report) {
         + '<div class="print-sheet__metric-card print-sheet__metric-card--wide"><div class="print-sheet__metric-title">差分アシスト</div>' + (clinicalPrintLines || '<div class="print-sheet__metric-line">差分アラートはまだありません。</div>') + '</div>'
         + '</div>'
         + '<div class="print-sheet__section">'
+        + '<div class="print-sheet__section-title">歯科医による自由記載</div>'
+        + '<div class="print-sheet__note">' + escapeHtml(formatDisplayValue(report.dentistFreeNote)) + '</div>'
+        + '</div>'
+        + '<div class="print-sheet__section">'
         + '<div class="print-sheet__section-title">コメント・支援方針</div>'
         + '<div class="print-sheet__note">' + escapeHtml(formatDisplayValue(report.comment)) + '</div>'
         + '</div>'
+        + '<div class="print-sheet__section print-sheet__section--comment">'
+        + '<div class="print-sheet__section-title">栄養ケア提供経過記録</div>'
+        + '<div class="print-sheet__note">' + escapeHtml(formatDisplayValue(report.nutritionCareProgress)) + '</div>'
+        + '</div>'
         + '</div>';
 }
-
 function preparePrintSheet(report) {
     const sheet = ensurePrintSheet();
     sheet.innerHTML = buildPrintSheetHtml(report);
 }
-
 function printAllRecordPages() {
     syncAllPrintTextareaMirrors();
     clearPrintMode();
@@ -4158,7 +3975,6 @@ function printAllRecordPages() {
         clearPrintMode();
     });
 }
-
 function clearPrintMode() {
     document.body.classList.remove('print-mode');
     document.body.classList.remove('print-all-mode');
@@ -4167,12 +3983,10 @@ function clearPrintMode() {
         sheet.style.zoom = '';
     }
 }
-
 function ensureStage1Styles() {
     if (document.getElementById(STAGE1_STYLE_ID)) {
         return;
     }
-
     const style = document.createElement('style');
     style.id = STAGE1_STYLE_ID;
     style.textContent = `
@@ -4819,7 +4633,6 @@ function ensureStage1Styles() {
         .nutrition-empty {
             color: var(--text-light);
         }
-
         /* ── Nutrition action edit modal ── */
         .nedit-overlay {
             display: none;
@@ -5032,16 +4845,13 @@ function ensureStage1Styles() {
     `;
     document.head.appendChild(style);
 }
-
 function buildEmptyMnaScores() {
     return { a: null, b: null, c: null, d: null, e: null, f: null };
 }
-
 function getActiveTabId() {
     const activeTab = document.querySelector('.tab-content.active');
     return activeTab ? String(activeTab.id || '').replace(/^tab-/, '') : 'patient';
 }
-
 function formatTimestampLabel(value) {
     if (!value) {
         return '未保存';
@@ -5058,7 +4868,6 @@ function formatTimestampLabel(value) {
         minute: '2-digit',
     });
 }
-
 function getDraftStore() {
     try {
         const raw = localStorage.getItem(DRAFT_STORAGE_KEY);
@@ -5071,11 +4880,9 @@ function getDraftStore() {
         return {};
     }
 }
-
 function setDraftStore(store) {
     localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(store));
 }
-
 function buildCurrentSnapshot(slot = '') {
     return {
         version: 1,
@@ -5087,7 +4894,6 @@ function buildCurrentSnapshot(slot = '') {
         mnaFieldMode: getSelectedMnaFieldMode() || currentMnaFieldMode || '',
     };
 }
-
 function isMeaningfulSnapshot(snapshot) {
     if (!snapshot || typeof snapshot !== 'object') {
         return false;
@@ -5098,7 +4904,6 @@ function isMeaningfulSnapshot(snapshot) {
     const hasScoreValue = Object.values(scores).some((value) => value !== null && value !== undefined && value !== '');
     return hasFieldValue || hasScoreValue;
 }
-
 function updateDraftStatusDisplays() {
     const store = getDraftStore();
     document.querySelectorAll('[data-draft-status]').forEach((element) => {
@@ -5106,7 +4911,6 @@ function updateDraftStatusDisplays() {
         const snapshot = store[slot];
         element.textContent = snapshot ? `下書き: ${formatTimestampLabel(snapshot.savedAt)}` : '下書きなし';
     });
-
     const autoStatus = document.getElementById('autoDraftStatus');
     if (autoStatus) {
         const autoSnapshot = store[AUTOSAVE_SLOT];
@@ -5115,7 +4919,6 @@ function updateDraftStatusDisplays() {
             : '自動下書きなし';
     }
 }
-
 function saveDraftSlot(slot, options = {}) {
     const snapshot = buildCurrentSnapshot(slot);
     if (!isMeaningfulSnapshot(snapshot)) {
@@ -5124,7 +4927,6 @@ function saveDraftSlot(slot, options = {}) {
         }
         return false;
     }
-
     const store = getDraftStore();
     store[slot] = snapshot;
     setDraftStore(store);
@@ -5134,7 +4936,6 @@ function saveDraftSlot(slot, options = {}) {
     }
     return true;
 }
-
 function restoreSnapshot(snapshot, options = {}) {
     if (!snapshot || typeof snapshot !== 'object') {
         if (!options.quiet) {
@@ -5142,7 +4943,6 @@ function restoreSnapshot(snapshot, options = {}) {
         }
         return false;
     }
-
     restoreFieldValues(snapshot.fields || {});
     currentMnaFieldMode = snapshot.mnaFieldMode || '';
     mnaScores = { ...buildEmptyMnaScores(), ...(snapshot.mnaScores || {}) };
@@ -5152,12 +4952,10 @@ function restoreSnapshot(snapshot, options = {}) {
         calcBMI();
     }
     updateSummary();
-
     const targetTab = snapshot.activeTab || snapshot.slot;
     if (targetTab && DRAFT_SLOTS.includes(targetTab)) {
         showTab(targetTab);
     }
-
     updateDraftStatusDisplays();
     updateStage2Panels();
     if (!options.quiet) {
@@ -5165,12 +4963,10 @@ function restoreSnapshot(snapshot, options = {}) {
     }
     return true;
 }
-
 function loadDraftSlot(slot, options = {}) {
     const store = getDraftStore();
     return restoreSnapshot(store[slot], options);
 }
-
 function deleteDraftSlot(slot, options = {}) {
     const store = getDraftStore();
     if (!store[slot]) {
@@ -5187,7 +4983,6 @@ function deleteDraftSlot(slot, options = {}) {
     }
     return true;
 }
-
 function scheduleAutosave() {
     if (autosaveHandle) {
         window.clearTimeout(autosaveHandle);
@@ -5196,12 +4991,10 @@ function scheduleAutosave() {
         saveDraftSlot(AUTOSAVE_SLOT, { quiet: true });
     }, 900);
 }
-
 function attachDraftAutosave() {
     if (draftListenersBound) {
         return;
     }
-
     const handleInput = (event) => {
         const target = event.target;
         if (!target || !target.tagName || !['INPUT', 'SELECT', 'TEXTAREA'].includes(target.tagName)) {
@@ -5212,12 +5005,10 @@ function attachDraftAutosave() {
         }
         scheduleAutosave();
     };
-
     document.addEventListener('input', handleInput, true);
     document.addEventListener('change', handleInput, true);
     draftListenersBound = true;
 }
-
 function ensureDraftControls() {
     const actionBarConfigs = [
         { slot: 'patient', selector: '#tab-patient .action-bar.no-print' },
@@ -5225,13 +5016,11 @@ function ensureDraftControls() {
         { slot: 'mna', selector: '#tab-mna .action-bar.no-print' },
         { slot: 'summary', selector: '#tab-summary .card.no-print .action-bar' },
     ];
-
     actionBarConfigs.forEach(({ slot, selector }) => {
         const actionBar = document.querySelector(selector);
         if (!actionBar || document.querySelector(`[data-draft-slot="${slot}"]`)) {
             return;
         }
-
         const toolbar = document.createElement('div');
         toolbar.className = 'draft-toolbar no-print';
         toolbar.setAttribute('data-draft-slot', slot);
@@ -5244,12 +5033,10 @@ function ensureDraftControls() {
             <div class="draft-toolbar__status" data-draft-status="${slot}">下書きなし</div>
         `;
         actionBar.insertAdjacentElement('afterend', toolbar);
-
         toolbar.querySelector('[data-draft-action="save"]').addEventListener('click', () => saveDraftSlot(slot));
         toolbar.querySelector('[data-draft-action="load"]').addEventListener('click', () => loadDraftSlot(slot));
         toolbar.querySelector('[data-draft-action="delete"]').addEventListener('click', () => deleteDraftSlot(slot));
     });
-
     const summaryActionBar = document.querySelector('#tab-summary .card.no-print .action-bar');
     if (summaryActionBar && !document.getElementById('autoDraftPanel')) {
         const autoPanel = document.createElement('div');
@@ -5266,21 +5053,17 @@ function ensureDraftControls() {
         autoPanel.querySelector('#loadAutoDraftButton').addEventListener('click', () => loadDraftSlot(AUTOSAVE_SLOT));
         autoPanel.querySelector('#deleteAutoDraftButton').addEventListener('click', () => deleteDraftSlot(AUTOSAVE_SLOT));
     }
-
     updateDraftStatusDisplays();
 }
-
 function getLocalSettingArray(key) {
     return Array.isArray(sharedSettingsState[key]) ? [...sharedSettingsState[key]] : [];
 }
-
 function setLocalSettingArray(key, values) {
     sharedSettingsState = {
         ...sharedSettingsState,
         [key]: mergeUniqueTextValues([], values || []),
     };
 }
-
 function mergeUniqueTextValues(existingValues, incomingValues) {
     const seen = new Set();
     return [...existingValues, ...incomingValues]
@@ -5297,11 +5080,9 @@ function mergeUniqueTextValues(existingValues, incomingValues) {
             return true;
         });
 }
-
 function getManagedFieldConfigByFieldId(fieldId) {
     return MANAGED_FIELD_CONFIGS.find((config) => config.fieldId === fieldId) || null;
 }
-
 async function ensureLocalSettingsInitialized() {
     try {
         applySharedSettingsState(await fetchSharedSettings());
@@ -5311,7 +5092,6 @@ async function ensureLocalSettingsInitialized() {
         showToast(error.message || '一覧設定の同期に失敗しました');
     }
 }
-
 function getManagedFieldNodes(config) {
     const field = document.getElementById(config.fieldId);
     const select = document.getElementById(config.selectId);
@@ -5321,11 +5101,9 @@ function getManagedFieldNodes(config) {
     }
     return { field, select, custom };
 }
-
 function toggleManagedCustomInput(nodes, visible) {
     nodes.custom.style.display = visible ? 'block' : 'none';
 }
-
 function syncDentistPresenceField(options = {}) {
     const presenceField = document.getElementById('dentist_has');
     const dentistField = document.getElementById('dentist');
@@ -5335,16 +5113,13 @@ function syncDentistPresenceField(options = {}) {
     if (!presenceField || !dentistField || !dentistGroup) {
         return;
     }
-
     const hasStoredDentist = Boolean(String(dentistField.value || '').trim());
     if (!presenceField.value && hasStoredDentist) {
         presenceField.value = 'あり';
     }
-
     const isVisible = presenceField.value === 'あり';
     dentistGroup.style.display = isVisible ? 'block' : 'none';
     dentistGroup.setAttribute('aria-hidden', isVisible ? 'false' : 'true');
-
     if (!isVisible && (presenceField.value === 'なし' || !options.preserveValue)) {
         dentistField.value = '';
         if (selectField) {
@@ -5355,31 +5130,26 @@ function syncDentistPresenceField(options = {}) {
             customField.style.display = 'none';
         }
     }
-
     if (isVisible && typeof renderDentistSelect === 'function') {
         renderDentistSelect();
     }
 }
-
 function bindDentistPresenceField() {
     const presenceField = document.getElementById('dentist_has');
     if (!presenceField || presenceField.dataset.boundDentistPresence === '1') {
         return;
     }
-
     presenceField.addEventListener('change', () => {
         syncDentistPresenceField();
         scheduleAutosave();
     });
     presenceField.dataset.boundDentistPresence = '1';
 }
-
 function syncManagedFieldStoredValue(config, options = {}) {
     const nodes = getManagedFieldNodes(config);
     if (!nodes) {
         return;
     }
-
     const selectValue = String(nodes.select.value || '');
     let storedValue = '';
     if (selectValue === MANAGED_SELECT_CUSTOM_VALUE) {
@@ -5393,7 +5163,6 @@ function syncManagedFieldStoredValue(config, options = {}) {
         toggleManagedCustomInput(nodes, false);
     }
     nodes.field.value = storedValue;
-
     if (config.fieldId === 'dentist') {
         const presenceField = document.getElementById('dentist_has');
         if (presenceField && storedValue && presenceField.value !== 'あり') {
@@ -5401,12 +5170,10 @@ function syncManagedFieldStoredValue(config, options = {}) {
         }
         syncDentistPresenceField({ preserveValue: true });
     }
-
     if (options.fromUser) {
         scheduleAutosave();
     }
 }
-
 function bindManagedFieldEvents(config, nodes) {
     if (nodes.select.dataset.boundManagedField !== '1') {
         nodes.select.addEventListener('change', () => {
@@ -5420,7 +5187,6 @@ function bindManagedFieldEvents(config, nodes) {
         });
         nodes.select.dataset.boundManagedField = '1';
     }
-
     if (nodes.custom.dataset.boundManagedField !== '1') {
         nodes.custom.addEventListener('input', () => {
             if (nodes.select.value === MANAGED_SELECT_CUSTOM_VALUE) {
@@ -5430,37 +5196,30 @@ function bindManagedFieldEvents(config, nodes) {
         nodes.custom.dataset.boundManagedField = '1';
     }
 }
-
 function renderManagedSelectField(config) {
     const nodes = getManagedFieldNodes(config);
     if (!nodes) {
         return;
     }
-
     const optionValues = mergeUniqueTextValues([], getLocalSettingArray(config.settingKey));
     const storedValue = String(nodes.field.value || '').trim();
     const fragment = document.createDocumentFragment();
-
     const emptyOption = document.createElement('option');
     emptyOption.value = '';
     emptyOption.textContent = '選択';
     fragment.appendChild(emptyOption);
-
     optionValues.forEach((value) => {
         const option = document.createElement('option');
         option.value = value;
         option.textContent = value;
         fragment.appendChild(option);
     });
-
     const customOption = document.createElement('option');
     customOption.value = MANAGED_SELECT_CUSTOM_VALUE;
     customOption.textContent = 'その他（自由入力）';
     fragment.appendChild(customOption);
-
     nodes.select.innerHTML = '';
     nodes.select.appendChild(fragment);
-
     if (storedValue && optionValues.includes(storedValue)) {
         nodes.select.value = storedValue;
         nodes.custom.value = '';
@@ -5474,35 +5233,29 @@ function renderManagedSelectField(config) {
         nodes.custom.value = '';
         toggleManagedCustomInput(nodes, false);
     }
-
     bindManagedFieldEvents(config, nodes);
 }
-
 function renderStaffSelect() {
     const config = getManagedFieldConfigByFieldId('staff');
     if (config) {
         renderManagedSelectField(config);
     }
 }
-
 function renderDentistSelect() {
     const config = getManagedFieldConfigByFieldId('dentist');
     if (config) {
         renderManagedSelectField(config);
     }
 }
-
 function syncManagedPersonSelectors() {
     MANAGED_FIELD_CONFIGS.forEach((config) => renderManagedSelectField(config));
     syncDentistPresenceField({ preserveValue: true });
 }
-
 function renderSettingsPanel(config) {
     const list = document.getElementById(config.settingsListId);
     if (!list) {
         return;
     }
-
     list.innerHTML = '';
     const values = getLocalSettingArray(config.settingKey);
     if (!values.length) {
@@ -5512,16 +5265,13 @@ function renderSettingsPanel(config) {
         list.appendChild(empty);
         return;
     }
-
     values.forEach((value) => {
         const item = document.createElement('div');
         item.className = 'settings-list__item';
-
         const label = document.createElement('div');
         label.className = 'settings-list__label';
         label.textContent = value;
         item.appendChild(label);
-
         const removeButton = document.createElement('button');
         removeButton.type = 'button';
         removeButton.className = 'btn btn-danger btn-sm';
@@ -5545,17 +5295,14 @@ function renderSettingsPanel(config) {
         list.appendChild(item);
     });
 }
-
 function renderSettingsPanels() {
     MANAGED_FIELD_CONFIGS.forEach((config) => renderSettingsPanel(config));
 }
-
 async function addManagedSettingValue(config) {
     const input = document.getElementById(config.settingsInputId);
     if (!input) {
         return;
     }
-
     const nextValue = String(input.value || '').trim();
     if (!nextValue) {
         showToast(`⚠️ ${config.label}を入力してください`);
@@ -5565,14 +5312,12 @@ async function addManagedSettingValue(config) {
         showToast('⚠️ その名称は登録できません');
         return;
     }
-
     const currentValues = getLocalSettingArray(config.settingKey);
     const mergedValues = mergeUniqueTextValues(currentValues, [nextValue]);
     if (mergedValues.length == currentValues.length) {
         showToast(`⚠️ ${config.duplicateMessage}`);
         return;
     }
-
     try {
         await saveSharedSettingsState({ [config.settingKey]: mergedValues });
         input.value = '';
@@ -5584,7 +5329,6 @@ async function addManagedSettingValue(config) {
         showToast(error.message || `${config.label}の保存に失敗しました`);
     }
 }
-
 function ensureSettingsControls() {
     MANAGED_FIELD_CONFIGS.forEach((config) => {
         const input = document.getElementById(config.settingsInputId);
@@ -5592,14 +5336,12 @@ function ensureSettingsControls() {
         if (!input || !addButton) {
             return;
         }
-
         if (addButton.dataset.boundSettingsAdd !== '1') {
             addButton.addEventListener('click', () => {
                 addManagedSettingValue(config);
             });
             addButton.dataset.boundSettingsAdd = '1';
         }
-
         if (input.dataset.boundSettingsEnter !== '1') {
             input.addEventListener('keydown', (event) => {
                 if (event.key === 'Enter') {
@@ -5610,15 +5352,12 @@ function ensureSettingsControls() {
             input.dataset.boundSettingsEnter = '1';
         }
     });
-
     renderSettingsPanels();
 }
-
 function installManagedFieldHooks() {
     if (managedFieldHooksInstalled) {
         return;
     }
-
     if (typeof clearAll === 'function') {
         const originalClearAll = clearAll;
         clearAll = function(...args) {
@@ -5628,16 +5367,13 @@ function installManagedFieldHooks() {
         };
         window.clearAll = clearAll;
     }
-
     managedFieldHooksInstalled = true;
 }
-
 function ensureImportInput() {
     let input = document.getElementById(IMPORT_INPUT_ID);
     if (input) {
         return input;
     }
-
     input = document.createElement('input');
     input.id = IMPORT_INPUT_ID;
     input.type = 'file';
@@ -5648,13 +5384,11 @@ function ensureImportInput() {
     document.body.appendChild(input);
     return input;
 }
-
 function ensureDataTransferControls() {
     const summaryActionBar = document.querySelector('#tab-summary .card.no-print .action-bar');
     if (!summaryActionBar) {
         return;
     }
-
     if (!document.getElementById('exportDataButton')) {
         const exportButton = document.createElement('button');
         exportButton.type = 'button';
@@ -5664,7 +5398,6 @@ function ensureDataTransferControls() {
         exportButton.addEventListener('click', exportAppData);
         summaryActionBar.appendChild(exportButton);
     }
-
     if (!document.getElementById('importDataButton')) {
         const importButton = document.createElement('button');
         importButton.type = 'button';
@@ -5678,7 +5411,6 @@ function ensureDataTransferControls() {
         });
         summaryActionBar.appendChild(importButton);
     }
-
     if (!document.getElementById('dataTransferNote')) {
         const note = document.createElement('div');
         note.id = 'dataTransferNote';
@@ -5686,10 +5418,8 @@ function ensureDataTransferControls() {
         note.textContent = '共有記録・担当者一覧・かかりつけ歯科一覧はサーバーへ、下書きはこの端末へ保存されます。';
         summaryActionBar.insertAdjacentElement('afterend', note);
     }
-
     ensureImportInput();
 }
-
 async function exportAppData() {
     try {
         const latestRecords = await fetchRecords();
@@ -5718,12 +5448,10 @@ async function exportAppData() {
         showToast(error.message || 'データの書き出しに失敗しました');
     }
 }
-
 function normalizeImportedBundle(payload) {
     if (Array.isArray(payload)) {
         return { records: payload, drafts: {}, staffList: [], dentistList: [] };
     }
-
     const safePayload = payload && typeof payload === 'object' ? payload : {};
     const localData = safePayload.localData && typeof safePayload.localData === 'object' ? safePayload.localData : {};
     return {
@@ -5733,7 +5461,6 @@ function normalizeImportedBundle(payload) {
         dentistList: Array.isArray(localData.dentistList) ? localData.dentistList : (Array.isArray(safePayload.dentistList) ? safePayload.dentistList : []),
     };
 }
-
 function sanitizeImportedRecord(record) {
     const cloned = JSON.parse(JSON.stringify(record || {}));
     delete cloned.id;
@@ -5743,7 +5470,6 @@ function sanitizeImportedRecord(record) {
     delete cloned.savedAt;
     delete cloned.updatedAt;
     delete cloned.patient;
-
     if (!cloned.fields || typeof cloned.fields !== 'object' || Array.isArray(cloned.fields)) {
         cloned.fields = {};
     }
@@ -5761,14 +5487,12 @@ function sanitizeImportedRecord(record) {
     }
     return cloned;
 }
-
 async function clearSharedRecords() {
     const existingRecords = await fetchRecords();
     for (const record of existingRecords) {
         await removeRecord(record.id);
     }
 }
-
 function normalizeDraftStore(rawStore) {
     if (!rawStore || typeof rawStore !== 'object' || Array.isArray(rawStore)) {
         return {};
@@ -5781,12 +5505,10 @@ function normalizeDraftStore(rawStore) {
     });
     return normalized;
 }
-
 async function applyImportedLocalData(bundle, replaceLocalData) {
     const incomingDrafts = normalizeDraftStore(bundle.drafts);
     const nextDrafts = replaceLocalData ? incomingDrafts : { ...getDraftStore(), ...incomingDrafts };
     setDraftStore(nextDrafts);
-
     const nextStaffList = replaceLocalData
         ? mergeUniqueTextValues([], bundle.staffList || [])
         : mergeUniqueTextValues(getLocalSettingArray('staffList'), bundle.staffList || []);
@@ -5797,7 +5519,6 @@ async function applyImportedLocalData(bundle, replaceLocalData) {
         staffList: nextStaffList,
         dentistList: nextDentistList,
     });
-
     if (typeof renderStaffSelect === 'function') {
         renderStaffSelect();
     }
@@ -5809,14 +5530,12 @@ async function applyImportedLocalData(bundle, replaceLocalData) {
     }
     updateDraftStatusDisplays();
 }
-
 async function handleImportSelection(event) {
     const input = event.target;
     const file = input.files && input.files[0];
     if (!file) {
         return;
     }
-
     try {
         const rawText = await file.text();
         const payload = JSON.parse(rawText);
@@ -5829,11 +5548,9 @@ async function handleImportSelection(event) {
             '下書き（この端末）と担当者一覧・かかりつけ歯科一覧（共有）を置換しますか？',
             'OK = 置換 / キャンセル = 既存へ追加',
         ].join('\n'));
-
         if (replaceSharedRecords) {
             await clearSharedRecords();
         }
-
         let importedCount = 0;
         let failedCount = 0;
         for (const record of bundle.records) {
@@ -5845,7 +5562,6 @@ async function handleImportSelection(event) {
                 failedCount += 1;
             }
         }
-
         await applyImportedLocalData(bundle, replaceLocalData);
         records = await fetchRecords();
         renderHistory();
@@ -5857,15 +5573,12 @@ async function handleImportSelection(event) {
         input.value = '';
     }
 }
-
 function getRsstCountInput() {
     return document.getElementById('rsst_count');
 }
-
 function getRsstTimeInput() {
     return document.getElementById('rsst_time');
 }
-
 function updateRsstDisplay() {
     const display = document.getElementById('rsstTimerDisplay');
     if (!display) {
@@ -5873,7 +5586,6 @@ function updateRsstDisplay() {
     }
     display.textContent = `${rsstRemainingSeconds}秒`;
 }
-
 function resetRsstTimer(options = {}) {
     if (rsstTimerHandle) {
         window.clearInterval(rsstTimerHandle);
@@ -5896,7 +5608,6 @@ function resetRsstTimer(options = {}) {
         showToast('⏱️ RSSTタイマーをリセットしました');
     }
 }
-
 function incrementRsstCount() {
     const countInput = getRsstCountInput();
     if (!countInput) {
@@ -5906,19 +5617,16 @@ function incrementRsstCount() {
     countInput.value = String(current + 1);
     countInput.dispatchEvent(new Event('input', { bubbles: true }));
 }
-
 function startRsstTimer() {
     if (rsstTimerHandle) {
         return;
     }
-
     const timeInput = getRsstTimeInput();
     if (timeInput) {
         timeInput.value = String(RSST_DEFAULT_SECONDS);
     }
     rsstRemainingSeconds = RSST_DEFAULT_SECONDS;
     updateRsstDisplay();
-
     rsstTimerHandle = window.setInterval(() => {
         rsstRemainingSeconds -= 1;
         updateRsstDisplay();
@@ -5929,18 +5637,15 @@ function startRsstTimer() {
         }
     }, 1000);
 }
-
 function ensureRsstTimerTools() {
     const rsstJudge = document.getElementById('rsst_judge');
     if (!rsstJudge || document.getElementById('rsstTimerPanel')) {
         return;
     }
-
     const anchor = rsstJudge.closest('.form-group');
     if (!anchor) {
         return;
     }
-
     const panel = document.createElement('div');
     panel.id = 'rsstTimerPanel';
     panel.className = 'rsst-timer-panel';
@@ -5959,13 +5664,11 @@ function ensureRsstTimerTools() {
         <button type="button" class="btn btn-accent rsst-tap-btn" id="rsstTapButton">＋ 1 回カウント</button>
     `;
     anchor.insertAdjacentElement('afterend', panel);
-
     panel.querySelector('#rsstTimerStartButton').addEventListener('click', startRsstTimer);
     panel.querySelector('#rsstTimerResetButton').addEventListener('click', () => resetRsstTimer());
     panel.querySelector('#rsstTapButton').addEventListener('click', incrementRsstCount);
     resetRsstTimer({ quiet: true });
 }
-
 function getCurrentPatientFormState() {
     const name = getFieldElementValue('name').trim();
     const birthdate = getFieldElementValue('birthdate').trim();
@@ -5989,18 +5692,15 @@ function getCurrentPatientFormState() {
         patientKey: buildPatientLookupKey(name, birthdate),
     };
 }
-
 function ensureBmiSupportPanel() {
     const bmiInput = document.getElementById('bmi');
     if (!bmiInput || document.getElementById('nutritionSupportPanel')) {
         return;
     }
-
     const patientGrid = bmiInput.closest('.form-grid');
     if (!patientGrid) {
         return;
     }
-
     const panel = document.createElement('div');
     panel.id = 'nutritionSupportPanel';
     panel.className = 'stage2-panel';
@@ -6016,14 +5716,12 @@ function ensureBmiSupportPanel() {
     `;
     patientGrid.insertAdjacentElement('afterend', panel);
 }
-
 function ensurePatientTrendPanel() {
     const summaryCard = document.querySelector('#tab-summary > .card');
     const divider = summaryCard ? summaryCard.querySelector('.divider') : null;
     if (!summaryCard || !divider || document.getElementById('patientTrendPanel')) {
         return;
     }
-
     const panel = document.createElement('div');
     panel.id = 'patientTrendPanel';
     panel.className = 'stage2-panel';
@@ -6056,12 +5754,10 @@ function ensurePatientTrendPanel() {
     `;
     divider.insertAdjacentElement('beforebegin', panel);
 }
-
 function ensureStage2Panels() {
     ensureBmiSupportPanel();
     ensurePatientTrendPanel();
 }
-
 function ensureClinicalSupportPanel() {
     const summaryCard = document.querySelector('#tab-summary > .card');
     const divider = summaryCard ? summaryCard.querySelector('.divider') : null;
@@ -6069,7 +5765,6 @@ function ensureClinicalSupportPanel() {
     if (!summaryCard || !divider || document.getElementById('clinicalSupportPanel')) {
         return;
     }
-
     const panel = document.createElement('div');
     panel.id = 'clinicalSupportPanel';
     panel.className = 'stage2-panel stage3-panel';
@@ -6087,14 +5782,12 @@ function ensureClinicalSupportPanel() {
             <div id="clinicalAlertList"></div>
         </section>
     `;
-
     if (trendPanel) {
         trendPanel.insertAdjacentElement('afterend', panel);
         return;
     }
     divider.insertAdjacentElement('beforebegin', panel);
 }
-
 function ensureNutritionAssessmentPanel() {
     const summaryCard = document.querySelector('#tab-summary > .card');
     const divider = summaryCard ? summaryCard.querySelector('.divider') : null;
@@ -6103,7 +5796,6 @@ function ensureNutritionAssessmentPanel() {
     if (!summaryCard || !divider || document.getElementById('nutritionAssessmentPanel')) {
         return;
     }
-
     const panel = document.createElement('div');
     panel.id = 'nutritionAssessmentPanel';
     panel.className = 'stage2-panel stage3-panel';
@@ -6120,7 +5812,6 @@ function ensureNutritionAssessmentPanel() {
         <div id="nutritionAssessmentSummary" class="stage2-panel__summary">BMI・MNA-SF・口腔機能を入力すると自動評価を表示します。</div>
         <div id="nutritionAssessmentCards" class="nutrition-cause-grid"></div>
     `;
-
     if (panel.dataset.boundNutritionPanel !== '1') {
         panel.addEventListener('change', (event) => {
             const target = event.target;
@@ -6151,7 +5842,6 @@ function ensureNutritionAssessmentPanel() {
         });
         panel.dataset.boundNutritionPanel = '1';
     }
-
     if (clinicalPanel) {
         clinicalPanel.insertAdjacentElement('beforebegin', panel);
         return;
@@ -6162,12 +5852,10 @@ function ensureNutritionAssessmentPanel() {
     }
     divider.insertAdjacentElement('beforebegin', panel);
 }
-
 function ensureStage3Panels() {
     ensureClinicalSupportPanel();
     ensureNutritionAssessmentPanel();
 }
-
 function getNutritionSelectionState() {
     const field = document.getElementById(NUTRITION_SELECTION_FIELD_ID);
     if (!field) {
@@ -6180,7 +5868,6 @@ function getNutritionSelectionState() {
         return {};
     }
 }
-
 function setNutritionSelectionState(state, options = {}) {
     const field = document.getElementById(NUTRITION_SELECTION_FIELD_ID);
     if (!field) {
@@ -6203,7 +5890,6 @@ function setNutritionSelectionState(state, options = {}) {
         scheduleAutosave();
     }
 }
-
 function getMnaScoreValue(key) {
     const rawValue = mnaScores && Object.prototype.hasOwnProperty.call(mnaScores, key) ? mnaScores[key] : null;
     if (rawValue === null || rawValue === undefined || rawValue === '') {
@@ -6212,17 +5898,14 @@ function getMnaScoreValue(key) {
     const numeric = Number(rawValue);
     return Number.isFinite(numeric) ? numeric : null;
 }
-
 function buildNutritionActionKey(modeId, causeId, role, index) {
     return [modeId, causeId, role, index].join('::');
 }
-
 // ---- Nutrition action text overrides (editable guidance) ----
 // Stored as { "modeId::causeId::role": ["項目1", "項目2", ...] }
 function buildNutritionOverrideKey(modeId, causeId, role) {
     return [modeId, causeId, role].join('::');
 }
-
 function getNutritionOverrideState() {
     const field = document.getElementById(NUTRITION_OVERRIDE_FIELD_ID);
     if (!field) {
@@ -6235,7 +5918,6 @@ function getNutritionOverrideState() {
         return {};
     }
 }
-
 function setNutritionOverrideState(state, options = {}) {
     const field = document.getElementById(NUTRITION_OVERRIDE_FIELD_ID);
     if (!field) {
@@ -6261,7 +5943,6 @@ function setNutritionOverrideState(state, options = {}) {
         scheduleAutosave();
     }
 }
-
 // returns the base (default) action items for a cause/role
 function getNutritionBaseActionItems(modeId, causeId, role) {
     const modeConfig = NUTRITION_GUIDANCE_LIBRARY[modeId];
@@ -6275,11 +5956,9 @@ function getNutritionBaseActionItems(modeId, causeId, role) {
         : role;
     return Array.isArray(causeConfig[sourceKey]) ? causeConfig[sourceKey].slice() : [];
 }
-
 function dedupeTextItems(items) {
     return [...new Set((items || []).map((item) => String(item || '').trim()).filter(Boolean))];
 }
-
 function buildNutritionCause(modeId, causeId, reasons) {
     const modeConfig = NUTRITION_GUIDANCE_LIBRARY[modeId];
     const causeConfig = modeConfig && modeConfig.causes ? modeConfig.causes[causeId] : null;
@@ -6310,15 +5989,12 @@ function buildNutritionCause(modeId, causeId, reasons) {
         modeTone: modeConfig.chipTone,
     };
 }
-
 function getNutritionActionItems(cause, role) {
     return cause && Array.isArray(cause[role]) ? cause[role] : [];
 }
-
 function countNutritionCauseActions(cause) {
     return NUTRITION_ACTION_ROLE_KEYS.reduce((sum, role) => sum + getNutritionActionItems(cause, role).length, 0);
 }
-
 function countSelectedNutritionCauseActions(cause, selectionState) {
     return NUTRITION_ACTION_ROLE_KEYS.reduce((sum, role) => {
         return sum + getNutritionActionItems(cause, role).reduce((roleSum, item, index) => {
@@ -6327,7 +6003,6 @@ function countSelectedNutritionCauseActions(cause, selectionState) {
         }, 0);
     }, 0);
 }
-
 function buildNutritionActionListHtml(cause, role, selectionState) {
     const items = getNutritionActionItems(cause, role);
     if (!items.length) {
@@ -6344,7 +6019,6 @@ function buildNutritionActionListHtml(cause, role, selectionState) {
         `;
     }).join('');
 }
-
 function buildNutritionAssessmentData() {
     const patientState = getCurrentPatientFormState();
     const oralState = getCurrentOralAssessmentState();
@@ -6363,7 +6037,6 @@ function buildNutritionAssessmentData() {
     const mnaE = getMnaScoreValue('e');
     const modes = [];
     const causes = [];
-
     const underReasons = [];
     if (mnaState.score !== null && mnaState.score <= 7) {
         underReasons.push(`MNA-SF ${mnaState.score}点で低栄養が疑われます`);
@@ -6376,7 +6049,6 @@ function buildNutritionAssessmentData() {
     if (hasMeaningfulDrop(patientState.weight, previousWeight, 1.0)) {
         underReasons.push(`体重が前回 ${previousWeight.toFixed(1)}kg から ${patientState.weight.toFixed(1)}kg に低下しています`);
     }
-
     if (underReasons.length) {
         const weightReasons = [];
         if (patientState.bmi !== null && bmiReference && patientState.bmi < bmiReference.low) {
@@ -6394,7 +6066,6 @@ function buildNutritionAssessmentData() {
         if (mnaState.score !== null && mnaState.score <= 11) {
             weightReasons.push(`MNA-SF ${mnaState.score}点です`);
         }
-
         const dysphagiaReasons = [];
         if (oralState.q2Code === 2) {
             dysphagiaReasons.push('水分でのむせがあります');
@@ -6411,7 +6082,6 @@ function buildNutritionAssessmentData() {
         if (patientState.waterTexture && patientState.waterTexture !== 'とろみなし') {
             dysphagiaReasons.push(`現在の水分形態は ${patientState.waterTexture} です`);
         }
-
         const anorexiaReasons = [];
         if (mnaA !== null && mnaA <= 1) {
             anorexiaReasons.push('MNA-SF の食欲・食事量項目が低下側です');
@@ -6422,7 +6092,6 @@ function buildNutritionAssessmentData() {
         if (oralState.q5Code !== null && oralState.q5Code >= 4) {
             anorexiaReasons.push('全身状態の自己評価が低下側です');
         }
-
         const oralReasons = [];
         if (oralState.q3Code === 2) {
             oralReasons.push('口腔乾燥があります');
@@ -6443,7 +6112,6 @@ function buildNutritionAssessmentData() {
         if (lowOdkLabels.length) {
             oralReasons.push(`${lowOdkLabels.join('、')} で口唇・舌機能低下がみられます`);
         }
-
         const cognitiveReasons = [];
         if (mnaE !== null && mnaE <= 1) {
             cognitiveReasons.push('MNA-SF の神経心理項目が低下側です');
@@ -6451,7 +6119,6 @@ function buildNutritionAssessmentData() {
         if (oralState.q11Code !== null && oralState.q11Code >= 4) {
             cognitiveReasons.push('表情変化が少なく注意低下が疑われます');
         }
-
         const underCauses = [
             buildNutritionCause('under', 'weight', weightReasons.length ? weightReasons : underReasons),
             buildNutritionCause('under', 'dysphagia', dysphagiaReasons),
@@ -6459,12 +6126,10 @@ function buildNutritionAssessmentData() {
             buildNutritionCause('under', 'oral', oralReasons),
             buildNutritionCause('under', 'cognitive', cognitiveReasons),
         ].filter(Boolean);
-
         const underModeLabel = mnaState.score !== null && mnaState.score <= 7 ? '低栄養' : '低栄養リスク';
         modes.push({ id: 'under', label: underModeLabel, tone: 'alert', reasons: dedupeTextItems(underReasons), causes: underCauses });
         causes.push(...underCauses);
     }
-
     const overReasons = [];
     if (patientState.bmi !== null && bmiReference && patientState.bmi > bmiReference.high) {
         overReasons.push(`BMI ${patientState.bmi.toFixed(1)} が ${bmiReference.label} ${bmiReference.high.toFixed(1)} を上回っています`);
@@ -6472,7 +6137,6 @@ function buildNutritionAssessmentData() {
     if (hasMeaningfulRise(patientState.weight, previousWeight, 1.0)) {
         overReasons.push(`体重が前回 ${previousWeight.toFixed(1)}kg から ${patientState.weight.toFixed(1)}kg に増加しています`);
     }
-
     if (overReasons.length) {
         const overeatingReasons = [];
         if (patientState.bmi !== null && bmiReference && patientState.bmi > bmiReference.high) {
@@ -6484,7 +6148,6 @@ function buildNutritionAssessmentData() {
         if (hasMeaningfulRise(patientState.bmi, previousBmi, 0.5)) {
             overeatingReasons.push(`BMI が前回より ${formatSignedDelta(patientState.bmi, previousBmi, '')} 増加しています`);
         }
-
         const imbalanceReasons = [];
         if (patientState.bmi !== null && patientState.bmi >= 25) {
             imbalanceReasons.push('BMI 25 以上で、量だけでなく内容の見直しが必要です');
@@ -6495,7 +6158,6 @@ function buildNutritionAssessmentData() {
         if (mnaState.score !== null && mnaState.score >= 12 && patientState.bmi !== null && bmiReference && patientState.bmi > bmiReference.high) {
             imbalanceReasons.push('MNA-SF は保たれていますが BMI 高値です');
         }
-
         const activityReasons = [];
         if (mnaC !== null && mnaC <= 1) {
             activityReasons.push('MNA-SF の移動能力項目が低下側です');
@@ -6506,7 +6168,6 @@ function buildNutritionAssessmentData() {
         if (mnaD === 0) {
             activityReasons.push('最近の急性疾患・ストレスで活動量低下が疑われます');
         }
-
         const hygieneReasons = [];
         if (oralState.q7Code !== null && oralState.q7Code >= 2) {
             hygieneReasons.push('口臭があります');
@@ -6517,18 +6178,15 @@ function buildNutritionAssessmentData() {
         if (oralState.q3Code === 2) {
             hygieneReasons.push('口腔乾燥があります');
         }
-
         const overCauses = [
             buildNutritionCause('over', 'overeating', overeatingReasons.length ? overeatingReasons : overReasons),
             buildNutritionCause('over', 'imbalance', imbalanceReasons.length ? imbalanceReasons : overReasons),
             buildNutritionCause('over', 'activity', activityReasons),
             buildNutritionCause('over', 'oral_hygiene', hygieneReasons),
         ].filter(Boolean);
-
         modes.push({ id: 'over', label: '過栄養', tone: 'info', reasons: dedupeTextItems(overReasons), causes: overCauses });
         causes.push(...overCauses);
     }
-
     const chips = [];
     if (patientState.bmi !== null) {
         chips.push(buildMetricChipHtml('BMI', patientState.bmi.toFixed(1), classifyBmiReference(patientState.bmi, bmiReference)));
@@ -6542,11 +6200,9 @@ function buildNutritionAssessmentData() {
     if (causes.length) {
         chips.push(buildMetricChipHtml('原因候補', `${causes.length}件`, causes.length >= 3 ? 'alert' : 'info'));
     }
-
     const summaryText = !modes.length
         ? 'BMI・MNA-SF・口腔機能の入力から、低栄養・過栄養の原因候補と提案を自動表示します。'
         : `自動評価: ${modes.map((mode) => mode.label).join(' / ')}。気になる領域: ${dedupeTextItems(causes.map((cause) => cause.label)).join('、')}。`;
-
     return {
         modes,
         causes,
@@ -6554,17 +6210,14 @@ function buildNutritionAssessmentData() {
         summaryText,
     };
 }
-
 function buildNutritionCommentDraft(data, selectionState) {
     if (!data || !data.causes || !data.causes.length) {
         return '';
     }
-
     const modeLabels = dedupeTextItems((data.modes || []).map((mode) => mode.label));
     const causeLabels = dedupeTextItems((data.causes || []).map((cause) => cause.label));
     const reasonLines = dedupeTextItems((data.causes || []).flatMap((cause) => cause.reasons || []));
     const selectedByRole = { patientFamily: [], rehabSt: [], rehabPt: [], rehabOt: [], ns: [] };
-
     (data.causes || []).forEach((cause) => {
         NUTRITION_ACTION_ROLE_KEYS.forEach((role) => {
             getNutritionActionItems(cause, role).forEach((item, index) => {
@@ -6575,7 +6228,6 @@ function buildNutritionCommentDraft(data, selectionState) {
             });
         });
     });
-
     const lines = [];
     lines.push(`自動評価: ${modeLabels.join(' / ')}。気になる領域: ${causeLabels.join('、')}。`);
     if (reasonLines.length) {
@@ -6590,19 +6242,16 @@ function buildNutritionCommentDraft(data, selectionState) {
     });
     return buildNutritionCommentBlock(lines);
 }
-
 function syncNutritionCommentDraft(data, selectionState) {
     const commentField = document.getElementById('summary_comment');
     if (!commentField) {
         return;
     }
-
     const draft = normalizeCommentBlock(buildNutritionCommentDraft(data, selectionState));
     const currentValue = String(commentField.value || '').trim();
     const sections = splitNutritionCommentSections(currentValue);
     const paragraphGap = String.fromCharCode(10) + String.fromCharCode(10);
     let nextValue = currentValue;
-
     if (!draft) {
         if (!sections.hasBlock) {
             return;
@@ -6611,11 +6260,9 @@ function syncNutritionCommentDraft(data, selectionState) {
     } else {
         nextValue = [sections.before, draft, sections.after].filter(Boolean).join(paragraphGap);
     }
-
     if (nextValue === currentValue) {
         return;
     }
-
     commentField.value = nextValue;
     commentField.dispatchEvent(new Event('input', { bubbles: true }));
     commentField.dispatchEvent(new Event('change', { bubbles: true }));
@@ -6623,30 +6270,24 @@ function syncNutritionCommentDraft(data, selectionState) {
         autoSizeTextarea(commentField);
     }
 }
-
 function renderNutritionAssessmentPanel() {
     ensureNutritionAssessmentPanel();
-
     const chips = document.getElementById('nutritionAssessmentChips');
     const summary = document.getElementById('nutritionAssessmentSummary');
     const cards = document.getElementById('nutritionAssessmentCards');
     if (!chips || !summary || !cards) {
         return;
     }
-
     const data = buildNutritionAssessmentData();
     const selectionState = getNutritionSelectionState();
-
     chips.innerHTML = data.chips.join('');
     summary.textContent = data.summaryText;
-
     if (!data.causes.length) {
         cards.innerHTML = '<section class="stage3-box nutrition-empty">低栄養・過栄養の評価条件を満たすと、ここに原因候補と対応方針を表示します。</section>';
         latestNutritionAssessmentData = data;
         syncNutritionCommentDraft(data, selectionState);
         return;
     }
-
     cards.innerHTML = data.causes.map((cause) => {
         const editBtn = (role, roleLabel) => `<button type="button" class="nutrition-edit-btn" data-nutrition-edit="1" data-mode="${escapeHtml(cause.modeId)}" data-cause="${escapeHtml(cause.causeId)}" data-role="${escapeHtml(role)}" data-rolelabel="${escapeHtml(roleLabel)}" data-causelabel="${escapeHtml(cause.label)}" title="この項目を編集">✎ 編集</button>`;
         const roleHtml = `
@@ -6679,7 +6320,6 @@ function renderNutritionAssessmentPanel() {
                 <div class="nutrition-action-list">${buildNutritionActionListHtml(cause, 'ns', selectionState)}</div>
             </div>
         `;
-
         return `
             <section class="stage3-box nutrition-cause-card">
                 <div class="nutrition-cause-card__header">
@@ -6692,7 +6332,6 @@ function renderNutritionAssessmentPanel() {
             </section>
         `;
     }).join('');
-
     const draft = buildNutritionCommentDraft(data, selectionState);
     const totalSelectableCount = data.causes.reduce((sum, cause) => sum + countNutritionCauseActions(cause), 0);
     const selectedCount = data.causes.reduce((sum, cause) => sum + countSelectedNutritionCauseActions(cause, selectionState), 0);
@@ -6702,10 +6341,8 @@ function renderNutritionAssessmentPanel() {
     latestNutritionAssessmentData = { ...data, commentDraft: draft };
     syncNutritionCommentDraft(data, selectionState);
 }
-
 // ==================== 栄養アセスメント 項目編集モーダル ====================
 let nutritionEditContext = null;
-
 function openNutritionEditModal(context) {
     if (!context || !context.modeId || !context.causeId || !context.role) {
         return;
@@ -6719,17 +6356,14 @@ function openNutritionEditModal(context) {
     }
     title.textContent = `${context.causeLabel}　${context.roleLabel}`;
     sub.textContent = '提案項目を加筆・修正・追加・削除できます。保存すると以降の表示とコメント反映に適用されます。';
-
     const overrides = getNutritionOverrideState();
     const overrideKey = buildNutritionOverrideKey(context.modeId, context.causeId, context.role);
     const items = Array.isArray(overrides[overrideKey])
         ? overrides[overrideKey].slice()
         : getNutritionBaseActionItems(context.modeId, context.causeId, context.role);
-
     renderNutritionEditRows(items.length ? items : ['']);
     overlay.classList.add('open');
 }
-
 function renderNutritionEditRows(items) {
     const body = document.getElementById('nutritionEditBody');
     if (!body) {
@@ -6746,7 +6380,6 @@ function renderNutritionEditRows(items) {
         <div class="nedit-empty-note">すべて空欄にして保存すると、この項目は提案なしになります。</div>
     `;
 }
-
 function collectNutritionEditRows() {
     const body = document.getElementById('nutritionEditBody');
     if (!body) {
@@ -6756,7 +6389,6 @@ function collectNutritionEditRows() {
         .map((textarea) => String(textarea.value || '').trim())
         .filter(Boolean);
 }
-
 function closeNutritionEditModal() {
     const overlay = document.getElementById('nutritionEditOverlay');
     if (overlay) {
@@ -6764,7 +6396,6 @@ function closeNutritionEditModal() {
     }
     nutritionEditContext = null;
 }
-
 function saveNutritionEditModal() {
     if (!nutritionEditContext) {
         closeNutritionEditModal();
@@ -6775,7 +6406,6 @@ function saveNutritionEditModal() {
     const editedItems = collectNutritionEditRows();
     const baseItems = getNutritionBaseActionItems(modeId, causeId, role);
     const overrides = getNutritionOverrideState();
-
     // if edited content equals the default, drop the override entry
     const sameAsBase = editedItems.length === baseItems.length
         && editedItems.every((item, index) => item === baseItems[index]);
@@ -6789,7 +6419,6 @@ function saveNutritionEditModal() {
     renderNutritionAssessmentPanel();
     showToast('✏️ 提案項目を更新しました');
 }
-
 function resetNutritionEditModal() {
     if (!nutritionEditContext) {
         return;
@@ -6798,14 +6427,12 @@ function resetNutritionEditModal() {
     const baseItems = getNutritionBaseActionItems(modeId, causeId, role);
     renderNutritionEditRows(baseItems.length ? baseItems : ['']);
 }
-
 function bindNutritionEditModal() {
     const overlay = document.getElementById('nutritionEditOverlay');
     if (!overlay || overlay.dataset.bound === '1') {
         return;
     }
     overlay.dataset.bound = '1';
-
     overlay.addEventListener('click', (event) => {
         if (event.target === overlay) {
             closeNutritionEditModal();
@@ -6827,7 +6454,6 @@ function bindNutritionEditModal() {
             }
         }
     });
-
     const cancelBtn = document.getElementById('nutritionEditCancelButton');
     if (cancelBtn) {
         cancelBtn.addEventListener('click', closeNutritionEditModal);
@@ -6846,7 +6472,6 @@ function bindNutritionEditModal() {
         }
     });
 }
-
 function stripTerminalPunctuation(value) {
     let text = String(value || '').trim();
     while (text) {
@@ -6859,7 +6484,6 @@ function stripTerminalPunctuation(value) {
     }
     return text;
 }
-
 function ensureSentenceText(value) {
     const text = String(value || '').trim();
     if (!text) {
@@ -6871,7 +6495,6 @@ function ensureSentenceText(value) {
     }
     return `${text}。`;
 }
-
 function isActionableStage3Message(value) {
     const text = String(value || '').trim();
     if (!text) {
@@ -6886,7 +6509,6 @@ function isActionableStage3Message(value) {
         '前回比較の準備が整う',
     ].some((snippet) => text.includes(snippet));
 }
-
 function joinCommentItems(items, limit) {
     const selected = (items || [])
         .map((item) => stripTerminalPunctuation(item))
@@ -6897,7 +6519,6 @@ function joinCommentItems(items, limit) {
     }
     return `${selected.join('、')}。`;
 }
-
 function normalizeCommentBlock(value) {
     return String(value || '')
     .split(String.fromCharCode(10))
@@ -6905,7 +6526,6 @@ function normalizeCommentBlock(value) {
         .filter(Boolean)
     .join(String.fromCharCode(10));
 }
-
 function stripMarkedCommentMarkers(value, startMarker, endMarker) {
     return normalizeCommentBlock(
         String(value || '')
@@ -6913,43 +6533,34 @@ function stripMarkedCommentMarkers(value, startMarker, endMarker) {
             .replace(endMarker, '')
     );
 }
-
 function stripClinicalCommentMarkers(value) {
     return stripMarkedCommentMarkers(value, CLINICAL_COMMENT_START_MARKER, CLINICAL_COMMENT_END_MARKER);
 }
-
 function stripNutritionCommentMarkers(value) {
     return stripMarkedCommentMarkers(value, NUTRITION_COMMENT_START_MARKER, NUTRITION_COMMENT_END_MARKER);
 }
-
 function buildClinicalCommentDraft(data) {
     if (!data) {
         return '';
     }
-
     const alertItems = dedupeTextItems(data.alertItems || []);
     if (!alertItems.length) {
         return '';
     }
-
     return buildClinicalCommentBlock([
         `差分アラート: ${joinCommentItems(alertItems, 3)}`,
     ]);
 }
-
 function buildClinicalPrintLines(data) {
     if (!data) {
         return ['差分アラート: 比較に必要な入力が不足しています。'];
     }
-
     const alertItems = dedupeTextItems(data.alertItems || []);
     if (!alertItems.length) {
         return ['差分アラート: 前回比較の準備が整うとここに表示します。'];
     }
-
     return [`差分アラート: ${joinCommentItems(alertItems, 3)}`];
 }
-
 function buildClinicalAlertSummary(alertItems) {
     const items = dedupeTextItems(alertItems || []);
     if (!items.length) {
@@ -6960,25 +6571,21 @@ function buildClinicalAlertSummary(alertItems) {
     }
     return `前回保存との差分から ${items.length} 件の要確認を抽出しました。`;
 }
-
 function syncClinicalCommentDraft(data) {
     const commentField = document.getElementById('summary_comment');
     if (!commentField) {
         return;
     }
-
     const draft = normalizeCommentBlock(buildClinicalCommentDraft(data));
     const currentValue = String(commentField.value || '').trim();
     const sections = splitClinicalCommentSections(currentValue);
     const paragraphGap = String.fromCharCode(10) + String.fromCharCode(10);
     let before = sections.before;
     let after = sections.after;
-
     if (sections.hasBlock && sections.isLegacyBlock) {
         const legacy = parseLegacyClinicalCommentBlock(sections.block);
         after = [legacy.trailingText, sections.after].filter(Boolean).join(paragraphGap);
     }
-
     let nextValue = currentValue;
     if (!draft) {
         if (!sections.hasBlock) {
@@ -6988,16 +6595,13 @@ function syncClinicalCommentDraft(data) {
     } else {
         nextValue = [before, draft, after].filter(Boolean).join(paragraphGap);
     }
-
     if (nextValue === currentValue) {
         return;
     }
-
     commentField.value = nextValue;
     commentField.dispatchEvent(new Event('input', { bubbles: true }));
     commentField.dispatchEvent(new Event('change', { bubbles: true }));
 }
-
 function updateClinicalCommentActionState(data) {
     const button = document.getElementById('applyClinicalCommentButton');
     const convertButton = document.getElementById('convertLegacyClinicalCommentButton');
@@ -7005,7 +6609,6 @@ function updateClinicalCommentActionState(data) {
     if (!button || !convertButton || !status) {
         return;
     }
-
     const draft = normalizeCommentBlock(data ? data.commentDraft : '');
     const hasDraft = Boolean(draft);
     const sections = splitClinicalCommentSections(getFieldElementValue('summary_comment'));
@@ -7020,21 +6623,18 @@ function updateClinicalCommentActionState(data) {
         ? '既存コメントは残したまま末尾へ追記します。'
         : '口腔項目が不足しているため、まだ追記できません。';
 }
-
 function convertLegacyClinicalCommentBlock() {
     const commentField = document.getElementById('summary_comment');
     if (!commentField) {
         showToast('⚠️ コメント欄が見つかりません');
         return;
     }
-
     const currentValue = String(commentField.value || '').trim();
     const sections = splitClinicalCommentSections(currentValue);
     if (!sections.hasBlock || !sections.isLegacyBlock) {
         showToast('ℹ️ 変換が必要な旧形式メモは見つかりません');
         return;
     }
-
     const legacy = parseLegacyClinicalCommentBlock(sections.block);
     const paragraphGap = String.fromCharCode(10) + String.fromCharCode(10);
     commentField.value = [sections.before, legacy.generatedBlock, legacy.trailingText, sections.after]
@@ -7052,21 +6652,18 @@ function convertLegacyClinicalCommentBlock() {
         ? '🔁 旧形式メモを変換し、後続の手入力を残しました'
         : '🔁 旧形式メモを新形式へ変換しました');
 }
-
 function applyClinicalCommentDraft() {
     const commentField = document.getElementById('summary_comment');
     if (!commentField) {
         showToast('⚠️ コメント欄が見つかりません');
         return;
     }
-
     const data = latestClinicalSupportData || buildClinicalSupportData();
     const draft = normalizeCommentBlock(data ? data.commentDraft : '');
     if (!draft) {
         showToast('⚠️ 反映できる所見候補がまだありません');
         return;
     }
-
     const currentValue = String(commentField.value || '').trim();
     const sections = splitClinicalCommentSections(currentValue);
     const normalizedDraft = stripClinicalCommentMarkers(draft);
@@ -7076,14 +6673,12 @@ function applyClinicalCommentDraft() {
         showToast('ℹ️ 同じ所見候補はすでにコメント欄へ反映済みです');
         return;
     }
-
     const paragraphGap = String.fromCharCode(10) + String.fromCharCode(10);
     if (sections.hasBlock && sections.isLegacyBlock) {
         commentField.focus();
         showToast('⚠️ 旧形式の口腔機能メモがあります。先に「旧形式メモを変換」を実行してください');
         return;
     }
-
     if (sections.hasBlock) {
         commentField.value = [sections.before, draft, sections.after].filter(Boolean).join(paragraphGap);
     } else {
@@ -7103,7 +6698,6 @@ function applyClinicalCommentDraft() {
     }
     showToast(currentValue ? '📝 所見候補をコメント欄へ追記しました' : '📝 所見候補をコメント欄へ反映しました');
 }
-
 function buildClinicalSupportData() {
     const patientState = getCurrentPatientFormState();
     const oralState = getCurrentOralAssessmentState();
@@ -7125,13 +6719,11 @@ function buildClinicalSupportData() {
     let swallowRisk = 0;
     let hygieneRisk = 0;
     let functionRisk = 0;
-
     const metaText = comparisonRecord && comparisonRecord.date
         ? `比較基準 ${comparisonRecord.date}`
         : history.length
             ? '比較基準 最新保存'
             : '';
-
     if (!hasCurrentOralData) {
         if (!patientState.patientKey) {
             alertItems.push('氏名と生年月日を入力すると前回比較ができます。');
@@ -7140,11 +6732,9 @@ function buildClinicalSupportData() {
         } else if (!hasPreviousOralData) {
             alertItems.push('前回保存に口腔詳細がないため、今回保存後から口腔差分が有効になります。');
         }
-
         if (nutritionGuidance.note) {
             alertItems.push(`MNA-SF 0〜7点のため ${nutritionGuidance.note} を確認してください。`);
         }
-
         const chips = history.length ? [buildMetricChipHtml('保存履歴', `${history.length}件`, history.length ? 'success' : 'info')] : [];
         if (patientState.bmi !== null) {
             chips.push(buildMetricChipHtml('BMI', patientState.bmi.toFixed(1), classifyBmiReference(patientState.bmi, bmiReference)));
@@ -7155,7 +6745,6 @@ function buildClinicalSupportData() {
         if (nutritionGuidance.note) {
             chips.push(buildMetricChipHtml('栄養詳細', nutritionGuidance.note, 'alert'));
         }
-
         return {
             chips,
             summaryText: buildClinicalAlertSummary(alertItems.length ? alertItems : ['口腔項目を入力すると差分判定を表示します。']),
@@ -7172,7 +6761,6 @@ function buildClinicalSupportData() {
             commentDraft: '',
         };
     }
-
     if (oralState.q1Code === 2) {
         chewingRisk += 2;
         findingItems.push('硬い食品の咀嚼困難を認めます。');
@@ -7246,7 +6834,6 @@ function buildClinicalSupportData() {
         functionRisk += 2;
         findingItems.push('表情が乏しく、口唇・頬の活動性低下が強く示唆されます。');
     }
-
     const gargleNotes = [];
     if (oralState.bukubukuCode === 2) {
         functionRisk += 1;
@@ -7265,13 +6852,11 @@ function buildClinicalSupportData() {
     if (gargleNotes.length) {
         findingItems.push(`${gargleNotes.join('、')}です。`);
     }
-
     const lowOdkLabels = getLowOdkLabels(oralState);
     if (lowOdkLabels.length) {
         functionRisk += lowOdkLabels.length;
         findingItems.push(`${lowOdkLabels.join('、')}でオーラルディアドコキネシス低下を認めます。`);
     }
-
     const summaryParts = [];
     if (swallowRisk >= 3) {
         summaryParts.push('嚥下リスクへの配慮が必要です。');
@@ -7292,7 +6877,6 @@ function buildClinicalSupportData() {
         summaryParts.push(`差分は ${comparisonRecord.date} の保存記録を基準に表示しています。`);
     }
     summaryParts.push('診断ではなく記録補助として利用してください。');
-
     if (!patientState.patientKey) {
         alertItems.push('氏名と生年月日を入力すると前回比較ができます。');
     } else if (!comparisonRecord) {
@@ -7304,7 +6888,6 @@ function buildClinicalSupportData() {
         if (hasMeaningfulDrop(patientState.bmi, previousBmi, 0.5)) {
             alertItems.push(`BMI が前回 ${previousBmi.toFixed(1)} から ${patientState.bmi.toFixed(1)} に低下しています。`);
         }
-
         if (!hasPreviousOralData) {
             alertItems.push('前回保存に口腔詳細がないため、今回保存後から口腔差分が有効になります。');
         } else {
@@ -7342,7 +6925,6 @@ function buildClinicalSupportData() {
             if (getCleaningHabitRisk(oralState.q8Code) > getCleaningHabitRisk(comparisonOralState.q8Code)) {
                 alertItems.push('口腔清掃習慣が前回より低下しています。');
             }
-
             const odkDrops = [
                 ['パ', oralState.pa, comparisonOralState.pa],
                 ['タ', oralState.ta, comparisonOralState.ta],
@@ -7357,11 +6939,9 @@ function buildClinicalSupportData() {
             }
         }
     }
-
     if (!alertItems.length) {
         alertItems.push('前回保存から大きな悪化所見は現時点で目立ちません。');
     }
-
     const totalRisk = chewingRisk + swallowRisk + hygieneRisk + functionRisk;
     let recommendationTone = 'success';
     let recommendationLabel = '現行食形態を基本に継続観察';
@@ -7380,7 +6960,6 @@ function buildClinicalSupportData() {
         recommendationLabel = '現行食をベースに食べやすさを調整';
         recommendationItems.push('硬さ・大きさ・水分量を本人の咀嚼しやすさに合わせて調整します。');
     }
-
     if (oralState.q3Code === 2) {
         recommendationItems.push('口腔乾燥があるため、食前後の保湿や水分併用を検討します。');
     }
@@ -7407,7 +6986,6 @@ function buildClinicalSupportData() {
     if (!recommendationItems.length) {
         recommendationItems.push('現行食形態を基本に継続し、むせや食事量の変化を経過観察します。');
     }
-
     if (nutritionGuidance.actionItems.length && recommendationTone === 'success') {
         recommendationTone = mnaState.needsPocketNutrition ? 'alert' : 'info';
         recommendationLabel = mnaState.needsPocketNutrition ? '栄養評価の再確認を優先' : '栄養状態を含めて継続観察';
@@ -7417,7 +6995,6 @@ function buildClinicalSupportData() {
         const [diagnosisNote] = summaryParts.splice(diagnosisNoteIndex, 1);
         summaryParts.push(diagnosisNote);
     }
-
     const chips = [
         buildMetricChipHtml('咀嚼', formatStage3DomainLabel(chewingRisk), classifyStage3Risk(chewingRisk)),
         buildMetricChipHtml('嚥下', formatStage3DomainLabel(swallowRisk), classifyStage3Risk(swallowRisk)),
@@ -7439,7 +7016,6 @@ function buildClinicalSupportData() {
     if (history.length) {
         chips.push(buildMetricChipHtml('保存履歴', `${history.length}件`, 'info'));
     }
-
     const data = {
         chips,
         summaryText: buildClinicalAlertSummary(alertItems),
@@ -7453,7 +7029,6 @@ function buildClinicalSupportData() {
     data.commentDraft = buildClinicalCommentDraft(data);
     return data;
 }
-
 function renderClinicalSupportPanel() {
     const summary = document.getElementById('clinicalSupportSummary');
     const alerts = document.getElementById('clinicalAlertList');
@@ -7461,7 +7036,6 @@ function renderClinicalSupportPanel() {
     if (!summary || !alerts || !meta) {
         return;
     }
-
     const data = buildClinicalSupportData();
     latestClinicalSupportData = data;
     summary.textContent = data.summaryText;
@@ -7469,7 +7043,6 @@ function renderClinicalSupportPanel() {
     meta.textContent = data.metaText;
     syncClinicalCommentDraft(data);
 }
-
 function parseDisplayedScore(value) {
     const match = String(value || '').trim().match(/(\d+(?:\.\d+)?)/);
     if (!match) {
@@ -7477,7 +7050,6 @@ function parseDisplayedScore(value) {
     }
     return Number.parseFloat(match[1]);
 }
-
 function classifyMnaSummaryTone(score) {
     if (score === null) {
         return 'info';
@@ -7490,7 +7062,6 @@ function classifyMnaSummaryTone(score) {
     }
     return 'success';
 }
-
 function getCurrentMnaSummaryState() {
     const score = parseDisplayedScore(getFieldElementValue('mna_summary_num'));
     const rawLabel = String(getFieldElementValue('mna_summary_result') || '').replace('【ポケニュー評価へ】', '').trim();
@@ -7501,11 +7072,9 @@ function getCurrentMnaSummaryState() {
         needsPocketNutrition: score !== null && score <= 7,
     };
 }
-
 function buildNutritionGuidance(state, reference, mnaState) {
     const issueItems = [];
     const actionItems = [];
-
     if (state.bmi !== null && reference) {
         if (state.bmi < reference.low) {
             issueItems.push(`BMI が ${reference.label} ${reference.low.toFixed(1)} 未満で、体重減少や摂取不足に注意が必要です。`);
@@ -7515,7 +7084,6 @@ function buildNutritionGuidance(state, reference, mnaState) {
             actionItems.push('活動量、食事量、体重推移を合わせて確認します。');
         }
     }
-
     if (mnaState.score !== null) {
         if (mnaState.score <= 7) {
             issueItems.push(`MNA-SF ${mnaState.score}点で低栄養の可能性があります。`);
@@ -7525,7 +7093,6 @@ function buildNutritionGuidance(state, reference, mnaState) {
             actionItems.push('摂取量、水分量、食事形態、体重変化を定期確認します。');
         }
     }
-
     const currentDiet = [state.foodStaple, state.foodMain].filter(Boolean).join(' / ');
     const currentWater = String(state.waterTexture || '').trim();
     if ((issueItems.length || actionItems.length) && (currentDiet || currentWater)) {
@@ -7533,19 +7100,16 @@ function buildNutritionGuidance(state, reference, mnaState) {
         const waterLabel = currentWater ? `水分形態（${currentWater}）` : '';
         actionItems.push(`${[dietLabel, waterLabel].filter(Boolean).join('・')}が現在の状態に合っているかを確認します。`);
     }
-
     if (!issueItems.length && !actionItems.length && (state.bmi !== null || mnaState.score !== null)) {
         issueItems.push('大きな栄養リスクは現時点で強く示されていません。');
         actionItems.push('現行の食形態・水分形態と体重推移を継続観察します。');
     }
-
     return {
         issueItems: [...new Set(issueItems)],
         actionItems: [...new Set(actionItems)],
         note: mnaState.needsPocketNutrition ? '【ポケニュー評価へ】' : '',
     };
 }
-
 function buildNutritionSupportText(state, age, bmi, reference, mnaInfo, latestSavedRecord, mnaState) {
     if (!state.birthdate) {
         return '生年月日を入力すると年齢帯の参考帯を表示します。';
@@ -7553,7 +7117,6 @@ function buildNutritionSupportText(state, age, bmi, reference, mnaInfo, latestSa
     if (bmi === null) {
         return '体重と身長を入力すると BMI と MNA F1 の目安を表示します。';
     }
-
     const parts = [`現在の BMI は ${bmi.toFixed(1)} です。`];
     const nutritionGuidance = buildNutritionGuidance(state, reference, mnaState);
     if (reference) {
@@ -7586,14 +7149,12 @@ function buildNutritionSupportText(state, age, bmi, reference, mnaInfo, latestSa
     parts.push('診断ではなく経過観察の参考表示です。');
     return parts.join(' ');
 }
-
 function renderNutritionSupportPanel() {
     const chips = document.getElementById('nutritionSupportChips');
     const summary = document.getElementById('nutritionSupportSummary');
     if (!chips || !summary) {
         return;
     }
-
     const state = getCurrentPatientFormState();
     const age = calculateAgeAtDate(state.birthdate, state.evalDate);
     const reference = getBmiReference(age);
@@ -7602,7 +7163,6 @@ function renderNutritionSupportPanel() {
     const history = state.patientKey ? (buildPatientRecordGroups(records).get(state.patientKey) || []) : [];
     const latestSavedRecord = history[0] || null;
     const latestSavedWeight = latestSavedRecord ? toMetricNumber(latestSavedRecord.weight ?? latestSavedRecord.fields?.weight) : null;
-
     const chipItems = [];
     if (age !== null) {
         chipItems.push(buildMetricChipHtml('年齢', `${age}歳`, 'info'));
@@ -7628,11 +7188,9 @@ function renderNutritionSupportPanel() {
         const tone = getTrendDirection(state.weight, latestSavedWeight) === 'down' ? 'alert' : 'info';
         chipItems.push(buildMetricChipHtml('前回比体重', formatSignedDelta(state.weight, latestSavedWeight, 'kg'), tone));
     }
-
     chips.innerHTML = chipItems.join('');
     summary.textContent = buildNutritionSupportText(state, age, state.bmi, reference, mnaInfo, latestSavedRecord, mnaState);
 }
-
 function renderPatientTrendPanel() {
     const summary = document.getElementById('patientTrendSummary');
     const meta = document.getElementById('patientTrendMeta');
@@ -7640,7 +7198,6 @@ function renderPatientTrendPanel() {
     if (!summary || !meta || !body) {
         return;
     }
-
     const state = getCurrentPatientFormState();
     if (!state.patientKey) {
         meta.textContent = '';
@@ -7648,12 +7205,10 @@ function renderPatientTrendPanel() {
         body.innerHTML = '<tr><td colspan="6"><div class="empty-state"><div class="icon">📈</div>氏名と生年月日を入力すると推移を表示します</div></td></tr>';
         return;
     }
-
     const history = (buildPatientRecordGroups(records).get(state.patientKey) || []).slice(0, TREND_HISTORY_LIMIT);
     const latestSavedRecord = history[0] || null;
     const latestSavedWeight = latestSavedRecord ? toMetricNumber(latestSavedRecord.weight ?? latestSavedRecord.fields?.weight) : null;
     const latestSavedBmi = latestSavedRecord ? toMetricNumber(latestSavedRecord.bmi ?? latestSavedRecord.fields?.bmi) : null;
-
     const summaryChips = [];
     if (state.weight !== null) {
         summaryChips.push(buildMetricChipHtml('現在体重', `${state.weight.toFixed(1)}kg`, 'info'));
@@ -7675,13 +7230,11 @@ function renderPatientTrendPanel() {
     }
     summaryChips.push(buildMetricChipHtml('保存履歴', `${history.length}件`, history.length ? 'success' : 'info'));
     summary.innerHTML = summaryChips.join('');
-
     if (!history.length) {
         meta.textContent = '保存済み履歴 0件';
         body.innerHTML = '<tr><td colspan="6"><div class="empty-state"><div class="icon">📈</div>この利用者の保存済み履歴はまだありません</div></td></tr>';
         return;
     }
-
     meta.textContent = `保存済み ${history.length}件 / 最新 ${history[0].date || '―'}`;
     body.innerHTML = history.map((record, index) => {
         const olderRecord = history[index + 1] || null;
@@ -7703,14 +7256,12 @@ function renderPatientTrendPanel() {
         `;
     }).join('');
 }
-
 function updateStage2Panels() {
     renderNutritionSupportPanel();
     renderPatientTrendPanel();
     renderClinicalSupportPanel();
     renderNutritionAssessmentPanel();
 }
-
 function scheduleStage2Update() {
     if (stage2UpdateHandle) {
         return;
@@ -7720,12 +7271,10 @@ function scheduleStage2Update() {
         updateStage2Panels();
     });
 }
-
 function attachStage2InputListeners() {
     if (stage2ListenersBound) {
         return;
     }
-
     const watchIds = new Set([
         'name',
         'birthdate',
@@ -7762,17 +7311,14 @@ function attachStage2InputListeners() {
         }
         scheduleStage2Update();
     };
-
     document.addEventListener('input', handleChange, true);
     document.addEventListener('change', handleChange, true);
     stage2ListenersBound = true;
 }
-
 function installStage2Hooks() {
     if (stage2HooksInstalled) {
         return;
     }
-
     if (typeof loadRecord === 'function') {
         const originalLoadRecord = loadRecord;
         loadRecord = function(...args) {
@@ -7782,7 +7328,6 @@ function installStage2Hooks() {
         };
         window.loadRecord = loadRecord;
     }
-
     if (typeof renderHistory === 'function') {
         const originalRenderHistory = renderHistory;
         renderHistory = function(...args) {
@@ -7792,10 +7337,8 @@ function installStage2Hooks() {
         };
         window.renderHistory = renderHistory;
     }
-
     stage2HooksInstalled = true;
 }
-
 function setSummaryFieldText(id, text) {
     const element = document.getElementById(id);
     if (!element) {
@@ -7807,7 +7350,6 @@ function setSummaryFieldText(id, text) {
     }
     element.textContent = text;
 }
-
 function summarizeOralEval2Value(value) {
     const text = String(value || '').trim();
     if (!text) {
@@ -7824,7 +7366,6 @@ function summarizeOralEval2Value(value) {
     }
     return text;
 }
-
 function ensureSummaryIdentitySubline() {
     const nameElement = document.getElementById('summary_name');
     const dateElement = document.getElementById('summary_date');
@@ -7842,7 +7383,6 @@ function ensureSummaryIdentitySubline() {
     }
     return subline;
 }
-
 function updateSummaryIdentityFields() {
     const nameText = getFieldElementValue('name').trim() || '―';
     const furiganaText = getFieldElementValue('furigana').trim() || '―';
@@ -7855,7 +7395,6 @@ function updateSummaryIdentityFields() {
         dateElement.textContent = `評価日: ${getFieldElementValue('evalDate').trim() || '―'}`;
     }
 }
-
 function buildEnhancedOralSummaryText() {
     const oralEval1 = getFieldElementValue('oral_eval1').trim();
     const oralEval2 = getFieldElementValue('oral_eval2').trim();
@@ -7869,10 +7408,8 @@ function buildEnhancedOralSummaryText() {
         `③ モニタリング後: ${oralEval3 || '未入力'}`,
     ].join(' / ');
 }
-
 function updateEnhancedSummaryFields() {
     updateSummaryIdentityFields();
-
     const oralSummaryText = buildEnhancedOralSummaryText();
     if (oralSummaryText) {
         if (document.getElementById('oral_summary_text')) {
@@ -7881,7 +7418,6 @@ function updateEnhancedSummaryFields() {
             setSummaryFieldText('oral_summary_box', oralSummaryText);
         }
     }
-
     const mnaState = getCurrentMnaSummaryState();
     const baseText = String(getFieldElementValue('mna_summary_result') || '').replace('【ポケニュー評価へ】', '').trim();
     if (mnaState.score !== null || baseText) {
@@ -7893,7 +7429,6 @@ function updateEnhancedSummaryFields() {
         }
     }
 }
-
 function ensureSummaryFieldCompatibility() {
     const oralSummaryBox = document.getElementById('oral_summary_box');
     if (oralSummaryBox && !document.getElementById('oral_summary_text')) {
@@ -7905,14 +7440,11 @@ function ensureSummaryFieldCompatibility() {
         oralSummaryBox.appendChild(valueElement);
     }
 }
-
 function installSummaryHooks() {
     if (summaryHooksInstalled) {
         return;
     }
-
     ensureSummaryFieldCompatibility();
-
     if (typeof updateSummary === 'function') {
         const originalUpdateSummary = updateSummary;
         updateSummary = function(...args) {
@@ -7923,7 +7455,6 @@ function installSummaryHooks() {
         };
         window.updateSummary = updateSummary;
     }
-
     if (typeof calcMNAScore === 'function') {
         const originalCalcMNAScore = calcMNAScore;
         calcMNAScore = function(...args) {
@@ -7934,13 +7465,10 @@ function installSummaryHooks() {
         };
         window.calcMNAScore = calcMNAScore;
     }
-
     summaryHooksInstalled = true;
     updateEnhancedSummaryFields();
 }
-
 window.addEventListener('afterprint', clearPrintMode);
-
 async function initializeApp() {
     ensureStage1Styles();
     await ensureLocalSettingsInitialized();
@@ -7978,7 +7506,6 @@ async function initializeApp() {
     if (typeof updateRsstJudge === 'function') updateRsstJudge();
     syncStatusIndicators();
 }
-
 // ---- Auto-grow textareas: expand to fit full content so nothing is hidden ----
 function autoSizeTextarea(textarea) {
     if (!textarea) {
@@ -7988,7 +7515,6 @@ function autoSizeTextarea(textarea) {
     const minHeight = parseInt(window.getComputedStyle(textarea).minHeight, 10) || 0;
     textarea.style.height = Math.max(textarea.scrollHeight, minHeight) + 'px';
 }
-
 function setupAutogrowTextareas() {
     document.querySelectorAll('textarea.autogrow').forEach((textarea) => {
         autoSizeTextarea(textarea);
@@ -7999,12 +7525,10 @@ function setupAutogrowTextareas() {
         textarea.dataset.autogrowBound = '1';
     });
 }
-
 // re-measure every auto-grow textarea (after programmatic value changes)
 function refreshAutogrowTextareas() {
     document.querySelectorAll('textarea.autogrow').forEach((textarea) => autoSizeTextarea(textarea));
 }
-
 // listen for changes that affect the score bar / step chips
 function attachStatusIndicatorListeners() {
   const nameEl = document.getElementById('name');
@@ -8015,7 +7539,6 @@ function attachStatusIndicatorListeners() {
     oralEl.addEventListener('input', syncStatusIndicators);
   }
 }
-
 // ==================== TABS ====================
 function showTab(id) {
   document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
@@ -8032,7 +7555,6 @@ function showTab(id) {
   }
   window.scrollTo(0, 0);
 }
-
 // ==================== SCORE BAR (always visible) ====================
 function updateScoreBar() {
   // Oral
@@ -8070,7 +7592,6 @@ function updateScoreBar() {
     }
   }
 }
-
 // ==================== STEP PROGRESS (workflow tabs) ====================
 function updateStepProgress() {
   // patient: name filled
@@ -8088,7 +7609,6 @@ function updateStepProgress() {
   // active tab should never show done state
   document.querySelectorAll('.tab-btn.active').forEach(b => b.classList.remove('done'));
 }
-
 // ==================== BMI ====================
 function calcBMI() {
   const w = parseFloat(document.getElementById('weight').value);
@@ -8102,7 +7622,6 @@ function calcBMI() {
     document.getElementById('bmi').value = '';
   }
 }
-
 function autoBMI(bmi) {
   let score = 0;
   if (bmi < 19) score = 0;
@@ -8111,7 +7630,6 @@ function autoBMI(bmi) {
   else score = 3;
   // visually pre-select
 }
-
 // ==================== RSST 自動判定 ====================
 // RSSTは30秒固定。回数から専門職判断を自動算出する（3回以上=問題なし / 3回未満=問題あり）。
 function updateRsstJudge() {
@@ -8148,7 +7666,6 @@ function updateRsstJudge() {
   }
   if (typeof syncStatusIndicators === 'function') syncStatusIndicators();
 }
-
 // ==================== MNA ====================
 function selectMNA(key, value, el) {
   // Clear selection in group
@@ -8162,7 +7679,6 @@ function selectMNA(key, value, el) {
   mnaScores[(key === 'f1' || key === 'f2') ? 'f' : key] = value;
   calcMNAScore();
 }
-
 function calcMNAScore() {
   const { a, b, c, d, e, f } = mnaScores;
   const vals = [a, b, c, d, e, f];
@@ -8190,20 +7706,17 @@ function calcMNAScore() {
   }
   syncStatusIndicators();
 }
-
 // keeps score bar + step chips in sync after any relevant change
 function syncStatusIndicators() {
   if (typeof updateScoreBar === 'function') updateScoreBar();
   if (typeof updateStepProgress === 'function') updateStepProgress();
 }
-
 // ==================== SUMMARY ====================
 function updateSummary() {
   const name = document.getElementById('name').value || '―';
   const date = document.getElementById('evalDate').value || '―';
   document.getElementById('summary_name').textContent = name;
   document.getElementById('summary_date').textContent = '評価日：' + date;
-
   // Oral
   const oral2 = document.getElementById('oral_eval2').value;
   const oralBox = document.getElementById('oral_summary_box');
@@ -8222,7 +7735,6 @@ function updateSummary() {
     if (oralIcon) oralIcon.textContent = '―';
     oralText.textContent = '口腔機能タブを入力してください';
   }
-
   // MNA
   const { a, b, c, d, e, f } = mnaScores;
   const vals = [a, b, c, d, e, f];
@@ -8242,7 +7754,6 @@ function updateSummary() {
   }
   syncStatusIndicators();
 }
-
 async function saveRecord() {
   const name = document.getElementById('name').value;
   if (!name) { showToast('⚠️ 氏名を入力してください'); return; }
@@ -8251,7 +7762,6 @@ async function saveRecord() {
   const vals = [a, b, c, d, e, f];
   const mnaTotal = vals.some(v => v === null) ? null : vals.reduce((s, v) => s + v, 0);
   let mnaLabel = mnaTotal === null ? '―' : mnaTotal >= 12 ? '良好' : mnaTotal >= 8 ? 'At risk' : '低栄養';
-
   const record = {
     id: Date.now(),
     date,
@@ -8267,7 +7777,6 @@ async function saveRecord() {
     bmi: document.getElementById('bmi').value,
     mnaScores: { ...mnaScores }
   };
-
   record.fields = collectFieldValues();
     record.mnaFieldMode = getSelectedMnaFieldMode();
     if (!record.fields.birthdate) {
@@ -8287,7 +7796,6 @@ async function saveRecord() {
     showToast(savedRecord.saveMode === 'updated' ? '♻️ 同一利用者・同一評価日の記録を更新しました' : '💾 記録を保存しました');
   showToast('💾 記録を保存しました');
 }
-
 // ==================== HISTORY ====================
 function renderHistory() {
   ensureHistoryTools();
@@ -8295,7 +7803,6 @@ function renderHistory() {
   updateHistoryStats(filteredRecords.length);
   renderActiveHistoryView(filteredRecords);
 }
-
 function loadRecord(id) {
   const r = records.find(rec => rec.id === id);
   if (!r) return;
@@ -8323,7 +7830,6 @@ function loadRecord(id) {
   showTab('patient');
   showToast('📂 記録を読み込みました');
 }
-
 async function deleteRecord(id) {
   if (!confirm('この記録を削除しますか？')) return;
   try {
@@ -8337,7 +7843,6 @@ async function deleteRecord(id) {
   }
   showToast('🗑️ 記録を削除しました');
 }
-
 // ==================== CLEAR ====================
 function clearAll() {
   if (!confirm('入力内容をすべてクリアしますか？')) return;
@@ -8359,7 +7864,6 @@ function clearAll() {
   showTab('patient');
   showToast('🔄 クリアしました');
 }
-
 // ==================== PRINT ====================
 function printRecord() {
   updateSummary();
@@ -8381,7 +7885,6 @@ function printRecord() {
         });
   });
 }
-
 // ==================== TOAST ====================
 function showToast(msg) {
   const t = document.getElementById('toast');
@@ -8389,7 +7892,6 @@ function showToast(msg) {
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2500);
 }
-
 // ==================== INIT ====================
 document.getElementById('evalDate').value = new Date().toISOString().split('T')[0];
 initializeApp();
